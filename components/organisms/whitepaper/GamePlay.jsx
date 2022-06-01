@@ -155,8 +155,8 @@ export default function GamePlay() {
               COMING SOON
             </p>
 
-            <div className="relative md:flex justify-between items-center rounded-lg py-6 px-6 mb-6 w-4/5 mx-auto bg-[url(/media/whitepaper/image4.png)] bg-cover">
-              <p className="m-0 text-[0.5rem] sm:text-sm">
+            <div className="relative md:flex justify-between items-center rounded-lg py-6 px-6 mb-6 mx-12 bg-[url(/media/whitepaper/image4.png)] bg-cover">
+              <p className="m-0 text-sm sm:text-base md:text-lg text-center">
                 DOPE CAT AND DOPE REVENANT OWNERS HAVE ACCESS TO IN-GAME UNLOCKS
                 AND EASTER EGGS WHILE PLAYING AS THEIR NFT.
               </p>

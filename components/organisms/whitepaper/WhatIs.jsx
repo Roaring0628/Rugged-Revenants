@@ -47,8 +47,7 @@ export default function WhatIs() {
                   turning your Rugged NFTs into valuable NFTs within thriving
                   communities, building fun projects! When you win the Rugged
                   Revenants, not only do you destroy Rugged NFTs, you revive
-                  their value, just like a Revenant. RUGGED PROJECTS GOT YOU ARE
-                  YOU SITTING ON SOME DOWN? WORTHLESS
+                  their value, just like a Revenant.
                 </p>
               </div>
             </div>
