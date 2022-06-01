@@ -76,7 +76,7 @@ export default function UpgradePotions() {
             <div className="px-6 overflow-x-auto">
               <table className="w-full border border-black text-black text-center text-[0.6rem] md:text-base">
                 <tbody>
-                  <tr className="bg-[url(/media/whitepaper/image32.png)] text-white">
+                  <tr className="bg-[url(/media/whitepaper/image32.png)] bg-cover text-white">
                     <td className="p-3">LAST LEVEL PLAYER REACHED</td>
                     <td className="border-l border-white p-3">
                       PREMIUM NFT EARNED?
