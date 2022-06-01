@@ -18,6 +18,7 @@ module.exports = {
           sky: "#28AAE1",
           blue: "#0070C0",
           grey: "#676767",
+          orange: "#E18426",
         },
       },
       fontFamily: {

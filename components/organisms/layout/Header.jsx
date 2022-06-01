@@ -10,7 +10,7 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="fixed w-full top-0 z-50">
+    <header className="fixed w-full top-0 z-50 bg-black">
       <nav className="flex justify-between items-center py-6 sm:p-6">
         <Link href="/#hero" passHref>
           <a className="block relative w-24 h-14 flex-shrink-0 z-10 ml-4">
@@ -27,7 +27,7 @@ export default function Header() {
             <NavItem link="/#roadmap" text="Roadmap" />
             <NavItem link="/#team" text="Team" />
             <NavItem link="/#FAQ" text="FAQ" />
-            {/* <NavItem link="/whitepaper" text="Whitepaper" /> */}
+            <NavItem link="/whitepaper" text="Whitepaper" />
             <li>
               <a
                 target="_blank"
@@ -101,11 +101,11 @@ export default function Header() {
             />
             <MobileNavItem link="/#team" text="Team" click={setHamburgerOpen} />
             <MobileNavItem link="/#FAQ" text="FAQ" click={setHamburgerOpen} />
-            {/* <MobileNavItem
+            <MobileNavItem
               link="/whitepaper"
               text="Whitepaper"
               click={setHamburgerOpen}
-            /> */}
+            />
             <li className="border-b border-white border-opacity-10">
               <a
                 target="_blank"
