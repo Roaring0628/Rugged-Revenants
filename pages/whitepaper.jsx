@@ -6,6 +6,7 @@ import Introduction from "components/organisms/whitepaper/Introduction";
 import WhatIs from "components/organisms/whitepaper/WhatIs";
 import GamePlay from "components/organisms/whitepaper/GamePlay";
 import FreeToPlay from "components/organisms/whitepaper/FreeToPlay";
+import PlayYourWay from "components/organisms/whitepaper/PlayYourWay";
 
 export default function Home() {
   return (
@@ -15,6 +16,7 @@ export default function Home() {
       <WhatIs />
       <GamePlay />
       <FreeToPlay />
+      <PlayYourWay />
     </main>
   );
 }
