@@ -22,6 +22,7 @@ module.exports = {
         },
       },
       fontFamily: {
+        arial: ["Arial", "sans-serif"],
         pressstart2p: ["PressStart2P", "Arial", "sans-serif"],
         vcrosd: ["VCROSD", "Arial", "sans-serif"],
         opensans: ["OpenSans", "Arial", "sans-serif"],
