@@ -9,6 +9,7 @@ module.exports = {
       colors: {
         brand: {
           DEFAULT: "#FFFFFF",
+          purple: "#A008C8",
           green: "#17C927",
           turquoise: "#67CEE1",
           lavender: "#CD33FC",
@@ -16,6 +17,7 @@ module.exports = {
           darkBlue: "#5865F2",
           sky: "#28AAE1",
           blue: "#0070C0",
+          grey: "#676767",
         },
       },
       fontFamily: {

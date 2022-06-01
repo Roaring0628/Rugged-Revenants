@@ -152,9 +152,9 @@ body {
   color: #ffffff;
   line-height: 20px;
 
-  font-size: 14px;
+  font-size: 12px;
   @media (min-width: 1024px) {
-    font-size: 16px;
+    font-size: 14px;
   }
 }
 
@@ -189,5 +189,148 @@ a {
   }
   @media (min-width: 1200px) {
     width: 1170px;
+  }
+}
+
+.game-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.demo-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  width: 1250px;
+  height: 850px;
+  /* transform: scale(0.74) translateY(-13%); */
+  transform: scale(0.86) translateY(-7%);
+}
+.demo-wrapper .tv-screen {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+.demo-wrapper iframe {
+  transform: none;
+  margin: 10px;
+  z-index: 0;
+}
+.game-wrapper .quit-wrapper {
+  /* position: absolute;
+	bottom: 4%; */
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 0;
+  margin-top: -40px;
+  z-index: 1;
+  margin-bottom: 30px;
+}
+
+.videoHeader {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+
+  max-width: 1040px;
+  margin: 0 auto;
+  display: block;
+}
+.videoHeader .tv-screen {
+  position: relative;
+  width: 100%;
+  z-index: 1;
+}
+.videoHeader .video {
+  position: absolute;
+  top: 51%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 97%;
+  z-index: 0;
+}
+
+.roadmap-text h1 {
+  align-self: start;
+  text-align: left;
+  color: #ffffff;
+}
+.roadmap-text p {
+  align-self: start;
+  text-align: left;
+  font-family: "Press Start 2P", cursive;
+  color: #ffffff;
+  font-size: 11px;
+}
+.roadmap-text ul {
+  align-self: start;
+  font-size: 11px;
+  list-style-position: outside;
+  margin-left: 12px;
+  list-style: disc;
+}
+.roadmap-text li {
+  margin-top: 5px;
+}
+.roadmap-text li.elipsis {
+  margin-top: 7px;
+  list-style: none;
+}
+@media (max-width: 767px) {
+  .roadmap-text {
+    align-self: center;
+    margin-bottom: 80px;
+  }
+  .roadmap-text h1 {
+    align-self: center;
+    text-align: center;
+  }
+  .roadmap-text p {
+    align-self: center;
+    text-align: center;
+  }
+  .roadmap-text ul {
+    align-self: center;
+    min-width: 240px;
+  }
+}
+
+.roadmap-content {
+  font-size: 18px;
+  list-style-position: outside;
+  margin-left: 18px;
+  list-style: disc;
+}
+.roadmap-content ul {
+  font-size: 18px;
+  list-style-position: outside;
+  margin-left: 60px;
+  list-style: circle;
+}
+.roadmap-content li {
+  margin-top: 7px;
+}
+
+@media (max-width: 767px) {
+  .roadmap-content {
+    font-size: 14px;
+    list-style-position: outside;
+    margin-left: 14px;
+  }
+  .roadmap-content ul {
+    font-size: 14px;
+    list-style-position: outside;
+    margin-left: 20px;
+  }
+  .roadmap-content li {
+    margin-top: 5px;
   }
 }

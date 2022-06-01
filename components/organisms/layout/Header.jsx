@@ -11,9 +11,9 @@ export default function Header() {
 
   return (
     <header className="fixed w-full top-0 z-50">
-      <nav className="container flex justify-between items-center py-4 sm:p-4">
-        <Link href="/" passHref>
-          <a className="block relative w-24 h-14 flex-shrink-0 z-10">
+      <nav className="flex justify-between items-center py-6 sm:p-6">
+        <Link href="/#hero" passHref>
+          <a className="block relative w-24 h-14 flex-shrink-0 z-10 ml-4">
             <NextImage
               src="/media/rrLogo.png"
               layout="fill"
@@ -86,7 +86,7 @@ export default function Header() {
         <div
           className={`${
             hamburgerOpen ? "h-full opacity-100" : "h-0 opacity-0"
-          } transition-all duration-500 fixed top-0 w-full overflow-hidden bg-black bg-opacity-70 pt-[100px] px-8 mx-[-15px] md:hidden`}
+          } transition-all duration-500 fixed top-0 w-full overflow-hidden bg-black pt-[100px] px-8 md:hidden`}
         >
           <ul className="flex flex-col cursor-pointer">
             <MobileNavItem
