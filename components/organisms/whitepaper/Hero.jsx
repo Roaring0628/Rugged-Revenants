@@ -23,7 +23,7 @@ export default function Hero() {
               <h1 className="text-center text-3xl md:text-4xl uppercase mb-4">
                 WHITEPAPER
               </h1>
-              <p className="text-lg text-center">MAY 20, 2022</p>
+              <p className="text-lg text-center">June 2, 2022</p>
             </div>
           </div>
         </div>
