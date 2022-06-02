@@ -8,6 +8,7 @@ import GamePlay from "components/organisms/whitepaper/GamePlay";
 import FreeToPlay from "components/organisms/whitepaper/FreeToPlay";
 import PlayYourWay from "components/organisms/whitepaper/PlayYourWay";
 // import RugsToRiches from "components/organisms/whitepaper/RugsToRiches";
+import LootBox from "components/organisms/whitepaper/LootBox";
 import GenesisCollection from "components/organisms/whitepaper/GenesisCollection";
 import RuggedRevenants from "components/organisms/whitepaper/RuggedRevenants";
 import PartnerRevenantsNFT from "components/organisms/whitepaper/PartnerRevenantsNFT";
@@ -34,6 +35,7 @@ export default function Home() {
       <FreeToPlay />
       <PlayYourWay />
       {/* <RugsToRiches /> */}
+      <LootBox />
       <GenesisCollection />
       <RuggedRevenants />
       <PartnerRevenantsNFT />
