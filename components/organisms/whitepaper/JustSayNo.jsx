@@ -6,7 +6,7 @@ import NextImage from "next/image";
 export default function JustSayNo() {
   return (
     <>
-      <section id="whitepaper-stakingstatupgrades" className="pt-20">
+      <section id="whitepaper-justsayno" className="pt-20">
         <div className="container">
           <div className="bg-white">
             <div className="sm:flex">

@@ -8,6 +8,8 @@ import GamePlay from "components/organisms/whitepaper/GamePlay";
 import FreeToPlay from "components/organisms/whitepaper/FreeToPlay";
 import PlayYourWay from "components/organisms/whitepaper/PlayYourWay";
 // import RugsToRiches from "components/organisms/whitepaper/RugsToRiches";
+import RuggedRevenantsNFT from "components/organisms/whitepaper/RuggedRevenantsNFT";
+import Rug from "components/organisms/whitepaper/Rug";
 import JustSayNo from "components/organisms/whitepaper/JustSayNo";
 import UpgradeRuggedRevenant from "components/organisms/whitepaper/UpgradeRuggedRevenant";
 import StakingSkillUpgrades from "components/organisms/whitepaper/StakingSkillUpgrades";
@@ -29,6 +31,8 @@ export default function Home() {
       <FreeToPlay />
       <PlayYourWay />
       {/* <RugsToRiches /> */}
+      <RuggedRevenantsNFT />
+      <Rug />
       <JustSayNo />
       <UpgradeRuggedRevenant />
       <StakingSkillUpgrades />
