@@ -7,7 +7,7 @@ import WhatIs from "components/organisms/whitepaper/WhatIs";
 import GamePlay from "components/organisms/whitepaper/GamePlay";
 import FreeToPlay from "components/organisms/whitepaper/FreeToPlay";
 import PlayYourWay from "components/organisms/whitepaper/PlayYourWay";
-// import RugsToRiches from "components/organisms/whitepaper/RugsToRiches";
+import RugsToRiches from "components/organisms/whitepaper/RugsToRiches";
 import GenesisNFTCharges from "components/organisms/whitepaper/GenesisNFTCharges";
 import LootBox from "components/organisms/whitepaper/LootBox";
 import GenesisCollection from "components/organisms/whitepaper/GenesisCollection";
@@ -35,7 +35,7 @@ export default function Home() {
       <GamePlay />
       <FreeToPlay />
       <PlayYourWay />
-      {/* <RugsToRiches /> */}
+      <RugsToRiches />
       <GenesisNFTCharges />
       <LootBox />
       <GenesisCollection />

@@ -20,109 +20,74 @@ export default function RugsToRiches() {
               </h1>
             </div>
 
-            <div className="w-full pb-12 px-6">
-              <h2 className="text-xl md:text-2xl text-black mb-4 text-center">
-                SOVANA METAVERSE OR WEB2
-              </h2>
-              <div className="md:flex">
-                <div className="md:w-[55%]">
-                  <img
-                    src="/media/whitepaper/image33.png"
-                    alt="play your way"
-                    className="w-4/5 mx-auto"
-                  />
-                </div>
-                <div className="md:w-[45%]">
-                  <p className="text-sm sm:text-lg md:text-xl text-black py-8">
-                    Rugged Revenants players can access the game from our
-                    website, or from within the Revenants Arcade within the
-                    Sovana metaverse.
-                  </p>
-                  <img
-                    src="/media/whitepaper/image34.jpeg"
-                    alt="play your way"
-                    className="w-3/5 mx-auto"
-                  />
-                </div>
+            <p className="px-6 text-sm sm:text-lg md:text-xl text-black mb-8">
+              Core to the gameplay of Rugged Revenants is the ability to acquire
+              valuable NFTs from Loot Coffins after completing the final level
+              of the game. Players can only acquire Loot Coffins if they use a
+              “charge” from a Genesis NFT before playing.
+            </p>
+
+            <div className="relative h-3 bg-[url(/media/whitepaper/image32.png)] bg-cover"></div>
+
+            <div className="flex flex-col md:flex-row items-center justify-center pt-8">
+              <img
+                src="/media/whitepaper/img6.jpg"
+                alt="potion"
+                className="w-3/5 md:w-1/5 mx-6 mb-6"
+              />
+              <div className="">
+                <p className="px-6 text-base sm:text-xl md:text-2xl text-brand-orange mb-4">
+                  HOW DO I GET LOOT COFFINS?
+                </p>
+                <p className="px-6 text-sm sm:text-lg md:text-xl text-black mb-8">
+                  Win Rugged Revenants after using 1/3 Charges from a Genesis
+                  NFT
+                </p>
+                <p className="px-6 text-base sm:text-xl md:text-2xl text-brand-orange mb-4">
+                  HOW DO I GET A GENESIS NFT?
+                </p>
+                <p className="px-6 text-sm sm:text-lg md:text-xl text-black mb-8">
+                  Burn a Rugged NFT without a Genesis NFT in your wallet, or
+                  beat level 1 of Rugged Revenants with no Genesis NFT in your
+                  wallet
+                </p>
+                <p className="px-6 text-base sm:text-xl md:text-2xl text-brand-orange mb-4">
+                  HOW DO I USE A CHARGE FROM A GENESIS NFT?
+                </p>
+                <p className="px-6 text-sm sm:text-lg md:text-xl text-black">
+                  You will be prompted to use a charge to activate the Loot
+                  Coffin before a game starts
+                </p>
               </div>
             </div>
 
-            <div className="relative md:flex justify-between items-center py-6 px-6 mb-6 bg-[url(/media/whitepaper/image32.png)] bg-cover">
-              <p className="m-0 text-sm sm:text-lg md:text-xl text-center">
-                To access Sovana, visit{" "}
-                <a
-                  href="https://www.sovana.world/"
-                  rel="noreferrer"
-                  target="_blank"
-                  className="underline"
-                >
-                  https://www.sovana.world
-                </a>{" "}
-                and click “Play Demo In Browser”. Once you’re in Sovana look for
-                the Revenants Arcade, head inside, load into the game and start
-                playing.
+            <div className="pt-8">
+              <p className="px-6 text-base sm:text-xl md:text-2xl text-brand-orange mb-4">
+                HOW DO I GET MORE CHARGES?
+              </p>
+              <p className="px-6 text-sm sm:text-lg md:text-xl text-black mb-8">
+                Beat levels or burn Rugged NFTs, both of which will apply 1
+                charge to your Genesis NFT
+              </p>
+              <p className="px-6 text-base sm:text-xl md:text-2xl text-brand-orange mb-4">
+                HOW MANY CHARGES CAN A GENESIS NFT HOLD?
+              </p>
+              <p className="px-6 text-sm sm:text-lg md:text-xl text-black mb-8">
+                Each genesis NFT can hold 3 charges
               </p>
             </div>
 
-            <img
-              src="/media/whitepaper/img2.jpg"
-              alt="play your way"
-              className="w-4/5 mx-auto mb-4"
-            />
-
-            <p className="text-sm sm:text-lg md:text-xl text-black px-6 mb-8">
-              Rugged Revenants is launching as a single-player experience,
-              however, multiplayer will debut in Summer 2022. Players will team
-              up with their fellow revenants as friends or foes to defeat levels
-              of ruggers mobbing their way into wallets! We’ve developed a
-              unique matchmaking service, powered by Discord.
-            </p>
-
-            <div className="relative py-8 px-6 bg-[url(/media/whitepaper/image32.png)] bg-cover">
-              <p className="m-0 text-base sm:text-lg md:text-xl text-center">
-                Here’s a quick user flow describing how it works:
-              </p>
-            </div>
-
-            <img
-              src="/media/whitepaper/img3.jpg"
-              alt="play your way"
-              className="w-full mb-4"
-            />
-            <img
-              src="/media/whitepaper/img4.jpg"
-              alt="play your way"
-              className="w-full mb-4"
-            />
-
-            <div className="relative py-8 px-6 mb-6 bg-[url(/media/whitepaper/image32.png)] bg-cover">
-              <p className="m-0 text-lg sm:text-3xl md:text-4xl text-center">
-                ONGOING DEVELOPMENT
-              </p>
-            </div>
-
-            <p className="px-6 text-sm sm:text-lg md:text-xl text-black mb-4">
-              Every month our game development partners at the Dev House Agency
-              in Dallas will add new content in the form of new levels, enemies,
-              and playable NFTs from new Dope Revenant partner collections
-              (NFTs).
-            </p>
-
-            <img
-              src="/media/whitepaper/image71.png"
-              alt="play your way"
-              className="w-4/5 md:w-3/5 mb-4 mx-auto"
-            />
-
-            <div className="flex justify-center">
-              <a
-                href="https://www.thedevhouseagency.com/"
-                rel="noreferrer"
-                target="_blank"
-                className="text-black"
-              >
-                www.thedevhouseagency.com
-              </a>
+            <div className="flex justify-evenly pt-4">
+              <img
+                src="/media/whitepaper/image75.png"
+                className="w-1/4"
+                alt=""
+              />
+              <img
+                src="/media/whitepaper/image108.png"
+                className="w-1/4"
+                alt=""
+              />
             </div>
           </div>
         </div>
