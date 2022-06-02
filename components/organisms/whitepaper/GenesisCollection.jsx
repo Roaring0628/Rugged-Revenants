@@ -65,10 +65,10 @@ export default function GenesisCollection() {
               </div>
               <div className="md:flex items-center py-6 border-b-4 border-white">
                 <div className="w-full md:w-2/5 px-4 mb-3 md:mb-0">
-                  <p className="font-bold text-sm sm:text-base md:text-lg text-white mb-4">
+                  <p className="font-bold text-sm sm:text-base md:text-lg text-white mb-4 text-center md:text-left">
                     IN-GAME POWERUPS
                   </p>
-                  <div className="flex">
+                  <div className="flex justify-center md:justify-start">
                     <img
                       src="/media/whitepaper/img9.png"
                       className="w-1/3 mr-6"
@@ -91,10 +91,10 @@ export default function GenesisCollection() {
               </div>
               <div className="md:flex items-center py-6 border-b-4 border-white">
                 <div className="w-full md:w-2/5 px-4 mb-3 md:mb-0">
-                  <p className="font-bold text-sm sm:text-base md:text-lg text-white mb-4">
+                  <p className="font-bold text-sm sm:text-base md:text-lg text-white mb-4 text-center md:text-left">
                     STAKING REQUIREMENT
                   </p>
-                  <div className="flex">
+                  <div className="flex justify-center md:justify-start">
                     <img
                       src="/media/whitepaper/img27.png"
                       className="w-3/4"
