@@ -19,7 +19,7 @@ const Partnerships = () => {
                 src="/media/partners/Cyber_Samurai.png"
                 alt="Cyber Samurai"
                 loading="lazy"
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain invert"
               />
             </div>
             <div className="px-2 flex flex-col justify-center items-center">
