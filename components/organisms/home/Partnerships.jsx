@@ -14,12 +14,18 @@ const Partnerships = () => {
         </div>
         <div className="flex flex-wrap justify-evenly">
           <div className="w-full md:w-[32%] flex flex-col items-center mb-12">
-            <div className="w-3/5 h-40 mb-8 pb-4 border-b-4 border-brand-purple">
+            <div className="w-[70%] h-40 mb-8 pb-4 border-b-4 border-brand-purple flex justify-between items-center">
               <img
-                src="/media/partners/Sovana-Logo.png"
+                src="/media/partners/SovaFlashy.gif"
                 alt="Cyber Samurai"
                 loading="lazy"
-                className="w-full h-full object-contain"
+                className="h-full object-contain w-[30%]"
+              />
+              <img
+                src="/media/partners/image55.png"
+                alt="Cyber Samurai"
+                loading="lazy"
+                className="h-full object-contain w-[65%]"
               />
             </div>
             <div className="px-2 flex flex-col justify-center items-center">
