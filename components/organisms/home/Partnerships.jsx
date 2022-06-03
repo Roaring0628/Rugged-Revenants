@@ -63,8 +63,9 @@ const Partnerships = () => {
             </div>
             <div className="px-2 flex flex-col justify-center items-center">
               <p className="text-sm text-center px-4">
-                Dope cat holders will receive in-game benefits and 1 rugged
-                revenant NFT.
+                A collection of 3,333 of the DOPEST Cats on the blockchain! Dope
+                cat holders will receive in-game benefits and 1 rugged revenant
+                NFT.
               </p>
             </div>
           </div>
