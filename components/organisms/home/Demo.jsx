@@ -9,6 +9,7 @@ const Demo = ({ handlePlay }) => {
       "https://v6p9d9t4.ssl.hwcdn.net/html/5932410/RuggedWebGL_TESTING/Build/RuggedWebGL_TESTING.loader.js";
     let script = document.createElement("script");
     script.src = loaderUrl;
+    script.id = "demo-game-script";
     script.onload = () => {
       window
         .createUnityInstance(document.querySelector("#unity-canvas"), {
@@ -40,6 +41,15 @@ const Demo = ({ handlePlay }) => {
     );
   };
 
+  const quitGame = () => {
+    myGameInstance.Quit();
+    const scriptEl = document.querySelector("#demo-game-script");
+    if (scriptEl) scriptEl.remove();
+    setMyGameInstance(null);
+    window.myGameInstance = null;
+    handlePlay();
+  };
+
   useEffect(() => {
     if (myGameInstance) sendMessageToGameInstance();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -63,7 +73,7 @@ const Demo = ({ handlePlay }) => {
       </div>
       <div className="quit-wrapper">
         <div
-          onClick={handlePlay}
+          onClick={quitGame}
           className="w-64 h-24 relative flex justify-center items-center cursor-pointer hover:text-brand-purple"
         >
           <img
