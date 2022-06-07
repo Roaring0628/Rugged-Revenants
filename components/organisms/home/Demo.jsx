@@ -5,8 +5,26 @@ const Demo = ({ handlePlay }) => {
   const [myGameInstance, setMyGameInstance] = useState(null);
 
   useEffect(() => {
+    window.addEventListener(
+      "message",
+      (event) => {
+        if (event.origin !== window.location.origin) return;
+
+        if (
+          event.data &&
+          typeof event.data === "object" &&
+          event.data.key === "unity-message"
+        ) {
+          console.log("========= UNITY MESSAGE =========");
+          console.log(event.data);
+        }
+      },
+      false
+    );
+
+    // For new build of game: Need to update loaderUrl, and download build files and replace them
     let loaderUrl =
-      "https://v6p9d9t4.ssl.hwcdn.net/html/5932410/RuggedWebGL_TESTING/Build/RuggedWebGL_TESTING.loader.js";
+      "https://v6p9d9t4.ssl.hwcdn.net/html/5937995/RuggedWebGL_TESTING/Build/RuggedWebGL_TESTING.loader.js";
     let script = document.createElement("script");
     script.src = loaderUrl;
     script.id = "demo-game-script";
