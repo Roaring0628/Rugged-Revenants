@@ -31,7 +31,7 @@ const Demo = ({ handlePlay }) => {
           frameBorder="0"
           width="960px"
           height="600px"
-          src="https://v6p9d9t4.ssl.hwcdn.net/html/5902926/RuggedWebGL/index.html"
+          src="https://v6p9d9t4.ssl.hwcdn.net/html/5954216/RuggedWebGL_All%20Unlocked/index.html"
           msallowfullscreen="true"
           scrolling="no"
           allowFullScreen={true}
