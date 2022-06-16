@@ -8,12 +8,12 @@ const TeamMembers = () => {
       image: "/media/team/tony.png",
       bio: "Tony Valcarcel is the head of 1KL gamefi division and plans to explode games onto Solana and throughout the metaverse. Formerly Amazon: Twitch Prime, EA, and Nintendo. He has been working in the gaming world for over 15 years. Tony's passion for gaming is immediately evident and ignites hype across web3. Eat, Sleep, Degen.",
     },
-    {
-      name: "Greg Parrish",
-      title: "Technical Product Director at 1Kin Labs",
-      image: "/media/team/greg.png",
-      bio: "Greg Parrish, is the Technical Product Director at 1Kin Labs with over three decades of experience building and leading product development teams through creating complex innovative platforms across a myriad of industries.",
-    },
+    // {
+    //   name: "Greg Parrish",
+    //   title: "Technical Product Director at 1Kin Labs",
+    //   image: "/media/team/greg.png",
+    //   bio: "Greg Parrish, is the Technical Product Director at 1Kin Labs with over three decades of experience building and leading product development teams through creating complex innovative platforms across a myriad of industries.",
+    // },
     {
       name: "Jason Atwood",
       title: "CEO/Co-founder of Drop-In Gaming",
