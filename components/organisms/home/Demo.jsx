@@ -22,6 +22,7 @@ const Demo = ({ handlePlay }) => {
 
           if (event.data.type === "win" && event.data.hasWon) {
             // Handle 5% of the time the users beat level 1
+            console.log("Open Chest");
             openChest();
           }
         }
