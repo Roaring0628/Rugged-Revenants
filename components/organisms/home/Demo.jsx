@@ -1,8 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 import { useEffect, useState } from "react";
+import GameWinner from "./GameWinner";
 
 const Demo = ({ handlePlay }) => {
   const [myGameInstance, setMyGameInstance] = useState(null);
+  const [showChest, setShowChest] = useState(false);
 
   useEffect(() => {
     window.addEventListener(
@@ -17,6 +19,11 @@ const Demo = ({ handlePlay }) => {
         ) {
           console.log("========= UNITY MESSAGE =========");
           console.log(event.data);
+
+          if (event.data.type === "win" && event.data.hasWon) {
+            // Handle 5% of the time the users beat level 1
+            openChest();
+          }
         }
       },
       false
@@ -73,6 +80,14 @@ const Demo = ({ handlePlay }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [myGameInstance]);
 
+  const openChest = () => {
+    setShowChest(true);
+  };
+
+  const closeChest = () => {
+    setShowChest(false);
+  };
+
   return (
     <div className="game-wrapper">
       <div className="demo-wrapper">
@@ -102,6 +117,7 @@ const Demo = ({ handlePlay }) => {
           <span className="text-lg mb-2 z-10">QUIT</span>
         </div>
       </div>
+      {showChest && <GameWinner closeChest={closeChest} />}
     </div>
   );
 };
