@@ -4,7 +4,7 @@ import NextImage from "next/image";
 export default function Footer() {
   return (
     <footer className="container flex justify-center md:justify-between items-center py-4 sm:p-4 !pt-36">
-      <Link href="/#hero" passHref>
+      <Link href="/" passHref>
         <a className="block relative w-24 h-14 flex-shrink-0 z-10">
           <NextImage
             src="/media/rrLogo.png"
