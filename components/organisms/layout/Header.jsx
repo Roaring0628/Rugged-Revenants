@@ -29,6 +29,7 @@ export default function Header() {
     if(publicKey) {
       fetchData()
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [publicKey]);
 
   const fetchData = async () => {
