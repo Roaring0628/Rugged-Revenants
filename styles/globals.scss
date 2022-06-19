@@ -192,6 +192,7 @@ a {
   }
 }
 
+// special sections
 .game-wrapper {
   display: flex;
   flex-direction: column;
@@ -332,5 +333,156 @@ a {
   }
   .roadmap-content li {
     margin-top: 5px;
+  }
+}
+
+// animations
+.fade-in-normal {
+  opacity: 0;
+  animation: fade-in-normal 1s 1 ease-out;
+  animation-fill-mode: forwards;
+}
+
+.fade-out-normal {
+  opacity: 1;
+  animation: fade-out-normal 1s 1 ease-out;
+  animation-fill-mode: forwards;
+}
+
+.fade-in-3s {
+  opacity: 0;
+  animation: fade-in-normal 3s 1 ease-out;
+  animation-fill-mode: forwards;
+}
+
+.fade-out-2s {
+  opacity: 1;
+  animation: fade-out-normal 2s 1 ease-out;
+  animation-fill-mode: forwards;
+}
+
+.fade-in-top-down {
+  opacity: 0;
+  animation: fade-in-top-down 1s 1 ease-out;
+  animation-fill-mode: forwards;
+}
+
+.fade-in-left-right {
+  opacity: 0;
+  animation: fade-in-left-right 1s 1 ease-out;
+  animation-fill-mode: forwards;
+}
+
+.scale-h-up {
+  animation: scale-h-up 1s 1 ease-out;
+  animation-fill-mode: forwards;
+}
+
+.scale-w-up {
+  animation: scale-w-up 1s 1 ease-out;
+  animation-fill-mode: forwards;
+}
+
+@keyframes fade-in-normal {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out-normal {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-in-top-down {
+  0% {
+    opacity: 0;
+    transform: translate(0, -20%);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes fade-in-left-right {
+  0% {
+    opacity: 0;
+    transform: translate(-10%, 0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes scale-w-up {
+  0% {
+    width: 0;
+  }
+
+  100% {
+    width: 100%;
+  }
+}
+
+@keyframes scale-h-up {
+  0% {
+    height: 0;
+  }
+
+  100% {
+    height: 100%;
+  }
+}
+
+.rabbit-spin {
+  animation: spin 6s infinite linear;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg) scale(1);
+  }
+  10% {
+    transform: rotate(180deg) scale(0.95);
+  }
+  20% {
+    transform: rotate(360deg) scale(0.9);
+  }
+  30% {
+    transform: rotate(540deg) scale(0.85);
+  }
+  40% {
+    transform: rotate(720deg) scale(0.8);
+  }
+  50% {
+    transform: rotate(900deg) scale(0.75);
+  }
+  60% {
+    transform: rotate(1080deg) scale(0.7);
+  }
+  70% {
+    transform: rotate(1260deg) scale(0.65);
+  }
+  80% {
+    transform: rotate(1440deg) scale(0.6);
+  }
+  90% {
+    transform: rotate(1620deg) scale(0.55);
+  }
+  to {
+    transform: rotate(1800deg) scale(0.5);
   }
 }
