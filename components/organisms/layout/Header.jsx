@@ -1,13 +1,76 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import NextImage from "next/image";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import * as anchor from "@project-serum/anchor";
+
+import {
+  TOKEN_PROGRAM_ID,
+  AccountLayout,
+  Token,
+} from "@solana/spl-token";
+import * as metadata from "@metaplex-foundation/mpl-token-metadata";
+import {PublicKey, sendAndConfirmTransaction} from "@solana/web3.js";
 
 export default function Header() {
-  const [hamburgerOpen, setHamburgerOpen] = useState(false);
+  const { connection } = useConnection();
+  const { publicKey, connected } = useWallet();
+  const [tokens, setTokens] = useState([])
 
+  const [hamburgerOpen, setHamburgerOpen] = useState(false);
+  const wallet = useWallet();
+  const provider = new anchor.AnchorProvider(connection, wallet);
   useEffect(() => {
     setHamburgerOpen(false);
   }, []);
+
+  useEffect(() => {
+    if(publicKey) {
+      fetchData()
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [publicKey]);
+
+  const fetchData = async () => {
+    const tokenAccounts = await connection.getTokenAccountsByOwner(
+      provider.wallet.publicKey,
+      {
+        programId: TOKEN_PROGRAM_ID,
+      }
+    );
+    let tokens = []
+    let tokenAddresses = []
+    tokenAccounts.value.forEach((e) => {
+      const accountInfo = AccountLayout.decode(e.account.data);
+      if(accountInfo.amount > 0) {
+        let pubKey = `${new PublicKey(accountInfo.mint)}`
+        
+        tokenAddresses.push(pubKey)
+      }
+    })
+
+    console.log('tokenAddresses', tokenAddresses)
+    for(let address of tokenAddresses) {
+      let tokenmetaPubkey = await metadata.Metadata.getPDA(address);
+
+      const tokenmeta = await metadata.Metadata.load(connection, tokenmetaPubkey);
+      if(tokenmeta.data.data.name == "Genesis Nft") {
+        const meta = await axios.get(tokenmeta.data.data.uri)
+        tokens.push({...tokenmeta.data, meta:meta.data})
+      } else 
+        tokens.push(tokenmeta.data)
+    }
+    
+    console.log('tokens', tokens)
+    const hasDopeCat = tokens.filter(o=>o.data.symbol == 'DOPECATS').length > 0
+    setTokens(tokens)
+
+    let ret = { hasDopeCat, hasPixelBand:false, hasHippo:false}
+    console.log("result", ret)
+  }
+
+  console.log('publicKey, connected', publicKey, connected)
 
   return (
     <header className="fixed w-full top-0 z-50 bg-black">
@@ -59,6 +122,9 @@ export default function Header() {
                   <path d="M33.567 7.554a32.283 32.283 0 00-7.969-2.472.12.12 0 00-.128.06c-.344.613-.725 1.411-.992 2.039a29.804 29.804 0 00-8.95 0 20.625 20.625 0 00-1.008-2.038.126.126 0 00-.128-.06 32.194 32.194 0 00-7.968 2.47.114.114 0 00-.053.046C1.296 15.18-.095 22.577.588 29.88c.003.036.023.07.05.092 3.349 2.459 6.593 3.952 9.776 4.941a.127.127 0 00.137-.045 23.203 23.203 0 002-3.253.124.124 0 00-.068-.172A21.379 21.379 0 019.43 29.99a.126.126 0 01-.012-.209c.205-.153.41-.313.607-.475a.121.121 0 01.126-.017c6.407 2.925 13.343 2.925 19.675 0a.12.12 0 01.128.015c.196.162.4.324.608.477a.126.126 0 01-.011.209c-.975.57-1.99 1.051-3.055 1.454a.125.125 0 00-.067.173 26.052 26.052 0 001.998 3.252c.031.043.087.062.138.046 3.199-.99 6.442-2.482 9.79-4.941a.126.126 0 00.052-.09c.816-8.445-1.368-15.78-5.789-22.283a.1.1 0 00-.05-.046zm-20.06 17.88c-1.928 0-3.517-1.771-3.517-3.946 0-2.175 1.558-3.946 3.518-3.946 1.975 0 3.549 1.787 3.518 3.946 0 2.175-1.558 3.946-3.518 3.946zm13.01 0c-1.93 0-3.52-1.771-3.52-3.946 0-2.175 1.56-3.946 3.52-3.946 1.974 0 3.548 1.787 3.517 3.946 0 2.175-1.543 3.946-3.518 3.946z"></path>
                 </svg>
               </a>
+            </li>
+            <li>
+            <WalletMultiButton/>
             </li>
           </ul>
         </div>

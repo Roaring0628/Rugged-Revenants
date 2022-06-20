@@ -3,6 +3,8 @@ import { useRouter } from "next/router";
 import Header from "components/organisms/layout/Header";
 import Footer from "components/organisms/layout/Footer";
 import MetaTags from "components/organisms/layout/MetaTags";
+import WalletContextProvider from "../contexts/WalletContextProvider";
+import "@solana/wallet-adapter-react-ui/styles.css";
 
 import "styles/globals.scss";
 
@@ -22,10 +24,12 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <>
-      <MetaTags />
-      <Header />
-      <Component {...pageProps} />
-      {!hideFooter && <Footer />}
+      <WalletContextProvider>
+        <MetaTags />
+        <Header />
+        <Component {...pageProps} />
+        {!hideFooter && <Footer />}
+      </WalletContextProvider>
     </>
   );
 }
