@@ -75,7 +75,7 @@ export default function Header() {
   return (
     <header className="fixed w-full top-0 z-50 bg-black">
       <nav className="flex justify-between items-center py-6 sm:p-6">
-        <Link href="/#hero" passHref>
+        <Link href="/" passHref>
           <a className="block relative w-24 h-14 flex-shrink-0 z-10 ml-4">
             <NextImage
               src="/media/rrLogo.png"
