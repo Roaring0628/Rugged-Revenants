@@ -36,7 +36,7 @@ export default function Home() {
         <div className="absolute w-56 top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] z-10">
           <div className="w-full relative">
             <img
-              src="/media/charge-success/Pixelband_incubator_animation.gif"
+              src="/media/charge-success/rugged-revenants_incubator.gif"
               alt="charge animation"
               className="w-full relative z-10"
             />
