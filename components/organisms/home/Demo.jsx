@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import GameWinner from "./GameWinner";
 
-const Demo = ({ handlePlay }) => {
+const Demo = ({ handlePlay, beatFirstLevel, hasGenesis }) => {
   const [myGameInstance, setMyGameInstance] = useState(null);
   const [showChest, setShowChest] = useState(false);
 
@@ -117,7 +117,7 @@ const Demo = ({ handlePlay }) => {
           <span className="text-lg mb-2 z-10">QUIT</span>
         </div>
       </div>
-      {showChest && <GameWinner closeChest={closeChest} />}
+      {showChest && <GameWinner closeChest={closeChest} beatFirstLevel={beatFirstLevel} />}
     </div>
   );
 };
