@@ -5,15 +5,16 @@ const CHEST_COMMON_ANIMATION_DURATION = 3500;
 
 const GameWinner = ({ closeChest, beatFirstLevel, hasGenesis }) => {
   const [inProgress, setInProgress] = useState(false);
+  const [acceptingGenesisNFT, setAcceptingGenesisNFT] = useState(false);
   const [showWon, setShowWon] = useState(false);
   const [showChestAnimation, setShowChestAnimation] = useState(false);
 
   const openWon = async () => {
-    if(!inProgress) {
-      setInProgress(true)
+    if (!inProgress) {
+      setInProgress(true);
 
       setShowChestAnimation(true);
-      if(!hasGenesis) {
+      if (!hasGenesis) {
         setTimeout(() => {
           setShowWon(true);
         }, CHEST_COMMON_ANIMATION_DURATION);
@@ -26,8 +27,12 @@ const GameWinner = ({ closeChest, beatFirstLevel, hasGenesis }) => {
 
   const acceptGenesisNFT = async () => {
     // Need to add logic to accept Genesis NFT
-    await beatFirstLevel();
-    closeChest();
+    if (!acceptingGenesisNFT) {
+      setAcceptingGenesisNFT(true);
+      
+      await beatFirstLevel();
+      closeChest();
+    }
   };
 
   return (
