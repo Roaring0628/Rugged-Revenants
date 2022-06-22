@@ -226,7 +226,7 @@ export default function Hero({ play, setPlay }) {
 
     if (uploadedMetatdataUrl == null) return;
     console.log("Uploaded meta data url: ", uploadedMetatdataUrl);
-    await mint(connection, wallet, GENESIS_NFT_NAME, NFT_SYMBOL, uploadedMetatdataUrl, GENESIS_NFT_PROGRAM_ID, GenesisNftIdl, burnInstruction);
+    await mint(connection, wallet, GENESIS_NFT_NAME, "$RRR", uploadedMetatdataUrl, GENESIS_NFT_PROGRAM_ID, GenesisNftIdl, burnInstruction);
   }
 
   const beatFirstLevel = async()=>{
