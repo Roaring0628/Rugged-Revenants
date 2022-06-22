@@ -78,8 +78,8 @@ export default function Hero({ play, setPlay }) {
   const provider = new anchor.AnchorProvider(connection, wallet);
   const hasDopeCat = tokens.filter(o=>o.data.symbol == 'DOPECATS').length > 0
   const hasGenesis = tokens.filter(o=>o.data.name == 'Genesis Nft').length > 0
-  const hasPixelBand = tokens.filter(o=>o.data.symbol == 'PXLB').length > 0
-  const hasHippo = tokens.filter(o=>o.data.name.startsWith("HRHC #")).length > 0
+  const hasPixelBand = tokens.filter(o=>o.data.symbol == 'PXLB'||o.data.symbol == 'PXBP'||o.data.symbol == 'PXBD').length > 0
+  const hasHippo = tokens.filter(o=>o.data.name.startsWith("HRHC #")||o.data.name.startsWith("HRHC Gen 2 #")).length > 0
   const burnAvailable = !hasGenesis || tokens.filter(o=>o.meta && o.meta.attributes[0].value < 3).length > 0
 
   useEffect(() => {
