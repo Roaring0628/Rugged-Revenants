@@ -89,6 +89,8 @@ export default function Hero({ play, setPlay }) {
   const hasSovana = tokens.filter(o=>o.data.symbol == 'Sovana Egg').length > 0
   const burnAvailable = !hasGenesis || tokens.filter(o=>o.meta && o.meta.attributes[0].value < 3).length > 0
 
+  const tokenOwnershipData = { hasDopeCat, hasPixelBand, hasHippo };
+
   useEffect(() => {
     updateMedia();
     window.addEventListener("resize", updateMedia);
@@ -323,7 +325,7 @@ export default function Hero({ play, setPlay }) {
         {play && (
           <div className="fixed z-50 inset-0 w-full h-full overflow-y-auto bg-black">
             <div className="absolute top-0 left-0 w-full h-full bg-black opacity-80"></div>
-            <Demo handlePlay={handlePlay} beatFirstLevel={beatFirstLevel} hasGenesis={hasGenesis}/>
+            <Demo handlePlay={handlePlay} beatFirstLevel={beatFirstLevel} hasGenesis={hasGenesis} tokenOwnershipData={tokenOwnershipData} />
           </div>
         )}
       </section>
