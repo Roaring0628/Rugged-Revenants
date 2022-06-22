@@ -83,7 +83,8 @@ export default function Hero({ play, setPlay }) {
   const wallet = useWallet();
   const { publicKey, connected } = useWallet();
   const router = useRouter();
-
+  const GENESIS_NFT_NAME = "Revenant Recovery Repository"
+  
   const provider = new anchor.AnchorProvider(connection, wallet);
   const hasDopeCat = tokens.filter(o=>o.data.symbol == 'DOPECATS').length > 0
   const hasGenesis = tokens.filter(o=>o.data.name == GENESIS_NFT_NAME).length > 0
@@ -92,8 +93,8 @@ export default function Hero({ play, setPlay }) {
   const hasSovanaEgg = tokens.filter(o=>o.data.symbol == 'Sovana Egg').length > 0
   const burnAvailable = !hasGenesis || tokens.filter(o=>o.meta && o.meta.attributes[0].value < 3).length > 0
 
+  console.log('hasGenesis', hasGenesis)
   const tokenOwnershipData = { hasDopeCat, hasPixelBand, hasHippo, hasSovanaEgg };
-  const GENESIS_NFT_NAME = "Revenant Recovery Repository"
   useEffect(() => {
     updateMedia();
     window.addEventListener("resize", updateMedia);
