@@ -4,7 +4,7 @@ import classNames from "classnames";
 
 const FAQ = () => {
   return (
-    <section id="FAQ" className="w-full pt-48">
+    <section id="FAQ" className="w-full pt-48 pb-32">
       <div className="container">
         <div className="mb-12">
           <h1 className="text-4xl text-center">FAQs</h1>

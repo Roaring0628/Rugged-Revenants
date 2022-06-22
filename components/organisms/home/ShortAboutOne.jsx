@@ -13,7 +13,7 @@ const ShortAboutOne = ({ play, setPlay }) => {
 
   // conditionally render demo for desktop only
   const updateMedia = () => {
-    setDesktop(window.innerWidth > 1008);
+    setDesktop(window.innerWidth > 1023);
   };
 
   const handlePlay = () => {
