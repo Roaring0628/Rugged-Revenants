@@ -16,7 +16,7 @@ import { notification } from "antd";
 import { useCallback, useMemo } from "react";
 
 const WalletContextProvider = (props) => {
-  const network = WalletAdapterNetwork.Devnet;
+  const network = WalletAdapterNetwork.Mainnet;
   const endpoint = useMemo(() => clusterApiUrl(network), [network]);
 
   const wallets = useMemo(
