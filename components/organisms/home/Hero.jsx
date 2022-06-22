@@ -86,10 +86,10 @@ export default function Hero({ play, setPlay }) {
   const hasGenesis = tokens.filter(o=>o.data.name == GENESIS_NFT_NAME).length > 0
   const hasPixelBand = tokens.filter(o=>o.data.symbol == 'PXLB'||o.data.symbol == 'PXBP'||o.data.symbol == 'PXBD').length > 0
   const hasHippo = tokens.filter(o=>o.data.name.startsWith("HRHC #")||o.data.name.startsWith("HRHC Gen 2 #")).length > 0
-  const hasSovana = tokens.filter(o=>o.data.symbol == 'Sovana Egg').length > 0
+  const hasSovanaEgg = tokens.filter(o=>o.data.symbol == 'Sovana Egg').length > 0
   const burnAvailable = !hasGenesis || tokens.filter(o=>o.meta && o.meta.attributes[0].value < 3).length > 0
 
-  const tokenOwnershipData = { hasDopeCat, hasPixelBand, hasHippo };
+  const tokenOwnershipData = { hasDopeCat, hasPixelBand, hasHippo, hasSovanaEgg };
   const GENESIS_NFT_NAME = "Revenant Recovery Repository"
   useEffect(() => {
     updateMedia();
