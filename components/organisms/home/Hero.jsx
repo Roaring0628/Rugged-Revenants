@@ -83,14 +83,14 @@ export default function Hero({ play, setPlay }) {
 
   const provider = new anchor.AnchorProvider(connection, wallet);
   const hasDopeCat = tokens.filter(o=>o.data.symbol == 'DOPECATS').length > 0
-  const hasGenesis = tokens.filter(o=>o.data.name == 'Genesis Nft').length > 0
+  const hasGenesis = tokens.filter(o=>o.data.name == GENESIS_NFT_NAME).length > 0
   const hasPixelBand = tokens.filter(o=>o.data.symbol == 'PXLB'||o.data.symbol == 'PXBP'||o.data.symbol == 'PXBD').length > 0
   const hasHippo = tokens.filter(o=>o.data.name.startsWith("HRHC #")||o.data.name.startsWith("HRHC Gen 2 #")).length > 0
   const hasSovana = tokens.filter(o=>o.data.symbol == 'Sovana Egg').length > 0
   const burnAvailable = !hasGenesis || tokens.filter(o=>o.meta && o.meta.attributes[0].value < 3).length > 0
 
   const tokenOwnershipData = { hasDopeCat, hasPixelBand, hasHippo };
-
+  const GENESIS_NFT_NAME = "Revenant Recovery Repository"
   useEffect(() => {
     updateMedia();
     window.addEventListener("resize", updateMedia);
@@ -133,7 +133,7 @@ export default function Hero({ play, setPlay }) {
         let tokenmetaPubkey = await metadata.Metadata.getPDA(address);
   
         const tokenmeta = await metadata.Metadata.load(connection, tokenmetaPubkey);
-        if(tokenmeta.data.data.name == "Genesis Nft") {
+        if(tokenmeta.data.data.name == GENESIS_NFT_NAME) {
           const meta = await axios.get(tokenmeta.data.data.uri)
           tokens.push({...tokenmeta.data, meta:meta.data})
         } else 
@@ -205,23 +205,28 @@ export default function Hero({ play, setPlay }) {
   }
 
   const mintGenesis = async (burnInstruction) => {
-    let name = 'Genesis Nft'
     let uploadedMetatdataUrl = await uploadMetadataToIpfs({
-      name: 'Genesis NFT',
-      symbol: NFT_SYMBOL,
-      description: 'Genesis Nft',
+      name: GENESIS_NFT_NAME,
+      symbol: "$RRR",
+      description: 'Rugged revenants are NFTs that holders will use as playable characters within the game. They provide in-game benefits like flight and extra lives based on their attributes.',
       image: GENESIS_IMAGE_URL,
+      external_url: "https://ruggedrevenants.io/",
+      collection:{"name":"Dope Cats"},
       attributes: [
         {
           trait_type: "charges remaining",
           value: 3,
+        },
+        {
+          trait_type: "Collection",
+          value: "Dope Cat Revenants",
         },
       ],
     });
 
     if (uploadedMetatdataUrl == null) return;
     console.log("Uploaded meta data url: ", uploadedMetatdataUrl);
-    await mint(connection, wallet, name, NFT_SYMBOL, uploadedMetatdataUrl, GENESIS_NFT_PROGRAM_ID, GenesisNftIdl, burnInstruction);
+    await mint(connection, wallet, GENESIS_NFT_NAME, NFT_SYMBOL, uploadedMetatdataUrl, GENESIS_NFT_PROGRAM_ID, GenesisNftIdl, burnInstruction);
   }
 
   const beatFirstLevel = async()=>{
@@ -236,7 +241,7 @@ export default function Hero({ play, setPlay }) {
       await fetchData()        
     } else {
       const token = tokens.find((t)=>{
-        return t.data.name == 'Genesis Nft' && t.meta.attributes[0].value < MAX_CHARGE_COUNT
+        return t.data.name == GENESIS_NFT_NAME && t.meta.attributes[0].value < MAX_CHARGE_COUNT
       })
 
       if(token) {
