@@ -1,0 +1,154 @@
+{
+  "version": "0.1.0",
+  "name": "rug_game",
+  "instructions": [
+    {
+      "name": "create",
+      "accounts": [
+        {
+          "name": "ruggedAccount",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "authority",
+          "type": "publicKey"
+        }
+      ]
+    },
+    {
+      "name": "charge",
+      "accounts": [
+        {
+          "name": "ruggedAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "decharge",
+      "accounts": [
+        {
+          "name": "ruggedAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "stake",
+      "accounts": [
+        {
+          "name": "ruggedAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "tokenAccount",
+          "type": "publicKey"
+        }
+      ]
+    },
+    {
+      "name": "unstake",
+      "accounts": [
+        {
+          "name": "ruggedAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "RuggedAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "charged",
+            "type": "bool"
+          },
+          {
+            "name": "tokenAccount",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "staked",
+            "type": "bool"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "MintFailed",
+      "msg": "Mint failed!"
+    },
+    {
+      "code": 6001,
+      "name": "MetadataCreateFailed",
+      "msg": "Metadata account create failed!"
+    },
+    {
+      "code": 6002,
+      "name": "SetAuthorityFailed",
+      "msg": "Staking set authority failed!"
+    },
+    {
+      "code": 6003,
+      "name": "TransferFailed",
+      "msg": "Staking transfer failed!"
+    }
+  ],
+  "metadata": {
+    "address": "66mXdV36Y1tGsBng2r51m2imAW2DdH8daqynigafBsvb"
+  }
+}

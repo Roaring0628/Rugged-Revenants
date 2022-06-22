@@ -2,75 +2,9 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import NextImage from "next/image";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import * as anchor from "@project-serum/anchor";
-
-import {
-  TOKEN_PROGRAM_ID,
-  AccountLayout,
-  Token,
-} from "@solana/spl-token";
-import * as metadata from "@metaplex-foundation/mpl-token-metadata";
-import {PublicKey, sendAndConfirmTransaction} from "@solana/web3.js";
 
 export default function Header() {
-  const { connection } = useConnection();
-  const { publicKey, connected } = useWallet();
-  const [tokens, setTokens] = useState([])
-
   const [hamburgerOpen, setHamburgerOpen] = useState(false);
-  const wallet = useWallet();
-  const provider = new anchor.AnchorProvider(connection, wallet);
-  useEffect(() => {
-    setHamburgerOpen(false);
-  }, []);
-
-  useEffect(() => {
-    if(publicKey) {
-      fetchData()
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [publicKey]);
-
-  const fetchData = async () => {
-    const tokenAccounts = await connection.getTokenAccountsByOwner(
-      provider.wallet.publicKey,
-      {
-        programId: TOKEN_PROGRAM_ID,
-      }
-    );
-    let tokens = []
-    let tokenAddresses = []
-    tokenAccounts.value.forEach((e) => {
-      const accountInfo = AccountLayout.decode(e.account.data);
-      if(accountInfo.amount > 0) {
-        let pubKey = `${new PublicKey(accountInfo.mint)}`
-        
-        tokenAddresses.push(pubKey)
-      }
-    })
-
-    console.log('tokenAddresses', tokenAddresses)
-    for(let address of tokenAddresses) {
-      let tokenmetaPubkey = await metadata.Metadata.getPDA(address);
-
-      const tokenmeta = await metadata.Metadata.load(connection, tokenmetaPubkey);
-      if(tokenmeta.data.data.name == "Genesis Nft") {
-        const meta = await axios.get(tokenmeta.data.data.uri)
-        tokens.push({...tokenmeta.data, meta:meta.data})
-      } else 
-        tokens.push(tokenmeta.data)
-    }
-    
-    console.log('tokens', tokens)
-    const hasDopeCat = tokens.filter(o=>o.data.symbol == 'DOPECATS').length > 0
-    setTokens(tokens)
-
-    let ret = { hasDopeCat, hasPixelBand:false, hasHippo:false}
-    console.log("result", ret)
-  }
-
-  console.log('publicKey, connected', publicKey, connected)
 
   return (
     <header className="fixed w-full top-0 z-50 bg-black">
