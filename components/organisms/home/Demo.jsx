@@ -41,16 +41,16 @@ const Demo = ({
 
     // For new build of game: Need to update loaderUrl, and download build files and replace them
     let loaderUrl =
-      "https://v6p9d9t4.ssl.hwcdn.net/html/6018967/RuggedWebGLTesting/Build/RuggedWebGLTesting.loader.js";
+      "https://v6p9d9t4.ssl.hwcdn.net/html/6019535/RuggedWebGL/Build/RuggedWebGL.loader.js";
     let script = document.createElement("script");
     script.src = loaderUrl;
     script.id = "demo-game-script";
     script.onload = () => {
       window
         .createUnityInstance(document.querySelector("#unity-canvas"), {
-          dataUrl: "/Build/RuggedWebGL_TESTING.data.unityweb",
-          frameworkUrl: "/Build/RuggedWebGL_TESTING.framework.js.unityweb",
-          codeUrl: "/Build/RuggedWebGL_TESTING.wasm.unityweb",
+          dataUrl: "/Build/RuggedWebGL.data.unityweb",
+          frameworkUrl: "/Build/RuggedWebGL.framework.js.unityweb",
+          codeUrl: "/Build/RuggedWebGL.wasm.unityweb",
           streamingAssetsUrl: "StreamingAssets",
           companyName: "DefaultCompany",
           productName: "Dope Cats",
