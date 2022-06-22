@@ -2,7 +2,12 @@
 import { useEffect, useState } from "react";
 import GameWinner from "./GameWinner";
 
-const Demo = ({ handlePlay, beatFirstLevel, hasGenesis, tokenOwnershipData }) => {
+const Demo = ({
+  handlePlay,
+  beatFirstLevel,
+  hasGenesis,
+  tokenOwnershipData,
+}) => {
   const [myGameInstance, setMyGameInstance] = useState(null);
   const [showChest, setShowChest] = useState(false);
 
@@ -20,7 +25,12 @@ const Demo = ({ handlePlay, beatFirstLevel, hasGenesis, tokenOwnershipData }) =>
           console.log("========= UNITY MESSAGE =========");
           console.log(event.data);
 
-          if (event.data.type === "win" && event.data.hasWon) {
+          if (
+            event.data.type === "win" &&
+            event.data.hasWon &&
+            event.data.level &&
+            event.data.level == 1
+          ) {
             // Handle 5% of the time the users beat level 1
             openChest();
           }
@@ -31,7 +41,7 @@ const Demo = ({ handlePlay, beatFirstLevel, hasGenesis, tokenOwnershipData }) =>
 
     // For new build of game: Need to update loaderUrl, and download build files and replace them
     let loaderUrl =
-      "https://v6p9d9t4.ssl.hwcdn.net/html/5937995/RuggedWebGL_TESTING/Build/RuggedWebGL_TESTING.loader.js";
+      "https://v6p9d9t4.ssl.hwcdn.net/html/6018967/RuggedWebGLTesting/Build/RuggedWebGLTesting.loader.js";
     let script = document.createElement("script");
     script.src = loaderUrl;
     script.id = "demo-game-script";
@@ -58,7 +68,7 @@ const Demo = ({ handlePlay, beatFirstLevel, hasGenesis, tokenOwnershipData }) =>
 
   const sendMessageToGameInstance = () => {
     // let testObject = { hasDopeCat: true, hasPixelBand: false };
-    console.log('TOKEN OWNERSHIP DATA: ', tokenOwnershipData);
+    console.log("TOKEN OWNERSHIP DATA: ", tokenOwnershipData);
     let jsonString = JSON.stringify(tokenOwnershipData);
     myGameInstance.SendMessage(
       "JavascriptHook",
@@ -118,7 +128,13 @@ const Demo = ({ handlePlay, beatFirstLevel, hasGenesis, tokenOwnershipData }) =>
           <span className="text-lg mb-2 z-10">QUIT</span>
         </div>
       </div>
-      {showChest && <GameWinner closeChest={closeChest} beatFirstLevel={beatFirstLevel} hasGenesis={hasGenesis} />}
+      {showChest && (
+        <GameWinner
+          closeChest={closeChest}
+          beatFirstLevel={beatFirstLevel}
+          hasGenesis={hasGenesis}
+        />
+      )}
     </div>
   );
 };
