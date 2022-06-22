@@ -30,6 +30,7 @@ import {burn, burnTx} from '../utils/nftburn'
 import api from "../api"
 
 import Demo from "./Demo.jsx";
+import ChargeSuccess from "./ChargeSuccess";
 
 const { SystemProgram } = anchor.web3;
 
@@ -76,6 +77,8 @@ export default function Hero({ play, setPlay }) {
   const [ruggedAccount, setRuggedAccount] = useState()
   const [rugToken, setRugToken] = useState(0)
   const [mainProgram, setMainProgram] = useState()
+
+  const [showChargeSuccess, setShowChargeSuccess] = useState(false);
 
   const wallet = useWallet();
   const { publicKey, connected } = useWallet();
@@ -256,7 +259,8 @@ export default function Hero({ play, setPlay }) {
         await fetchData()
         
         //go to success screen
-        router.push('/charge-success')
+        // router.push('/charge-success')
+        openChargeSuccess();
       }
     }
   }
@@ -270,6 +274,14 @@ export default function Hero({ play, setPlay }) {
     if (play) document.body.style.overflow = "unset";
     else document.body.style.overflow = "hidden";
     setPlay(!play);
+  };
+
+  const openChargeSuccess = () => {
+    setShowChargeSuccess(true);
+  };
+
+  const closeChargeSuccess = () => {
+    setShowChargeSuccess(false);
   };
 
   return (
@@ -333,6 +345,7 @@ export default function Hero({ play, setPlay }) {
             <Demo handlePlay={handlePlay} beatFirstLevel={beatFirstLevel} hasGenesis={hasGenesis} tokenOwnershipData={tokenOwnershipData} />
           </div>
         )}
+        {showChargeSuccess && <ChargeSuccess closeChargeSuccess={closeChargeSuccess} />}
       </section>
     </>
   );
