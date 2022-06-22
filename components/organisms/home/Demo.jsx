@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import GameWinner from "./GameWinner";
 
-const Demo = ({ handlePlay, beatFirstLevel, hasGenesis }) => {
+const Demo = ({ handlePlay, beatFirstLevel, hasGenesis, tokenOwnershipData }) => {
   const [myGameInstance, setMyGameInstance] = useState(null);
   const [showChest, setShowChest] = useState(false);
 
@@ -57,8 +57,9 @@ const Demo = ({ handlePlay, beatFirstLevel, hasGenesis }) => {
   }, []);
 
   const sendMessageToGameInstance = () => {
-    let testObject = { hasDopeCat: true, hasPixelBand: false };
-    let jsonString = JSON.stringify(testObject);
+    // let testObject = { hasDopeCat: true, hasPixelBand: false };
+    console.log('TOKEN OWNERSHIP DATA: ', tokenOwnershipData);
+    let jsonString = JSON.stringify(tokenOwnershipData);
     myGameInstance.SendMessage(
       "JavascriptHook",
       "RecieveWalletJson",
