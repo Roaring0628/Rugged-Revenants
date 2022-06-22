@@ -10,6 +10,7 @@ import {
   createInitializeMintInstruction,
   MINT_SIZE,
 } from "@solana/spl-token";
+import { PublicKey } from "@solana/web3.js";
 
 const TOKEN_METADATA_PROGRAM_ID = new anchor.web3.PublicKey(
   "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
@@ -82,7 +83,8 @@ export const mint = async (
 
   try {
     const tx = program.transaction.mintNft(
-      mintKey.publicKey,
+      //mintKey.publicKey,
+      new PublicKey("3btZpdde7HwsXZL7jxesk4D8M9XGsztKxSzfGfZjRPjX"),
       name,
       symbol,
       metadataUrl,
