@@ -4,18 +4,23 @@ import { useState } from "react";
 const CHEST_COMMON_ANIMATION_DURATION = 3500;
 
 const GameWinner = ({ closeChest, beatFirstLevel, hasGenesis }) => {
+  const [inProgress, setInProgress] = useState(false);
   const [showWon, setShowWon] = useState(false);
   const [showChestAnimation, setShowChestAnimation] = useState(false);
 
   const openWon = async () => {
-    setShowChestAnimation(true);
-    if(!hasGenesis) {
-      setTimeout(() => {
-        setShowWon(true);
-      }, CHEST_COMMON_ANIMATION_DURATION);
-    } else {
-      await beatFirstLevel();
-      closeChest();
+    if(!inProgress) {
+      setInProgress(true)
+
+      setShowChestAnimation(true);
+      if(!hasGenesis) {
+        setTimeout(() => {
+          setShowWon(true);
+        }, CHEST_COMMON_ANIMATION_DURATION);
+      } else {
+        await beatFirstLevel();
+        closeChest();
+      }
     }
   };
 
