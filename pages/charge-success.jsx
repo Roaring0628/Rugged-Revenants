@@ -10,7 +10,7 @@ export default function Home() {
 
   useEffect(() => {
     const oldCharges = Number(localStorage.getItem("old-charges") || 0);
-    const newCharges = Number(localStorage.getItem("new-charges") || 0) + 1; // for test purpose + 1
+    const newCharges = Number(localStorage.getItem("new-charges") || 0); // for test purpose + 1
     localStorage.removeItem("old-charges");
     localStorage.removeItem("new-charges");
 

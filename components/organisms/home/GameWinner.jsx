@@ -3,15 +3,20 @@ import { useState } from "react";
 
 const CHEST_COMMON_ANIMATION_DURATION = 3500;
 
-const GameWinner = ({ closeChest, beatFirstLevel }) => {
+const GameWinner = ({ closeChest, beatFirstLevel, hasGenesis }) => {
   const [showWon, setShowWon] = useState(false);
   const [showChestAnimation, setShowChestAnimation] = useState(false);
 
-  const openWon = () => {
+  const openWon = async () => {
     setShowChestAnimation(true);
-    setTimeout(() => {
-      setShowWon(true);
-    }, CHEST_COMMON_ANIMATION_DURATION);
+    if(!hasGenesis) {
+      setTimeout(() => {
+        setShowWon(true);
+      }, CHEST_COMMON_ANIMATION_DURATION);
+    } else {
+      await beatFirstLevel();
+      closeChest();
+    }
   };
 
   const acceptGenesisNFT = async () => {

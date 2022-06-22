@@ -7,6 +7,7 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
 import * as anchor from "@project-serum/anchor";
 import { Program } from "@project-serum/anchor";
+import { useRouter } from 'next/router';
 
 // import { Metadata } from "@metaplex-foundation/mpl-token-metadata";
 import * as metadata from "@metaplex-foundation/mpl-token-metadata";
@@ -78,12 +79,14 @@ export default function Hero({ play, setPlay }) {
 
   const wallet = useWallet();
   const { publicKey, connected } = useWallet();
+  const router = useRouter();
 
   const provider = new anchor.AnchorProvider(connection, wallet);
   const hasDopeCat = tokens.filter(o=>o.data.symbol == 'DOPECATS').length > 0
   const hasGenesis = tokens.filter(o=>o.data.name == 'Genesis Nft').length > 0
   const hasPixelBand = tokens.filter(o=>o.data.symbol == 'PXLB'||o.data.symbol == 'PXBP'||o.data.symbol == 'PXBD').length > 0
   const hasHippo = tokens.filter(o=>o.data.name.startsWith("HRHC #")||o.data.name.startsWith("HRHC Gen 2 #")).length > 0
+  const hasSovana = tokens.filter(o=>o.data.symbol == 'Sovana Egg').length > 0
   const burnAvailable = !hasGenesis || tokens.filter(o=>o.meta && o.meta.attributes[0].value < 3).length > 0
 
   useEffect(() => {
@@ -238,11 +241,15 @@ export default function Hero({ play, setPlay }) {
         console.log('selected genesis to charge', token)
         //upgrade meta of token
         let newMeta = token.meta
+        localStorage.setItem("old-charges", newMeta.attributes[0].value)
         newMeta.attributes[0].value = newMeta.attributes[0].value + 1
-  
+        localStorage.setItem("new-charges", newMeta.attributes[0].value)
         await updateMeta(connection, wallet, token, newMeta)
         
         await fetchData()
+        
+        //go to success screen
+        router.push('/charge-success')
       }
     }
   }

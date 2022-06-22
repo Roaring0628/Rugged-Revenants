@@ -117,7 +117,7 @@ const Demo = ({ handlePlay, beatFirstLevel, hasGenesis }) => {
           <span className="text-lg mb-2 z-10">QUIT</span>
         </div>
       </div>
-      {showChest && <GameWinner closeChest={closeChest} beatFirstLevel={beatFirstLevel} />}
+      {showChest && <GameWinner closeChest={closeChest} beatFirstLevel={beatFirstLevel} hasGenesis={hasGenesis} />}
     </div>
   );
 };
