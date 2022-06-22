@@ -47,7 +47,11 @@ const RUG_GAME_PROGRAM_ID = new anchor.web3.PublicKey(
 const RUG_TOKEN_MINTKEY="9MNDotk5DwCGnTvnPwnzG6oeB9whzLLymQFhacE3swxv"
 
 const NFT_SYMBOL = "rugged-nft";
+
+const GENESIS_IMAGE_URL = "https://ipfs.infura.io/ipfs/QmVES5wiCuomUmXsZaCbHMEU7TxpSP1iHeW2r55MnX8uAB"
+
 const MAX_GAME_LEVEL = 10
+const MAX_CHARGE_COUNT = 99
 
 function getRandomInt(min, max) {       
   // Create byte array and fill with 1 random number
@@ -201,7 +205,7 @@ export default function Hero({ play, setPlay }) {
       name: 'Genesis NFT',
       symbol: NFT_SYMBOL,
       description: 'Genesis Nft',
-      image: 'https://ipfs.io/ipfs/bafkreieo24yvbfumux3qw34cnnwxwwkycrhefswaxwj2ku7ltu2jmfju5e',
+      image: GENESIS_IMAGE_URL,
       attributes: [
         {
           trait_type: "charges remaining",
@@ -227,7 +231,7 @@ export default function Hero({ play, setPlay }) {
       await fetchData()        
     } else {
       const token = tokens.find((t)=>{
-        return t.data.name == 'Genesis Nft' && t.meta.attributes[0].value < 3
+        return t.data.name == 'Genesis Nft' && t.meta.attributes[0].value < MAX_CHARGE_COUNT
       })
 
       if(token) {
