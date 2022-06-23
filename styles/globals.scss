@@ -450,10 +450,10 @@ a {
 }
 
 .rabbit-spin {
-  animation: spin 6s infinite linear;
+  animation: spin1 6s infinite linear;
 }
 
-@keyframes spin {
+@keyframes spin1 {
   from {
     transform: rotate(0deg) scale(1);
   }
