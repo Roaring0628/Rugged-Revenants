@@ -371,7 +371,13 @@ export default function Hero({ play, setPlay }) {
         {play && (
           <div className="fixed z-50 inset-0 w-full h-full overflow-y-auto bg-black">
             <div className="absolute top-0 left-0 w-full h-full bg-black opacity-80"></div>
-            <Demo handlePlay={handlePlay} beatFirstLevel={beatFirstLevel} hasGenesis={hasGenesis} tokenOwnershipData={tokenOwnershipData} />
+            <Demo
+              handlePlay={handlePlay}
+              beatFirstLevel={beatFirstLevel}
+              hasGenesis={hasGenesis}
+              tokenOwnershipData={tokenOwnershipData}
+              solBalance={solBalance}
+            />
           </div>
         )}
         {showChargeSuccess && <ChargeSuccess closeChargeSuccess={closeChargeSuccess} />}
