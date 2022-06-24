@@ -90,7 +90,7 @@ const Demo = ({
   };
 
   const quitGame = () => {
-    myGameInstance.Quit();
+    if (myGameInstance) myGameInstance.Quit();
     const scriptEl = document.querySelector("#demo-game-script");
     if (scriptEl) scriptEl.remove();
     setMyGameInstance(null);
