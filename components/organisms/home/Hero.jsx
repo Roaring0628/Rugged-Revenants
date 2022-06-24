@@ -79,6 +79,7 @@ export default function Hero({ play, setPlay }) {
   const [ruggedAccount, setRuggedAccount] = useState()
   const [rugToken, setRugToken] = useState(0)
   const [mainProgram, setMainProgram] = useState()
+  const [solBalance, setSolBalance] = useState(0)
 
   const [showChargeSuccess, setShowChargeSuccess] = useState(false);
 
@@ -96,6 +97,7 @@ export default function Hero({ play, setPlay }) {
   const burnAvailable = !hasGenesis || tokens.filter(o=>o.meta && o.meta.attributes[0].value < 3).length > 0
 
   console.log('hasGenesis', hasGenesis)
+  console.log('solBalance', solBalance)
   const tokenOwnershipData = { hasDopeCat, hasPixelBand, hasHippo, hasSovanaEgg };
   useEffect(() => {
     updateMedia();
@@ -111,6 +113,12 @@ export default function Hero({ play, setPlay }) {
   }, [publicKey]);
 
   const fetchData = async () => {
+    let walletInfo = await connection.getAccountInfo(provider.wallet.publicKey)
+    console.log("walletInfo", walletInfo)
+    if(walletInfo) {
+      setSolBalance(walletInfo.lamports)
+    }
+
     const tokenAccounts = await connection.getTokenAccountsByOwner(
       provider.wallet.publicKey,
       {
