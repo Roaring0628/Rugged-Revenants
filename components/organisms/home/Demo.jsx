@@ -41,7 +41,7 @@ const Demo = ({
 
     // For new build of game: Need to update loaderUrl, and download build files and replace them
     let loaderUrl =
-      "https://v6p9d9t4.ssl.hwcdn.net/html/6019535/RuggedWebGL/Build/RuggedWebGL.loader.js";
+      "https://v6p9d9t4.ssl.hwcdn.net/html/6031302/RuggedWebGL/Build/RuggedWebGL.loader.js";
     let script = document.createElement("script");
     script.src = loaderUrl;
     script.id = "demo-game-script";
