@@ -99,7 +99,7 @@ export default function Hero({ play, setPlay }) {
 
   console.log('hasGenesis', hasGenesis)
   console.log('solBalance', solBalance)
-  const tokenOwnershipData = { hasDopeCat, hasPixelBand, hasHippo, hasSovanaEgg };
+  const tokenOwnershipData = { hasDopeCat, hasPixelBand, hasHippo, hasCyberSamurai, hasSovanaEgg };
   useEffect(() => {
     updateMedia();
     window.addEventListener("resize", updateMedia);
