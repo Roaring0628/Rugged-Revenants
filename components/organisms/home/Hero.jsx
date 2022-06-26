@@ -79,6 +79,7 @@ export default function Hero({ play, setPlay }) {
   const [ruggedAccount, setRuggedAccount] = useState()
   const [rugToken, setRugToken] = useState(0)
   const [mainProgram, setMainProgram] = useState()
+  const [solBalance, setSolBalance] = useState(0)
 
   const [showChargeSuccess, setShowChargeSuccess] = useState(false);
 
@@ -93,10 +94,12 @@ export default function Hero({ play, setPlay }) {
   const hasPixelBand = tokens.filter(o=>o.data.symbol == 'PXLB'||o.data.symbol == 'PXBP'||o.data.symbol == 'PXBD').length > 0
   const hasHippo = tokens.filter(o=>o.data.name.startsWith("HRHC #")||o.data.name.startsWith("HRHC Gen 2 #")).length > 0
   const hasSovanaEgg = tokens.filter(o=>o.data.symbol == 'Sovana Egg').length > 0
+  const hasCyberSamurai = tokens.filter(o=>o.data.symbol == 'CSAMURAI'||o.data.symbol == 'CSCOMIC'||o.data.name.startsWith("Cyber Samurai")||o.data.creators[0].addrss=='9pqwVvMNZ6Ceh4v8V98yi7MwC8vYwU1koEpEhoQWAPAg').length > 0
   const burnAvailable = !hasGenesis || tokens.filter(o=>o.meta && o.meta.attributes[0].value < 3).length > 0
 
   console.log('hasGenesis', hasGenesis)
-  const tokenOwnershipData = { hasDopeCat, hasPixelBand, hasHippo, hasSovanaEgg };
+  console.log('solBalance', solBalance)
+  const tokenOwnershipData = { hasDopeCat, hasPixelBand, hasHippo, hasCyberSamurai, hasSovanaEgg };
   useEffect(() => {
     updateMedia();
     window.addEventListener("resize", updateMedia);
@@ -111,6 +114,12 @@ export default function Hero({ play, setPlay }) {
   }, [publicKey]);
 
   const fetchData = async () => {
+    let walletInfo = await connection.getAccountInfo(provider.wallet.publicKey)
+    console.log("walletInfo", walletInfo)
+    if(walletInfo) {
+      setSolBalance(walletInfo.lamports)
+    }
+
     const tokenAccounts = await connection.getTokenAccountsByOwner(
       provider.wallet.publicKey,
       {
@@ -363,7 +372,13 @@ export default function Hero({ play, setPlay }) {
         {play && (
           <div className="fixed z-50 inset-0 w-full h-full overflow-y-auto bg-black">
             <div className="absolute top-0 left-0 w-full h-full bg-black opacity-80"></div>
-            <Demo handlePlay={handlePlay} beatFirstLevel={beatFirstLevel} hasGenesis={hasGenesis} tokenOwnershipData={tokenOwnershipData} />
+            <Demo
+              handlePlay={handlePlay}
+              beatFirstLevel={beatFirstLevel}
+              hasGenesis={hasGenesis}
+              tokenOwnershipData={tokenOwnershipData}
+              solBalance={solBalance}
+            />
           </div>
         )}
         {showChargeSuccess && <ChargeSuccess closeChargeSuccess={closeChargeSuccess} />}
