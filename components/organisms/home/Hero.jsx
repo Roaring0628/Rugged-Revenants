@@ -111,6 +111,7 @@ export default function Hero({ play, setPlay }) {
       fetchData()
       initMainProgram()
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [publicKey]);
 
   const fetchData = async () => {
