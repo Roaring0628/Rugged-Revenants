@@ -125,10 +125,12 @@ const Scrollbar = ({ children, className, ...props }) => {
       setTimeout(() => {
         handleResize(ref, trackSize);
       }, 30);
-      // TODO - Need to clear interval, will do next time
-      setInterval(() => {
+      const resizeInterval = setInterval(() => {
         handleResize(ref, trackSize);
       }, 1000);
+      return () => {
+        clearInterval(resizeInterval);
+      };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
