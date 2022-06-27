@@ -66,7 +66,7 @@ const Scrollbar = ({ children, className, ...props }) => {
     const thumb = scrollThumbRef.current;
     thumb.style.top = `${newTop}px`;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [thumbHeight]);
 
   const handleThumbMousedown = useCallback((e) => {
     e.preventDefault();
