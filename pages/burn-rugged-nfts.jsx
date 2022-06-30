@@ -1222,6 +1222,9 @@ export default function BurnRuggedNFTs() {
     await fetchData(whitelist)
   };
 
+  let genesisToken = allTokens.find(o=>o.data.name == Const.GENESIS_NFT_NAME && o.meta.attributes[0].value < Const.MAX_CHARGE_COUNT)
+
+
   return (
     <main className="w-full relative">
       <div className="h-[100vh] w-full relative flex">
@@ -1297,9 +1300,9 @@ export default function BurnRuggedNFTs() {
                   />
                   <span className="text-lg">3 Charges</span>
                 </div>
-                <span className="text-[0.7rem] tracking-tighter">
-                  Total Charges : {"99"}
-                </span>
+                {genesisToken && <span className="text-[0.7rem] tracking-tighter">
+                  Total Charges : {genesisToken.meta.attributes[0].value}
+                </span>}
               </div>
               <img
                 src="/media/inventory/Inventory_Page/ui_inventory_burnbutton.png"
