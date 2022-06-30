@@ -22,7 +22,7 @@ import {PublicKey, sendAndConfirmTransaction} from "@solana/web3.js";
 
 import RugGameIdl from "../components/organisms/idl/rug_game.json";
 
-import { uploadMetadataToIpfs, mint, mintGenesis, mintPotion, mintLootBox, updateMeta } from "../components/organisms/utils/mint";
+import { uploadMetadataToIpfs, mint, mintGenesis, mintPotion, mintLootBox, updateMeta, payToBackendTx } from "../components/organisms/utils/mint";
 import {burn, burnTx} from '../components/organisms/utils/nftburn'
 import api from "../components/organisms/api"
 import * as Const from '../components/organisms/utils/constants'
@@ -1211,7 +1211,7 @@ export default function BurnRuggedNFTs() {
       let oldToken = allTokens.find(o=>o.data.name == Const.GENESIS_NFT_NAME && o.meta.attributes[0].value < Const.MAX_CHARGE_COUNT)
       if(!oldToken) return
       let oldMeta = oldToken.meta
-      oldMeta.attributes[0].value = oldMeta.attributes[0].value + 1
+      oldMeta.attributes[0].value = oldMeta.attributes[0].value + 3
       await updateMeta(oldToken, oldMeta)
     } else {
       let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
