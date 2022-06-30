@@ -21,52 +21,17 @@ import {
 import {PublicKey, sendAndConfirmTransaction} from "@solana/web3.js";
 import axios from 'axios'
 
-import GenesisNftIdl from "../idl/genesis_nft.json";
-import RuggedNftIdl from "../idl/rugged_nft.json";
 import RugGameIdl from "../idl/rug_game.json";
 
-import { uploadMetadataToIpfs, mint, mintWithTx } from "../utils/mint";
-import {updateMeta} from '../utils/updatemeta'
+import { uploadMetadataToIpfs, mint, mintGenesis, mintPotion, mintLootBox, updateMeta } from "../utils/mint";
 import {burn, burnTx} from '../utils/nftburn'
 import api from "../api"
+import * as Const from '../utils/constants'
 
 import Demo from "./Demo.jsx";
 import ChargeSuccess from "./ChargeSuccess";
 
-const { SystemProgram } = anchor.web3;
-
-const GENESIS_NFT_PROGRAM_ID = new anchor.web3.PublicKey(
-  "zHq4ptTjZUBo7gcUpNvGwK3yUgZfuHgnrdxSBHVuL1L"
-);
-
-const RUGGED_NFT_PROGRAM_ID = new anchor.web3.PublicKey(
-  "DYvtKwZ7PMmD26dqgGQ7mfnXcqompTPVfN4GUTGWSgQi"
-);
-
-const RUG_GAME_PROGRAM_ID = new anchor.web3.PublicKey(
-  "66mXdV36Y1tGsBng2r51m2imAW2DdH8daqynigafBsvb"
-);
-
 const RUG_TOKEN_MINTKEY="9MNDotk5DwCGnTvnPwnzG6oeB9whzLLymQFhacE3swxv"
-
-const NFT_SYMBOL = "rugged-nft";
-
-const GENESIS_IMAGE_URL = "https://ipfs.infura.io/ipfs/QmVES5wiCuomUmXsZaCbHMEU7TxpSP1iHeW2r55MnX8uAB"
-
-const MAX_GAME_LEVEL = 10
-const MAX_CHARGE_COUNT = 99
-
-function getRandomInt(min, max) {       
-  // Create byte array and fill with 1 random number
-  var byteArray = new Uint8Array(1);
-  window.crypto.getRandomValues(byteArray);
-
-  var range = max - min + 1;
-  var max_range = 256;
-  if (byteArray[0] >= Math.floor(max_range / range) * range)
-      return getRandomInt(min, max);
-  return min + (byteArray[0] % range);
-}
 
 export default function Hero({ play, setPlay }) {
   const [isDesktop, setDesktop] = useState(false);
@@ -86,11 +51,10 @@ export default function Hero({ play, setPlay }) {
   const wallet = useWallet();
   const { publicKey, connected } = useWallet();
   const router = useRouter();
-  const GENESIS_NFT_NAME = "Revenant Recovery Repository"
   
   const provider = new anchor.AnchorProvider(connection, wallet);
   const hasDopeCat = tokens.filter(o=>o.data.symbol == 'DOPECATS').length > 0
-  const hasGenesis = tokens.filter(o=>o.data.name == GENESIS_NFT_NAME).length > 0
+  const hasGenesis = tokens.filter(o=>o.data.name == Const.GENESIS_NFT_NAME).length > 0
   const hasPixelBand = tokens.filter(o=>o.data.symbol == 'PXLB'||o.data.symbol == 'PXBP'||o.data.symbol == 'PXBD').length > 0
   const hasHippo = tokens.filter(o=>o.data.name.startsWith("HRHC #")||o.data.name.startsWith("HRHC Gen 2 #")).length > 0
   const hasSovanaEgg = tokens.filter(o=>o.data.symbol == 'Sovana Egg').length > 0
@@ -132,7 +96,7 @@ export default function Hero({ play, setPlay }) {
     let tokenAddresses = []
     tokenAccounts.value.forEach((e) => {
       const accountInfo = AccountLayout.decode(e.account.data);
-      console.log('accountInfo', accountInfo)
+      // console.log('accountInfo', accountInfo)
       if(accountInfo.amount > 0) {
         let pubKey = `${new PublicKey(accountInfo.mint)}`
         if(pubKey === RUG_TOKEN_MINTKEY) {
@@ -149,7 +113,7 @@ export default function Hero({ play, setPlay }) {
         let tokenmetaPubkey = await metadata.Metadata.getPDA(address);
   
         const tokenmeta = await metadata.Metadata.load(connection, tokenmetaPubkey);
-        if(tokenmeta.data.data.name == GENESIS_NFT_NAME) {
+        if(tokenmeta.data.data.name == Const.GENESIS_NFT_NAME) {
           const meta = await axios.get(tokenmeta.data.data.uri)
           tokens.push({...tokenmeta.data, meta:meta.data})
         } else 
@@ -172,7 +136,9 @@ export default function Hero({ play, setPlay }) {
 
   const initMainProgram = async () => {
     anchor.setProvider(provider)
-    const program = new Program(RugGameIdl, RUG_GAME_PROGRAM_ID, provider);
+    const program = new Program(RugGameIdl, new anchor.web3.PublicKey(
+      Const.RUG_GAME_PROGRAM_ID
+    ), provider);
     console.log("Main Program Id: ", program, program.account,  program.programId.toBase58());
     setMainProgram(program)
     // api.getRuggedAccount(wallet.publicKey.toBase58(), async (err, ret)=>{
@@ -221,44 +187,14 @@ export default function Hero({ play, setPlay }) {
     // })
   }
 
-  const mintGenesis = async (burnInstruction) => {
-    let uploadedMetatdataUrl = await uploadMetadataToIpfs({
-      name: GENESIS_NFT_NAME,
-      symbol: "$RRR",
-      description: 'Rugged revenants are NFTs that holders will use as playable characters within the game. They provide in-game benefits like flight and extra lives based on their attributes.',
-      image: GENESIS_IMAGE_URL,
-      external_url: "https://ruggedrevenants.io/",
-      collection:{"name":"Dope Cats"},
-      attributes: [
-        {
-          trait_type: "charges remaining",
-          value: 3,
-        },
-        {
-          trait_type: "Collection",
-          value: "Dope Cat Revenants",
-        },
-      ],
-    });
-
-    if (uploadedMetatdataUrl == null) return;
-    console.log("Uploaded meta data url: ", uploadedMetatdataUrl);
-    await mint(connection, wallet, GENESIS_NFT_NAME, "$RRR", uploadedMetatdataUrl, GENESIS_NFT_PROGRAM_ID, GenesisNftIdl, burnInstruction);
-  }
-
   const beatFirstLevel = async()=>{
     console.log('called beatFirstLevel', hasGenesis)
     if(!hasGenesis) {
-      // let random = getRandomInt(0,1);
-      // if(random == 1) {
-      //   //alert("Lucky Man! Genesis NFT will be minted")
-      //   //mint genesis
-      // }
       await mintGenesis()
       await fetchData()        
     } else {
       const token = tokens.find((t)=>{
-        return t.data.name == GENESIS_NFT_NAME && t.meta.attributes[0].value < MAX_CHARGE_COUNT
+        return t.data.name == Const.GENESIS_NFT_NAME && t.meta.attributes[0].value < Const.MAX_CHARGE_COUNT
       })
 
       if(token) {
@@ -268,7 +204,7 @@ export default function Hero({ play, setPlay }) {
         localStorage.setItem("old-charges", newMeta.attributes[0].value)
         newMeta.attributes[0].value = newMeta.attributes[0].value + 1
         localStorage.setItem("new-charges", newMeta.attributes[0].value)
-        await updateMeta(connection, wallet, token, newMeta)
+        await updateMeta(token, newMeta)
         
         await fetchData()
         

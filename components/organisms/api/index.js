@@ -52,6 +52,28 @@ export default {
             })
         })
     },
+    async mintNft(data){
+        return new Promise((resolve, reject)=>{
+            this.baseApi('/players/mintNft', 'POST', data, (err, ret)=>{
+                if(err) {
+                    reject()
+                } else {
+                    resolve(ret)
+                }
+            })
+        })
+    },
+    async updateNftMeta(data){
+        return new Promise((resolve, reject)=>{
+            this.baseApi('/players/updateNftMeta', 'POST', data, (err, ret)=>{
+                if(err) {
+                    reject()
+                } else {
+                    resolve(ret)
+                }
+            })
+        })
+    },
     async transferPremiumNft(data){
         return new Promise((resolve, reject)=>{
             this.baseApi('/players/transferPremiumNft', 'POST', data, (err, ret)=>{
@@ -77,6 +99,17 @@ export default {
     async unstake(playerAccount, tokenAccount){
         return new Promise((resolve, reject)=>{
             this.baseApi('/players/unstake', 'POST', {playerAccount, tokenAccount}, (err, ret)=>{
+                if(err) {
+                    reject()
+                } else {
+                    resolve(ret)
+                }
+            })
+        })
+    },
+    async getRuggedWhitelist(){
+        return new Promise((resolve, reject)=>{
+            this.baseApi('/rugged-whitelists', 'GET', {}, (err, ret)=>{
                 if(err) {
                     reject()
                 } else {

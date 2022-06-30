@@ -7,6 +7,27 @@ import classNames from "classnames";
 
 import CustomScroll from "components/molecules/CustomScroll";
 
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import * as anchor from "@project-serum/anchor";
+import { Program } from "@project-serum/anchor";
+import { useRouter } from 'next/router';
+import * as metadata from "@metaplex-foundation/mpl-token-metadata";
+import {
+  TOKEN_PROGRAM_ID,
+  getOrCreateAssociatedTokenAccount,
+  AccountLayout,
+  createTransferInstruction,
+} from "@solana/spl-token";
+import {PublicKey, sendAndConfirmTransaction} from "@solana/web3.js";
+
+import RugGameIdl from "../components/organisms/idl/rug_game.json";
+
+import { uploadMetadataToIpfs, mint, mintGenesis, mintPotion, mintLootBox, updateMeta } from "../components/organisms/utils/mint";
+import {burn, burnTx} from '../components/organisms/utils/nftburn'
+import api from "../components/organisms/api"
+import * as Const from '../components/organisms/utils/constants'
+const { SystemProgram } = anchor.web3;
+
 const stubTokens = [
   {
     key: 4,
@@ -981,14 +1002,155 @@ const stubTokens = [
 export default function BurnRuggedNFTs() {
   const [keyword, setKeyword] = useState("");
   const [tokens, setTokens] = useState([]);
+  const [allTokens, setAllTokens] = useState([]);
   const [tokensWithImage, setTokensWithImage] = useState([]);
   const [filteredNFTs, setFilteredNFTs] = useState([]);
   const [selectedNFT, setSelectedNFT] = useState(null);
 
+
+  const [whitelist, setWhitelist] = useState({})
+  const [ruggedTokenAddresses, setRuggedTokenAddresses] = useState([])
+  const [charged, setCharged] = useState(false)
+  const [staked, setStaked] = useState(false)
+  const [ruggedAccount, setRuggedAccount] = useState()
+  const [mainProgram, setMainProgram] = useState()
+
+  const { connection } = useConnection();
+  const wallet = useWallet();
+  const { publicKey, connected } = useWallet();
+  const provider = new anchor.AnchorProvider(connection, wallet);
+  const hasGenesis = allTokens.filter(o=>o.data.name == Const.GENESIS_NFT_NAME).length > 0
+
   useEffect(() => {
     // TODO - Get tokens from wallet and set state
-    setTokens(stubTokens);
+    // setTokens(stubTokens);
   }, []);
+
+  useEffect(() => {
+    if(publicKey) {
+      init()
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [publicKey]);
+
+  const init = async () => {
+    let whitelist = await api.getRuggedWhitelist()
+    console.log('whitelist', whitelist)
+    if(whitelist.length > 0) {
+      setWhitelist(whitelist[0])
+    }
+
+    fetchData(whitelist[0])
+    initMainProgram()
+  }
+
+  const fetchData = async (whitelist) => {
+    let walletInfo = await connection.getAccountInfo(provider.wallet.publicKey)
+    console.log("walletInfo", walletInfo)
+
+    // const tokenMetadata = await metaplex.nfts().findAllByOwner(metaplex.identity().publicKey);
+    // console.log('tokenMetadata', JSON.stringify(tokenMetadata));
+    
+    const tokenAccounts = await connection.getTokenAccountsByOwner(
+      provider.wallet.publicKey,
+      {
+        programId: TOKEN_PROGRAM_ID,
+      }
+    );
+    console.log('tokenAccounts', tokenAccounts)
+    let tokens = []
+    let tokenAddresses = []
+    tokenAccounts.value.forEach((e) => {
+      const accountInfo = AccountLayout.decode(e.account.data);
+      // console.log('accountInfo', accountInfo)
+      if(accountInfo.amount > 0) {
+        let pubKey = `${new PublicKey(accountInfo.mint)}`
+        if(pubKey === Const.RUG_TOKEN_MINTKEY) {
+          
+        } else {
+          tokenAddresses.push(pubKey)
+        }
+      }
+    })
+
+    console.log('tokenAddresses', tokenAddresses)
+    let ruggedTokenAddresses = tokenAddresses.filter(o=>whitelist.mint_keys.indexOf(o) != -1)
+    setRuggedTokenAddresses(ruggedTokenAddresses)
+    for(let address of tokenAddresses) {
+      try {
+        let tokenmetaPubkey = await metadata.Metadata.getPDA(address);
+  
+        const tokenmeta = await metadata.Metadata.load(connection, tokenmetaPubkey);
+        const meta = await axios.get(tokenmeta.data.data.uri)
+        tokens.push({...tokenmeta.data, meta:meta.data})
+      } catch(e) {
+        console.log('e', e)
+      }
+    }
+    console.log('tokens', tokens)
+    setAllTokens(tokens)
+    setTokens(tokens.filter(o=>ruggedTokenAddresses.indexOf(o.mint) != -1))
+
+    if(ruggedAccount && mainProgram) {
+      let programAccount = await mainProgram.account.ruggedAccount.fetch(ruggedAccount);
+      console.log('ruggedAccount', programAccount)
+      setCharged(programAccount.charged)
+      setStaked(programAccount.staked)
+    }
+  }
+
+  const initMainProgram = async () => {
+    anchor.setProvider(provider)
+    const program = new Program(RugGameIdl, new anchor.web3.PublicKey(
+      Const.RUG_GAME_PROGRAM_ID
+    ), provider);
+    console.log("Main Program Id: ", program, program.account,  program.programId.toBase58());
+    setMainProgram(program)
+    api.getRuggedAccount(wallet.publicKey.toBase58(), async (err, ret)=>{
+      console.log('getRuggedAccount', wallet.publicKey.toBase58(), err, ret)
+      if(ret.length == 0) {
+        console.log('create account')
+        //initialize account
+        let ruggedAccount = anchor.web3.Keypair.generate();
+        let tx = program.transaction.create(provider.wallet.publicKey, {
+          accounts: {
+            ruggedAccount: ruggedAccount.publicKey,
+            user: wallet.publicKey,
+            systemProgram: SystemProgram.programId,
+          },
+          signers: [ruggedAccount],
+        });
+
+        const create_tx = new anchor.web3.Transaction().add(tx)
+        let blockhashObj = await connection.getLatestBlockhash();
+        console.log("blockhashObj", blockhashObj);
+        create_tx.recentBlockhash = blockhashObj.blockhash;
+
+        const signature = await wallet.sendTransaction(create_tx, connection, {
+          signers: [ruggedAccount],
+        });
+
+        await connection.confirmTransaction(signature, "confirmed");
+
+        let fetchData = await program.account.ruggedAccount.fetch(ruggedAccount.publicKey);
+        console.log('ruggedAccount', fetchData)
+
+        api.addRuggedAccount({
+          player_account: wallet.publicKey,
+          rugged_account: ruggedAccount.publicKey,
+        }, (err, ret)=>{
+          console.log('addRuggedAccount', err, ret)
+        })
+        setRuggedAccount(ruggedAccount.publicKey)
+      } else {
+        console.log('check account')
+        let ruggedAccount = await program.account.ruggedAccount.fetch(ret[0].rugged_account);
+        console.log('ruggedAccount', ruggedAccount)
+        setCharged(ruggedAccount.charged)
+        setRuggedAccount(ret[0].rugged_account)
+      }
+    })
+  }
 
   useEffect(() => {
     setTokensWithImage([]);
@@ -1028,9 +1190,24 @@ export default function BurnRuggedNFTs() {
     setSelectedNFT(token);
   };
 
-  const burnSelectedNFT = (token) => {
+  const burnSelectedNFT = async (token) => {
     // TODO - Logic to burn selected NFT
     console.log(token);
+    anchor.setProvider(provider);
+    await burn(token.mint, provider.wallet.publicKey, wallet, connection, 1)
+
+    if(hasGenesis) {
+      //update meta
+      let oldToken = allTokens.find(o=>o.data.name == Const.GENESIS_NFT_NAME && o.meta.attributes[0].value < Const.MAX_CHARGE_COUNT)
+      if(!oldToken) return
+      let oldMeta = oldToken.meta
+      oldMeta.attributes[0].value = oldMeta.attributes[0].value + 1
+      await updateMeta(oldToken, oldMeta)
+    } else {
+      //mint genesis
+      await mintGenesis(wallet)
+    }
+    await fetchData(whitelist)
   };
 
   return (
