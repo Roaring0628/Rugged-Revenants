@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { useEffect, useState } from "react";
 import GameWinner from "./GameWinner";
+import GameWinnerLootbox from "./GameWinnerLootbox";
 
 const Demo = ({
   handlePlay,
@@ -11,6 +12,7 @@ const Demo = ({
 }) => {
   const [myGameInstance, setMyGameInstance] = useState(null);
   const [showChest, setShowChest] = useState(false);
+  const [showLootboxChest, setShowLootboxChest] = useState(false);
 
   useEffect(() => {
     window.addEventListener(
@@ -34,6 +36,16 @@ const Demo = ({
           ) {
             // Handle 5% of the time the users beat level 1
             openChest();
+          }
+
+          if (
+            event.data.type === "win" &&
+            event.data.hasWon &&
+            event.data.level &&
+            event.data.level == 2
+          ) {
+            // TODO - Need to update this, open lootbox chest when the user beat level 2 for demo
+            openLootboxChest();
           }
         }
       },
@@ -111,6 +123,14 @@ const Demo = ({
     setShowChest(false);
   };
 
+  const openLootboxChest = () => {
+    setShowLootboxChest(true);
+  };
+
+  const closeLootboxChest = () => {
+    setShowLootboxChest(false);
+  };
+
   return (
     <div className="game-wrapper">
       <div className="demo-wrapper">
@@ -144,6 +164,13 @@ const Demo = ({
         <GameWinner
           closeChest={closeChest}
           beatFirstLevel={beatFirstLevel}
+          hasGenesis={hasGenesis}
+          solBalance={solBalance}
+        />
+      )}
+      {showLootboxChest && (
+        <GameWinnerLootbox
+          closeChest={closeLootboxChest}
           hasGenesis={hasGenesis}
           solBalance={solBalance}
         />
