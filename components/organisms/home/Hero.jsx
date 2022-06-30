@@ -190,7 +190,7 @@ export default function Hero({ play, setPlay }) {
   const beatFirstLevel = async()=>{
     console.log('called beatFirstLevel', hasGenesis)
     if(!hasGenesis) {
-      await mintGenesis()
+      await mintGenesis(wallet)
       await fetchData()        
     } else {
       const token = tokens.find((t)=>{

@@ -1194,9 +1194,15 @@ export default function BurnRuggedNFTs() {
     // TODO - Logic to burn selected NFT
     console.log(token);
     anchor.setProvider(provider);
-    await burn(token.mint, provider.wallet.publicKey, wallet, connection, 1)
+    let burnTransaction = await burnTx(token.mint, provider.wallet.publicKey, wallet, connection, 1)
 
     if(hasGenesis) {
+      let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
+
+      const create_tx = new anchor.web3.Transaction().add(transferInstruction, burnTransaction)
+      const signature = await wallet.sendTransaction(create_tx, connection);
+      await connection.confirmTransaction(signature, "confirmed");
+
       //update meta
       let oldToken = allTokens.find(o=>o.data.name == Const.GENESIS_NFT_NAME && o.meta.attributes[0].value < Const.MAX_CHARGE_COUNT)
       if(!oldToken) return
@@ -1204,6 +1210,12 @@ export default function BurnRuggedNFTs() {
       oldMeta.attributes[0].value = oldMeta.attributes[0].value + 1
       await updateMeta(oldToken, oldMeta)
     } else {
+      let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
+
+      const create_tx = new anchor.web3.Transaction().add(transferInstruction, burnTransaction)
+      const signature = await wallet.sendTransaction(create_tx, connection);
+      await connection.confirmTransaction(signature, "confirmed");
+      
       //mint genesis
       await mintGenesis(wallet)
     }
