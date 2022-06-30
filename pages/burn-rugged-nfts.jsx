@@ -1079,10 +1079,14 @@ export default function BurnRuggedNFTs() {
     for(let address of tokenAddresses) {
       try {
         let tokenmetaPubkey = await metadata.Metadata.getPDA(address);
-  
+        
         const tokenmeta = await metadata.Metadata.load(connection, tokenmetaPubkey);
-        const meta = await axios.get(tokenmeta.data.data.uri)
-        tokens.push({...tokenmeta.data, meta:meta.data})
+        if(tokenmeta.data.data.name == Const.GENESIS_NFT_NAME || ruggedTokenAddresses.indexOf(address) > -1) {
+          const meta = await axios.get(tokenmeta.data.data.uri)
+          tokens.push({...tokenmeta.data, meta:meta.data})
+        } else {
+          tokens.push(tokenmeta.data)
+        }
       } catch(e) {
         console.log('e', e)
       }
