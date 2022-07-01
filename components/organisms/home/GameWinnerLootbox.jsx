@@ -4,7 +4,7 @@ import { useState } from "react";
 const CHEST_COMMON_ANIMATION_DURATION = 3500; // 3.5s
 const MINIMUN_SOL_BALANCE = 100000000; // 0.1 SOL
 
-const GameWinnerLootbox = ({ closeChest, hasGenesis, solBalance }) => {
+const GameWinnerLootbox = ({ closeChest, hasGenesis, solBalance, endGame }) => {
   const [inProgress, setInProgress] = useState(false);
   const [showChestAnimation, setShowChestAnimation] = useState(false);
   const [showBalanceWarning, setShowBalanceWarning] = useState(false);
@@ -21,7 +21,7 @@ const GameWinnerLootbox = ({ closeChest, hasGenesis, solBalance }) => {
       } else {
         console.log("minting lootbox");
         // Need to add logic to mint lootbox
-        // await beatFirstLevel();
+        await endGame(2, false)
         closeChest();
       }
     }

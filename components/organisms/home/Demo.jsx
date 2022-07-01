@@ -9,6 +9,7 @@ const Demo = ({
   hasGenesis,
   tokenOwnershipData,
   solBalance,
+  endGame,
 }) => {
   const [myGameInstance, setMyGameInstance] = useState(null);
   const [showChest, setShowChest] = useState(false);
@@ -173,6 +174,7 @@ const Demo = ({
           closeChest={closeLootboxChest}
           hasGenesis={hasGenesis}
           solBalance={solBalance}
+          endGame={endGame}
         />
       )}
     </div>

@@ -23,7 +23,7 @@ import axios from 'axios'
 
 import RugGameIdl from "../idl/rug_game.json";
 
-import { uploadMetadataToIpfs, mint, mintGenesis, mintPotion, mintLootBox, updateMeta } from "../utils/mint";
+import { uploadMetadataToIpfs, mint, mintGenesis, mintPotion, mintLootBox, updateMeta, payToBackendTx } from "../utils/mint";
 import {burn, burnTx} from '../utils/nftburn'
 import api from "../api"
 import * as Const from '../utils/constants'
@@ -190,6 +190,11 @@ export default function Hero({ play, setPlay }) {
   const beatFirstLevel = async()=>{
     console.log('called beatFirstLevel', hasGenesis)
     if(!hasGenesis) {
+      let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
+      const create_tx = new anchor.web3.Transaction().add(transferInstruction)
+      const signature = await wallet.sendTransaction(create_tx, connection);
+      await connection.confirmTransaction(signature, "confirmed");
+
       await mintGenesis(wallet)
       await fetchData()        
     } else {
@@ -198,6 +203,11 @@ export default function Hero({ play, setPlay }) {
       })
 
       if(token) {
+        let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
+        const create_tx = new anchor.web3.Transaction().add(transferInstruction)
+        const signature = await wallet.sendTransaction(create_tx, connection);
+        await connection.confirmTransaction(signature, "confirmed");
+  
         console.log('selected genesis to charge', token)
         //upgrade meta of token
         let newMeta = token.meta
@@ -213,6 +223,19 @@ export default function Hero({ play, setPlay }) {
         openChargeSuccess();
       }
     }
+  }
+
+  const endGame = async (level, hasWon) => {
+    //generate lootbox
+    if(level > 1) {
+      let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
+      const create_tx = new anchor.web3.Transaction().add(transferInstruction)
+      const signature = await wallet.sendTransaction(create_tx, connection);
+      await connection.confirmTransaction(signature, "confirmed");
+
+      await mintLootBox(wallet, level, hasWon)
+    }
+    await fetchData()
   }
 
   // conditionally render demo for desktop only
@@ -312,6 +335,7 @@ export default function Hero({ play, setPlay }) {
             <Demo
               handlePlay={handlePlay}
               beatFirstLevel={beatFirstLevel}
+              endGame={endGame}
               hasGenesis={hasGenesis}
               tokenOwnershipData={tokenOwnershipData}
               solBalance={solBalance}
