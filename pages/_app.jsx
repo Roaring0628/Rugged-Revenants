@@ -14,7 +14,7 @@ function MyApp({ Component, pageProps }) {
 
   useEffect(() => {
     if (router.pathname) {
-      if (["/charge-success", "/burn-rugged-nfts"].includes(router.pathname)) {
+      if (["/charge-success", "/burn-rugged-nfts", "/inventory"].includes(router.pathname)) {
         setHideFooter(true);
       } else {
         setHideFooter(false);
