@@ -649,17 +649,17 @@ export default function BurnRuggedNFTs() {
                         <div className="flex justify-end items-center h-6 border-r-2 border-white mb-4 whitespace-nowrap pr-3 relative group">
                           HEALTH
                           {/* TODO - Hover Display, example */}
-                          <div className="hidden group-hover:block absolute w-72 h-40 bottom-0 right-2 border-4 border-[#812991] shadow-white shadow-sm bg-black whitespace-normal">
+                          <div className="hidden group-hover:block absolute w-72 h-40 bottom-0 right-2 border-4 border-[#812991] shadow-white shadow-sm bg-black whitespace-normal p-2">
                             HEALTH <br />
                             <br />
                             Every number value increase adds 0.1 tick of damage
                             to the player's health bar.
                           </div>
                         </div>
-                        <div className="flex justify-end items-center h-6 border-r-2 border-white mb-4 whitespace-nowrap pr-3 relative">
+                        <div className="flex justify-end items-center h-6 border-r-2 border-white mb-4 whitespace-nowrap pr-3 relative group">
                           HEALTH REGEN
                         </div>
-                        <div className="flex justify-end items-center h-6 border-r-2 border-white mb-4 whitespace-nowrap pr-3 relative">
+                        <div className="flex justify-end items-center h-6 border-r-2 border-white mb-4 whitespace-nowrap pr-3 relative group">
                           LUCK
                         </div>
                       </div>
@@ -684,13 +684,13 @@ export default function BurnRuggedNFTs() {
                     </div>
                     <div className="flex">
                       <div className="w-3/5">
-                        <div className="flex justify-end items-center h-6 border-r-2 border-white mb-4 whitespace-nowrap pr-3 relative">
+                        <div className="flex justify-end items-center h-6 border-r-2 border-white mb-4 whitespace-nowrap pr-3 relative group">
                           PROJT COUNT
                         </div>
-                        <div className="flex justify-end items-center h-6 border-r-2 border-white mb-4 whitespace-nowrap pr-3 relative">
+                        <div className="flex justify-end items-center h-6 border-r-2 border-white mb-4 whitespace-nowrap pr-3 relative group">
                           PROJT REGEN
                         </div>
-                        <div className="flex justify-end items-center h-6 border-r-2 border-white mb-4 whitespace-nowrap pr-3 relative">
+                        <div className="flex justify-end items-center h-6 border-r-2 border-white mb-4 whitespace-nowrap pr-3 relative group">
                           PROJT TYPE
                         </div>
                       </div>
