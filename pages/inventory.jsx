@@ -435,11 +435,20 @@ export default function BurnRuggedNFTs() {
   const [tokensWithImage, setTokensWithImage] = useState([]);
   const [filteredNFTs, setFilteredNFTs] = useState([]);
   const [selectedNFT, setSelectedNFT] = useState(null);
-  const [tab, setTab] = useState("player"); // player, lootbox, genesis
+  const [tab, setTab] = useState("genesis"); // player, lootbox, genesis
 
   const selectTab = (tab) => {
     setTab(tab);
     setSelectedNFT(null);
+
+    if (tab === "genesis") {
+      // TODO - This is test data, need to set tokens when changing tab
+      setTokens(stubTokens);
+    } else if (tab === "player") {
+      setTokens([]);
+    } else {
+      setTokens([]);
+    }
   };
 
   useEffect(() => {
@@ -506,11 +515,6 @@ export default function BurnRuggedNFTs() {
 
   const openLootbox = (token) => {
     // TODO - Logic to open lootbox NFT
-    console.log(token);
-  };
-
-  const stakeGenesisNFT = (token) => {
-    // TODO - Logic to stake Genesis NFT
     console.log(token);
   };
 
@@ -589,6 +593,16 @@ export default function BurnRuggedNFTs() {
             {/* NFT Table */}
             <div className="h-[55vh]">
               <CustomScroll>
+                {!tokens.length && tab === "player" && (
+                  <p className="text-center">
+                    There is currently no Playable Characters in the wallet
+                  </p>
+                )}
+                {!tokens.length && tab === "lootbox" && (
+                  <p className="text-center">
+                    There is currently no Lootboxes available in the wallet
+                  </p>
+                )}
                 <div className="grid grid-cols-3 gap-10">
                   {filteredNFTs.map((token, index) => (
                     <div key={index} className="mb-3">
@@ -664,7 +678,7 @@ export default function BurnRuggedNFTs() {
                         </div>
                       </div>
                       <div className="w-2/5">
-                        <div
+                        {/* <div
                           className={classNames(
                             "flex justify-start items-center h-6 mb-4 whitespace-nowrap pl-3",
                             {
@@ -679,6 +693,15 @@ export default function BurnRuggedNFTs() {
                         </div>
                         <div className="flex justify-start items-center h-6 mb-4 whitespace-nowrap pl-3">
                           100
+                        </div> */}
+                        <div className="flex justify-start items-center h-6 mb-4 whitespace-nowrap pl-3">
+                          0
+                        </div>
+                        <div className="flex justify-start items-center h-6 mb-4 whitespace-nowrap pl-3">
+                          0
+                        </div>
+                        <div className="flex justify-start items-center h-6 mb-4 whitespace-nowrap pl-3">
+                          0
                         </div>
                       </div>
                     </div>
@@ -695,7 +718,7 @@ export default function BurnRuggedNFTs() {
                         </div>
                       </div>
                       <div className="w-2/5">
-                        <div className="flex justify-start items-center h-6 mb-4 whitespace-nowrap pl-3">
+                        {/* <div className="flex justify-start items-center h-6 mb-4 whitespace-nowrap pl-3">
                           100
                         </div>
                         <div
@@ -710,6 +733,15 @@ export default function BurnRuggedNFTs() {
                         </div>
                         <div className="flex justify-start items-center h-6 mb-4 whitespace-nowrap pl-3">
                           100
+                        </div> */}
+                        <div className="flex justify-start items-center h-6 mb-4 whitespace-nowrap pl-3">
+                          0
+                        </div>
+                        <div className="flex justify-start items-center h-6 mb-4 whitespace-nowrap pl-3">
+                          0
+                        </div>
+                        <div className="flex justify-start items-center h-6 mb-4 whitespace-nowrap pl-3">
+                          0
                         </div>
                       </div>
                     </div>
@@ -754,32 +786,18 @@ export default function BurnRuggedNFTs() {
                   <div className="w-full h-44 border-4 border-white p-2 text-[0.7rem] leading-[1rem]">
                     {"<DESCRIPTION>"}
                   </div>
-                  <div className="flex items-center justify-center gap-12">
-                    <img
-                      src="/media/NewInventory/Elements/ui_inventory_button_stake.png"
-                      alt="flame"
-                      className={classNames("h-12 cursor-pointer", {
-                        "opacity-70": !selectedNFT,
-                      })}
-                      onClick={() => {
-                        if (selectedNFT) {
-                          stakeGenesisNFT(selectedNFT);
-                        }
-                      }}
-                    />
-                    <img
-                      src="/media/NewInventory/Elements/ui_inventory_button_charge.png"
-                      alt="flame"
-                      className={classNames("h-12 cursor-pointer", {
-                        "opacity-70": !selectedNFT,
-                      })}
-                      onClick={() => {
-                        if (selectedNFT) {
-                          chargeGenesisNFT(selectedNFT);
-                        }
-                      }}
-                    />
-                  </div>
+                  <img
+                    src="/media/NewInventory/Elements/ui_inventory_button_charge.png"
+                    alt="flame"
+                    className={classNames("h-12 cursor-pointer", {
+                      "opacity-70": !selectedNFT,
+                    })}
+                    onClick={() => {
+                      if (selectedNFT) {
+                        chargeGenesisNFT(selectedNFT);
+                      }
+                    }}
+                  />
                 </>
               )}
             </div>
