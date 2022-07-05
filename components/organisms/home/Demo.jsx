@@ -23,8 +23,8 @@ const Demo = ({
           typeof event.data === "object" &&
           event.data.key === "unity-message"
         ) {
-          console.log("========= UNITY MESSAGE =========");
-          console.log(event.data);
+          // console.log("========= UNITY MESSAGE =========");
+          // console.log(event.data);
 
           if (
             event.data.type === "win" &&
@@ -80,7 +80,7 @@ const Demo = ({
 
   const sendMessageToGameInstance = () => {
     // let testObject = { hasDopeCat: true, hasPixelBand: false };
-    console.log("TOKEN OWNERSHIP DATA: ", tokenOwnershipData);
+    // console.log("TOKEN OWNERSHIP DATA: ", tokenOwnershipData);
     let jsonString = JSON.stringify(tokenOwnershipData);
     myGameInstance.SendMessage(
       "JavascriptHook",
