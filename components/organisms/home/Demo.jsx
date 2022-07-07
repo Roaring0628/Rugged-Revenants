@@ -24,7 +24,7 @@ const Demo = ({
         if (
           event.data &&
           typeof event.data === "object" &&
-          event.data.key === "unity-message"
+          event.data.key === "htc4mc3piwgxupacohjtjjhseuaubqu9"
         ) {
           // console.log("========= UNITY MESSAGE =========");
           // console.log(event.data);
@@ -55,11 +55,11 @@ const Demo = ({
 
     // For new build of game: Need to update loaderUrl, and download build files and replace them
     // Live loaderUrl
-    let loaderUrl =
-      "https://v6p9d9t4.ssl.hwcdn.net/html/6031302/RuggedWebGL/Build/RuggedWebGL.loader.js";
-    // Test purpose loaderUrl
     // let loaderUrl =
-    //   "https://v6p9d9t4.ssl.hwcdn.net/html/6018967/RuggedWebGLTesting/Build/RuggedWebGLTesting.loader.js";
+    //   "https://v6p9d9t4.ssl.hwcdn.net/html/6031302/RuggedWebGL/Build/RuggedWebGL.loader.js";
+    // Test purpose loaderUrl
+    let loaderUrl =
+      "https://v6p9d9t4.ssl.hwcdn.net/html/6096955/RuggedWebGL_TESTING/Build/RuggedWebGL_TESTING.loader.js";
 
     let script = document.createElement("script");
     script.src = loaderUrl;
@@ -68,13 +68,13 @@ const Demo = ({
       window
         .createUnityInstance(document.querySelector("#unity-canvas"), {
           // Live build files
-          dataUrl: "/Build/RuggedWebGL.data.unityweb",
-          frameworkUrl: "/Build/RuggedWebGL.framework.js.unityweb",
-          codeUrl: "/Build/RuggedWebGL.wasm.unityweb",
+          // dataUrl: "/Build/RuggedWebGL.data.unityweb",
+          // frameworkUrl: "/Build/RuggedWebGL.framework.js.unityweb",
+          // codeUrl: "/Build/RuggedWebGL.wasm.unityweb",
           // Test purpose files
-          // dataUrl: "/Build/RuggedWebGLTesting.data.unityweb",
-          // frameworkUrl: "/Build/RuggedWebGLTesting.framework.js.unityweb",
-          // codeUrl: "/Build/RuggedWebGLTesting.wasm.unityweb",
+          dataUrl: "/Build/RuggedWebGLTesting.data.unityweb",
+          frameworkUrl: "/Build/RuggedWebGLTesting.framework.js.unityweb",
+          codeUrl: "/Build/RuggedWebGLTesting.wasm.unityweb",
 
           streamingAssetsUrl: "StreamingAssets",
           companyName: "DefaultCompany",
