@@ -55,7 +55,7 @@ export default function Hero({ play, setPlay }) {
   
   const provider = new anchor.AnchorProvider(connection, wallet);
   const hasDopeCat = tokens.filter(o=>o.data.symbol == 'DOPECATS').length > 0
-  const hasGenesis = tokens.filter(o=>o.data.name == Const.GENESIS_NFT_NAME).length > 0
+  const hasGenesis = tokens.filter(o=>o.data.name == Const.GENESIS_NFT_NAME && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY).length > 0
   const hasPixelBand = tokens.filter(o=>o.data.symbol == 'PXLB'||o.data.symbol == 'PXBP'||o.data.symbol == 'PXBD').length > 0
   const hasHippo = tokens.filter(o=>o.data.name.startsWith("HRHC #")||o.data.name.startsWith("HRHC Gen 2 #")).length > 0
   const hasSovanaEgg = tokens.filter(o=>o.data.symbol == 'Sovana Egg').length > 0
@@ -114,7 +114,7 @@ export default function Hero({ play, setPlay }) {
         let tokenmetaPubkey = await metadata.Metadata.getPDA(address);
   
         const tokenmeta = await metadata.Metadata.load(connection, tokenmetaPubkey);
-        if(tokenmeta.data.data.name == Const.GENESIS_NFT_NAME) {
+        if(tokenmeta.data.data.name == Const.GENESIS_NFT_NAME && tokenmeta.data.updateAuthority == Const.NFT_ACCOUNT_PUBKEY) {
           const meta = await axios.get(tokenmeta.data.data.uri)
           tokens.push({...tokenmeta.data, meta:meta.data})
         } else 
@@ -200,7 +200,7 @@ export default function Hero({ play, setPlay }) {
       await fetchData()        
     } else {
       const token = tokens.find((t)=>{
-        return t.data.name == Const.GENESIS_NFT_NAME && t.meta.attributes[0].value < Const.MAX_CHARGE_COUNT
+        return t.data.name == Const.GENESIS_NFT_NAME && t.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && t.meta.attributes[0].value < Const.MAX_CHARGE_COUNT
       })
 
       if(token) {

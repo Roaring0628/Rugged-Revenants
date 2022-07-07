@@ -1020,7 +1020,7 @@ export default function BurnRuggedNFTs() {
   const wallet = useWallet();
   const { publicKey, connected } = useWallet();
   const provider = new anchor.AnchorProvider(connection, wallet);
-  const hasGenesis = allTokens.filter(o=>o.data.name == Const.GENESIS_NFT_NAME).length > 0
+  const hasGenesis = allTokens.filter(o=>o.data.name == Const.GENESIS_NFT_NAME && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY).length > 0
   const router = useRouter();
 
   useEffect(()=>{
@@ -1208,12 +1208,12 @@ export default function BurnRuggedNFTs() {
     if(hasGenesis) {
       let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
 
-      const create_tx = new anchor.web3.Transaction().add(transferInstruction, burnTransaction)
+      const create_tx = new anchor.web3.Transaction().add(transferInstruction)
       const signature = await wallet.sendTransaction(create_tx, connection);
       await connection.confirmTransaction(signature, "confirmed");
 
       //update meta
-      let oldToken = allTokens.find(o=>o.data.name == Const.GENESIS_NFT_NAME && o.meta.attributes[0].value < Const.MAX_CHARGE_COUNT)
+      let oldToken = allTokens.find(o=>o.data.name == Const.GENESIS_NFT_NAME && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && o.meta.attributes[0].value < Const.MAX_CHARGE_COUNT)
       if(!oldToken) return
       let oldMeta = oldToken.meta
       oldMeta.attributes[0].value = oldMeta.attributes[0].value + 3
@@ -1225,7 +1225,7 @@ export default function BurnRuggedNFTs() {
     } else {
       let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
 
-      const create_tx = new anchor.web3.Transaction().add(transferInstruction, burnTransaction)
+      const create_tx = new anchor.web3.Transaction().add(transferInstruction)
       const signature = await wallet.sendTransaction(create_tx, connection);
       await connection.confirmTransaction(signature, "confirmed");
       
@@ -1236,7 +1236,7 @@ export default function BurnRuggedNFTs() {
   };
 
   let genesisToken = selectedGenesisNft?allTokens.find(o=>o.mint == selectedGenesisNft):
-    allTokens.find(o=>o.data.name == Const.GENESIS_NFT_NAME && o.meta.attributes[0].value < Const.MAX_CHARGE_COUNT)
+    allTokens.find(o=>o.data.name == Const.GENESIS_NFT_NAME && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && o.meta.attributes[0].value < Const.MAX_CHARGE_COUNT)
 
   return (
     <main className="w-full relative">

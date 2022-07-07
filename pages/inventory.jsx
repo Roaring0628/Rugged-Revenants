@@ -470,7 +470,7 @@ export default function BurnRuggedNFTs() {
   const wallet = useWallet();
   const { publicKey, connected } = useWallet();
   const provider = new anchor.AnchorProvider(connection, wallet);
-  const hasGenesis = allTokens.filter(o=>o.data.name == Const.GENESIS_NFT_NAME).length > 0
+  const hasGenesis = allTokens.filter(o=>o.data.name == Const.GENESIS_NFT_NAME && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY).length > 0
   const router = useRouter();
 
   useEffect(() => {
@@ -509,7 +509,6 @@ export default function BurnRuggedNFTs() {
     let tokenAddresses = []
     tokenAccounts.value.forEach((e) => {
       const accountInfo = AccountLayout.decode(e.account.data);
-      console.log('accountInfo', accountInfo)
       if(accountInfo.amount > 0) {
         let pubKey = `${new PublicKey(accountInfo.mint)}`
         if(pubKey === Const.RUG_TOKEN_MINTKEY) {
@@ -525,7 +524,7 @@ export default function BurnRuggedNFTs() {
         let tokenmetaPubkey = await metadata.Metadata.getPDA(address);
         
         const tokenmeta = await metadata.Metadata.load(connection, tokenmetaPubkey);
-        if(tokenmeta.data.data.name == Const.GENESIS_NFT_NAME || tokenmeta.data.data.name == Const.LOOTBOX_NFT_NAME) {
+        if(tokenmeta.data.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && (tokenmeta.data.data.name == Const.GENESIS_NFT_NAME || tokenmeta.data.data.name == Const.LOOTBOX_NFT_NAME)) {
           const meta = await axios.get(tokenmeta.data.data.uri)
           tokens.push({...tokenmeta.data, meta:meta.data})
         } else {
