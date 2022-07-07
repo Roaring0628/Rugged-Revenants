@@ -1021,6 +1021,7 @@ export default function BurnRuggedNFTs() {
   const { publicKey, connected } = useWallet();
   const provider = new anchor.AnchorProvider(connection, wallet);
   const hasGenesis = allTokens.filter(o=>o.data.name == Const.GENESIS_NFT_NAME).length > 0
+  const router = useRouter();
 
   useEffect(()=>{
     const selectedGenesisNft= localStorage.getItem("selectedGenesisNft")
@@ -1217,6 +1218,10 @@ export default function BurnRuggedNFTs() {
       let oldMeta = oldToken.meta
       oldMeta.attributes[0].value = oldMeta.attributes[0].value + 3
       await updateMeta(oldToken, oldMeta)
+
+      localStorage.setItem("old-charges", oldMeta.attributes[0].value - 3)
+      localStorage.setItem("new-charges", oldMeta.attributes[0].value)
+      router.push('/charge-success')
     } else {
       let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
 
