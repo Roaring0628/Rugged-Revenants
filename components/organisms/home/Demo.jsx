@@ -24,7 +24,7 @@ const Demo = ({
         if (
           event.data &&
           typeof event.data === "object" &&
-          event.data.key === "unity-message"
+          event.data.key === "htc4mc3piwgxupacohjtjjhseuaubqu9"
         ) {
           // console.log("========= UNITY MESSAGE =========");
           // console.log(event.data);
