@@ -1014,12 +1014,21 @@ export default function BurnRuggedNFTs() {
   const [staked, setStaked] = useState(false)
   const [ruggedAccount, setRuggedAccount] = useState()
   const [mainProgram, setMainProgram] = useState()
+  const [selectedGenesisNft, setSelectedGenesisNft] = useState()
 
   const { connection } = useConnection();
   const wallet = useWallet();
   const { publicKey, connected } = useWallet();
   const provider = new anchor.AnchorProvider(connection, wallet);
   const hasGenesis = allTokens.filter(o=>o.data.name == Const.GENESIS_NFT_NAME).length > 0
+
+  useEffect(()=>{
+    const selectedGenesisNft= localStorage.getItem("selectedGenesisNft")
+    setSelectedGenesisNft(selectedGenesisNft)
+    if(selectedGenesisNft) {
+      localStorage.removeItem("selectedGenesisNft")
+    }
+  }, [])
 
   useEffect(() => {
     if(publicKey) {
@@ -1221,7 +1230,7 @@ export default function BurnRuggedNFTs() {
     await fetchData(whitelist)
   };
 
-  let genesisToken = localStorage.getItem("selectedGenesisNft")?allTokens.find(o=>o.mint == localStorage.getItem("selectedGenesisNft")):
+  let genesisToken = selectedGenesisNft?allTokens.find(o=>o.mint == selectedGenesisNft):
     allTokens.find(o=>o.data.name == Const.GENESIS_NFT_NAME && o.meta.attributes[0].value < Const.MAX_CHARGE_COUNT)
 
   return (
