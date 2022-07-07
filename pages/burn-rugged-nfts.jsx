@@ -1221,7 +1221,7 @@ export default function BurnRuggedNFTs() {
     await fetchData(whitelist)
   };
 
-  let genesisToken = localStorage.selectedGenesisNft?allTokens.find(o=>o.mint == localStorage.selectedGenesisNft):
+  let genesisToken = localStorage.getItem("selectedGenesisNft")?allTokens.find(o=>o.mint == localStorage.getItem("selectedGenesisNft")):
     allTokens.find(o=>o.data.name == Const.GENESIS_NFT_NAME && o.meta.attributes[0].value < Const.MAX_CHARGE_COUNT)
 
   return (

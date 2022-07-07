@@ -747,7 +747,7 @@ export default function BurnRuggedNFTs() {
   const chargeGenesisNFT = (token) => {
     // TODO - Logic to charge Genesis NFT
     console.log(token);
-    localStorage.selectedGenesisNft = token.mint
+    localStorage.setItem("selectedGenesisNft", token.mint)
     router.push('/burn-rugged-nfts')
   };
 
