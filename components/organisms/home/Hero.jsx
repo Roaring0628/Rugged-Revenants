@@ -31,7 +31,7 @@ import * as Const from '../utils/constants'
 import Demo from "./Demo.jsx";
 import ChargeSuccess from "./ChargeSuccess";
 
-const RUG_TOKEN_MINTKEY="9MNDotk5DwCGnTvnPwnzG6oeB9whzLLymQFhacE3swxv"
+const RUG_TOKEN_MINTKEY="Dt7gQrFFWzToJAEUqyMZWb1fRi4M2pLM4o6MDtS57R7e"
 
 export default function Hero({ play, setPlay }) {
   const [isDesktop, setDesktop] = useState(false);

@@ -1022,11 +1022,6 @@ export default function BurnRuggedNFTs() {
   const hasGenesis = allTokens.filter(o=>o.data.name == Const.GENESIS_NFT_NAME).length > 0
 
   useEffect(() => {
-    // TODO - Get tokens from wallet and set state
-    // setTokens(stubTokens);
-  }, []);
-
-  useEffect(() => {
     if(publicKey) {
       init()
     }
@@ -1226,8 +1221,8 @@ export default function BurnRuggedNFTs() {
     await fetchData(whitelist)
   };
 
-  let genesisToken = allTokens.find(o=>o.data.name == Const.GENESIS_NFT_NAME && o.meta.attributes[0].value < Const.MAX_CHARGE_COUNT)
-
+  let genesisToken = localStorage.selectedGenesisNft?allTokens.find(o=>o.mint == localStorage.selectedGenesisNft):
+    allTokens.find(o=>o.data.name == Const.GENESIS_NFT_NAME && o.meta.attributes[0].value < Const.MAX_CHARGE_COUNT)
 
   return (
     <main className="w-full relative">

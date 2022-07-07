@@ -109,7 +109,18 @@ export default {
     },
     async getRuggedWhitelist(){
         return new Promise((resolve, reject)=>{
-            this.baseApi('/rugged-whitelists', 'GET', {}, (err, ret)=>{
+            this.baseApi('/rugged-whiltelists', 'GET', {}, (err, ret)=>{
+                if(err) {
+                    reject()
+                } else {
+                    resolve(ret)
+                }
+            })
+        })
+    },
+    async openLootBox(data){
+        return new Promise((resolve, reject)=>{
+            this.baseApi('/players/openLootBox', 'POST', data, (err, ret)=>{
                 if(err) {
                     reject()
                 } else {

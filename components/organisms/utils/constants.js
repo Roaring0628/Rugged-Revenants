@@ -1,7 +1,7 @@
 
 export const RUG_GAME_PROGRAM_ID = "66mXdV36Y1tGsBng2r51m2imAW2DdH8daqynigafBsvb"
 
-export const RUG_TOKEN_MINTKEY="9MNDotk5DwCGnTvnPwnzG6oeB9whzLLymQFhacE3swxv"
+export const RUG_TOKEN_MINTKEY="Dt7gQrFFWzToJAEUqyMZWb1fRi4M2pLM4o6MDtS57R7e"
 
 export const NFT_ACCOUNT_PUBKEY="FkgYhZzFqCh4SQ3JZH63QMAJspQmv4dNqjG8xMdhASZz"
 export const PREMIUM_ACCOUNT_PUBKEY="3i1osZHj86NrGtFPU4qvtU8RAdNWqP8mqZUp9yhQ7tQ8"

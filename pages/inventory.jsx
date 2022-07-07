@@ -7,6 +7,27 @@ import classNames from "classnames";
 
 import CustomScroll from "components/molecules/CustomScroll";
 
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import * as anchor from "@project-serum/anchor";
+import { Program } from "@project-serum/anchor";
+import { useRouter } from 'next/router';
+import * as metadata from "@metaplex-foundation/mpl-token-metadata";
+import {
+  TOKEN_PROGRAM_ID,
+  getOrCreateAssociatedTokenAccount,
+  AccountLayout,
+  createTransferInstruction,
+} from "@solana/spl-token";
+import {PublicKey, sendAndConfirmTransaction} from "@solana/web3.js";
+
+import RugGameIdl from "../components/organisms/idl/rug_game.json";
+
+import { uploadMetadataToIpfs, mint, mintGenesis, mintPotion, mintLootBox, updateMeta, payToBackendTx, createPotionMeta } from "../components/organisms/utils/mint";
+import {burn, burnTx} from '../components/organisms/utils/nftburn'
+import api from "../components/organisms/api"
+import * as Const from '../components/organisms/utils/constants'
+const { SystemProgram } = anchor.web3;
+
 const stubTokens = [
   {
     key: 4,
@@ -433,28 +454,169 @@ export default function BurnRuggedNFTs() {
   const [keyword, setKeyword] = useState("");
   const [tokens, setTokens] = useState([]);
   const [tokensWithImage, setTokensWithImage] = useState([]);
-  const [filteredNFTs, setFilteredNFTs] = useState([]);
   const [selectedNFT, setSelectedNFT] = useState(null);
   const [tab, setTab] = useState("genesis"); // player, lootbox, genesis
 
-  const selectTab = (tab) => {
+  const [allTokens, setAllTokens] = useState([]);
+
+  const [whitelist, setWhitelist] = useState({})
+  const [ruggedTokenAddresses, setRuggedTokenAddresses] = useState([])
+  const [charged, setCharged] = useState(false)
+  const [staked, setStaked] = useState(false)
+  const [ruggedAccount, setRuggedAccount] = useState()
+  const [mainProgram, setMainProgram] = useState()
+
+  const { connection } = useConnection();
+  const wallet = useWallet();
+  const { publicKey, connected } = useWallet();
+  const provider = new anchor.AnchorProvider(connection, wallet);
+  const hasGenesis = allTokens.filter(o=>o.data.name == Const.GENESIS_NFT_NAME).length > 0
+  const router = useRouter();
+
+  useEffect(() => {
+    if(publicKey) {
+      init()
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [publicKey]);
+
+  const init = async () => {
+    let whitelist = await api.getRuggedWhitelist()
+    console.log('whitelist', whitelist)
+    if(whitelist.length > 0) {
+      setWhitelist(whitelist[0])
+    }
+
+    fetchData(whitelist[0])
+    initMainProgram()
+  }
+
+  const fetchData = async (whitelist) => {
+    let walletInfo = await connection.getAccountInfo(provider.wallet.publicKey)
+    console.log("walletInfo", walletInfo)
+
+    // const tokenMetadata = await metaplex.nfts().findAllByOwner(metaplex.identity().publicKey);
+    // console.log('tokenMetadata', JSON.stringify(tokenMetadata));
+    
+    const tokenAccounts = await connection.getTokenAccountsByOwner(
+      provider.wallet.publicKey,
+      {
+        programId: TOKEN_PROGRAM_ID,
+      }
+    );
+    console.log('tokenAccounts', tokenAccounts)
+    let tokens = []
+    let tokenAddresses = []
+    tokenAccounts.value.forEach((e) => {
+      const accountInfo = AccountLayout.decode(e.account.data);
+      console.log('accountInfo', accountInfo)
+      if(accountInfo.amount > 0) {
+        let pubKey = `${new PublicKey(accountInfo.mint)}`
+        if(pubKey === Const.RUG_TOKEN_MINTKEY) {
+          
+        } else {
+          tokenAddresses.push(pubKey)
+        }
+      }
+    })
+
+    for(let address of tokenAddresses) {
+      try {
+        let tokenmetaPubkey = await metadata.Metadata.getPDA(address);
+        
+        const tokenmeta = await metadata.Metadata.load(connection, tokenmetaPubkey);
+        if(tokenmeta.data.data.name == Const.GENESIS_NFT_NAME || tokenmeta.data.data.name == Const.LOOTBOX_NFT_NAME) {
+          const meta = await axios.get(tokenmeta.data.data.uri)
+          tokens.push({...tokenmeta.data, meta:meta.data})
+        } else {
+          tokens.push(tokenmeta.data)
+        }
+      } catch(e) {
+        console.log('e', e)
+      }
+    }
+    console.log('tokens', tokens)
+    setAllTokens(tokens)
+    selectTab('genesis', tokens)
+
+    if(ruggedAccount && mainProgram) {
+      let programAccount = await mainProgram.account.ruggedAccount.fetch(ruggedAccount);
+      console.log('ruggedAccount', programAccount)
+      setCharged(programAccount.charged)
+      setStaked(programAccount.staked)
+    }
+  }
+
+  const initMainProgram = async () => {
+    anchor.setProvider(provider)
+    const program = new Program(RugGameIdl, new anchor.web3.PublicKey(
+      Const.RUG_GAME_PROGRAM_ID
+    ), provider);
+    console.log("Main Program Id: ", program, program.account,  program.programId.toBase58());
+    setMainProgram(program)
+    api.getRuggedAccount(wallet.publicKey.toBase58(), async (err, ret)=>{
+      console.log('getRuggedAccount', wallet.publicKey.toBase58(), err, ret)
+      if(ret.length == 0) {
+        console.log('create account')
+        //initialize account
+        let ruggedAccount = anchor.web3.Keypair.generate();
+        let tx = program.transaction.create(provider.wallet.publicKey, {
+          accounts: {
+            ruggedAccount: ruggedAccount.publicKey,
+            user: wallet.publicKey,
+            systemProgram: SystemProgram.programId,
+          },
+          signers: [ruggedAccount],
+        });
+
+        const create_tx = new anchor.web3.Transaction().add(tx)
+        let blockhashObj = await connection.getLatestBlockhash();
+        console.log("blockhashObj", blockhashObj);
+        create_tx.recentBlockhash = blockhashObj.blockhash;
+
+        const signature = await wallet.sendTransaction(create_tx, connection, {
+          signers: [ruggedAccount],
+        });
+
+        await connection.confirmTransaction(signature, "confirmed");
+
+        let fetchData = await program.account.ruggedAccount.fetch(ruggedAccount.publicKey);
+        console.log('ruggedAccount', fetchData)
+
+        api.addRuggedAccount({
+          player_account: wallet.publicKey,
+          rugged_account: ruggedAccount.publicKey,
+        }, (err, ret)=>{
+          console.log('addRuggedAccount', err, ret)
+        })
+        setRuggedAccount(ruggedAccount.publicKey)
+      } else {
+        console.log('check account')
+        let ruggedAccount = await program.account.ruggedAccount.fetch(ret[0].rugged_account);
+        console.log('ruggedAccount', ruggedAccount)
+        setCharged(ruggedAccount.charged)
+        setRuggedAccount(ret[0].rugged_account)
+      }
+    })
+  }
+
+  const selectTab = (tab, tokens) => {
     setTab(tab);
     setSelectedNFT(null);
 
+    let filteredTokens = []
     if (tab === "genesis") {
       // TODO - This is test data, need to set tokens when changing tab
-      setTokens(stubTokens);
+      filteredTokens = tokens.filter(o=>o.data.name == Const.GENESIS_NFT_NAME)
     } else if (tab === "player") {
-      setTokens([]);
     } else {
-      setTokens([]);
+      filteredTokens = tokens.filter(o=>o.data.name == Const.LOOTBOX_NFT_NAME)
     }
-  };
 
-  useEffect(() => {
-    // TODO - Get tokens from wallet and set state
-    setTokens(stubTokens);
-  }, []);
+    console.log('filteredTokens', filteredTokens)
+
+    setTokens(filteredTokens)
+  };
 
   useEffect(() => {
     setTokensWithImage([]);
@@ -466,20 +628,6 @@ export default function BurnRuggedNFTs() {
       setTokensWithImage(results);
     });
   }, [tokens]);
-
-  useEffect(() => {
-    searchNFT();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tokensWithImage]);
-
-  const searchNFT = () => {
-    const filteredNFTs = tokensWithImage.filter((token) =>
-      String(token.data.name || "")
-        .toLowerCase()
-        .includes(String(keyword || "").toLowerCase())
-    );
-    setFilteredNFTs(filteredNFTs);
-  };
 
   const getImageFromMetadata = async (uri) => {
     try {
@@ -513,15 +661,103 @@ export default function BurnRuggedNFTs() {
     console.log(token);
   };
 
-  const openLootbox = (token) => {
+  const getRugToken = (level, hasGene) => {
+    return level * 2
+  }
+
+  const getPotion = (level, charged) => {
+    if(!charged) return 0
+
+    const percent = Math.min(level * 6.6, 100)
+    return getRandomInt(0, 100) <= percent? 1 : 0;
+  }
+
+  const openLootbox = async (token) => {
     // TODO - Logic to open lootbox NFT
     console.log(token);
+    anchor.setProvider(provider);
+
+    //get token meta
+    const meta = await axios.get(token.data.uri)
+    console.log(meta)
+    if(!meta || !meta.data) {
+      return
+    }
+
+    let beatLevel = meta.data.attributes.find(o=>o.trait_type == 'level').value
+    let isWon = meta.data.attributes.find(o=>o.trait_type == 'nft').value != 'No'
+
+    console.log('burn', token)
+    let burnInstruction = await burnTx(token.mint, provider.wallet.publicKey, wallet, connection, 1)
+    const create_tx = new anchor.web3.Transaction().add(burnInstruction)
+
+    let rugTokenAmount = getRugToken(beatLevel, hasGenesis)
+    let potionAmount = getPotion(beatLevel, charged)
+
+    console.log('open lootbox', rugTokenAmount, potionAmount, isWon)
+
+    let tx = mainProgram.transaction.charge({
+      accounts: {
+        ruggedAccount: ruggedAccount,
+        authority: provider.wallet.publicKey,
+      },
+    });
+
+    let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.BACKEND_ACCOUNT_PUBKEY), Const.MINT_FEE);
+    create_tx.add(tx, transferInstruction)
+
+    if(potionAmount > 0) 
+    {
+      transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
+      create_tx.add(transferInstruction)
+    }
+    if(isWon) 
+    {
+      transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.PREMIUM_ACCOUNT_PUBKEY), Const.MINT_FEE);
+      create_tx.add(transferInstruction)
+    }
+
+    // let txSignature = window.crypto.randomUUID()
+    // let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
+    // create_tx.add(signatureTx)
+
+    let blockhashObj = await connection.getLatestBlockhash();
+    console.log("blockhashObj", blockhashObj);
+    create_tx.recentBlockhash = blockhashObj.blockhash;
+
+    // const signature = await wallet.sendTransaction(create_tx, connection);
+    // await connection.confirmTransaction(signature, "confirmed");
+
+    let potionMeta = ""
+    if(potionAmount > 0) {
+      potionMeta = await createPotionMeta()
+    }
+    await api.openLootBox({
+      key:wallet.publicKey.toBase58(),
+      rugTokenAmount,
+      potionAmount,
+      potionMeta,
+      isWon,
+      // txId: txSignature
+    })
+
+    await fetchData()
   };
 
   const chargeGenesisNFT = (token) => {
     // TODO - Logic to charge Genesis NFT
     console.log(token);
+    localStorage.selectedGenesisNft = token.mint
+    router.push('/burn-rugged-nfts')
   };
+
+  const filteredNFTs = tokens.filter((token) =>
+      String(token.data.name || "")
+        .toLowerCase()
+        .includes(String(keyword || "").toLowerCase())
+  );
+
+  console.log('filteredNFTs', filteredNFTs)
 
   return (
     <main className="w-full relative">
@@ -541,7 +777,7 @@ export default function BurnRuggedNFTs() {
                   src="/media/NewInventory/Elements/ui_inventory_group_player.png"
                   alt="search icon"
                   className="h-14 cursor-pointer"
-                  onClick={() => selectTab("player")}
+                  onClick={() => selectTab("player", allTokens)}
                 />
               )}
               {tab === "lootbox" ? (
@@ -555,7 +791,7 @@ export default function BurnRuggedNFTs() {
                   src="/media/NewInventory/Elements/ui_inventory_group_lootbox.png"
                   alt="search icon"
                   className="h-14 cursor-pointer"
-                  onClick={() => selectTab("lootbox")}
+                  onClick={() => selectTab("lootbox", allTokens)}
                 />
               )}
               {tab === "genesis" ? (
@@ -569,7 +805,7 @@ export default function BurnRuggedNFTs() {
                   src="/media/NewInventory/Elements/ui_inventory_group_genesis.png"
                   alt="search icon"
                   className="h-14 cursor-pointer"
-                  onClick={() => selectTab("genesis")}
+                  onClick={() => selectTab("genesis", allTokens)}
                 />
               )}
             </div>
@@ -582,7 +818,7 @@ export default function BurnRuggedNFTs() {
                   setKeyword(e.target.value);
                 }}
               />
-              <button onClick={searchNFT}>
+              <button>
                 <img
                   src="/media/inventory/Inventory_Page/searchicon.png"
                   alt="search icon"
@@ -616,7 +852,7 @@ export default function BurnRuggedNFTs() {
                         onClick={() => selectNFT(token)}
                       >
                         <img
-                          src={token.image}
+                          src={token.meta.image}
                           alt="NFT Image"
                           className="w-full h-full object-cover"
                         />
@@ -639,7 +875,7 @@ export default function BurnRuggedNFTs() {
               <div className="w-48 h-48 relative p-1">
                 {selectedNFT && (
                   <img
-                    src={selectedNFT.image}
+                    src={selectedNFT.meta.image}
                     alt="NFT Image"
                     className="w-full h-full object-cover rounded-[2rem]"
                   />
@@ -764,7 +1000,7 @@ export default function BurnRuggedNFTs() {
               {tab === "lootbox" && (
                 <>
                   <div className="w-full h-44 border-4 border-white p-2 text-[0.7rem] leading-[1rem]">
-                    {"<DESCRIPTION>"}
+                    {selectedNFT?selectedNFT.meta.description:"<DESCRIPTION>"}
                   </div>
                   <img
                     src="/media/NewInventory/Elements/ui_inventory_button_openlootbox.png"
@@ -784,7 +1020,7 @@ export default function BurnRuggedNFTs() {
               {tab === "genesis" && (
                 <>
                   <div className="w-full h-44 border-4 border-white p-2 text-[0.7rem] leading-[1rem]">
-                    {"<DESCRIPTION>"}
+                    {selectedNFT?selectedNFT.meta.description:"<DESCRIPTION>"}
                   </div>
                   <img
                     src="/media/NewInventory/Elements/ui_inventory_button_charge.png"

@@ -36,16 +36,16 @@ export const uploadMetadataToIpfs = async (metadata) => {
   }
 };
 
-export const updateMeta = async (token, newMeta)=>{
+export const updateMeta = async (token, newMeta, playerAccount, txId)=>{
   let newUri = await uploadMetadataToIpfs(newMeta)
   console.log('newUri', newUri)
 
-  let ret = await api.updateNftMeta({token, metaUri: newUri})
+  let ret = await api.updateNftMeta({token, metaUri: newUri, playerAccount, txId})
   console.log('ret', ret)
   return ret
 }
 
-export const mintGenesis = async (wallet) => {
+export const mintGenesis = async (wallet, txId) => {
   let uploadedMetatdataUrl = await uploadMetadataToIpfs({
     name: Const.GENESIS_NFT_NAME,
     symbol: Const.GENESIS_NFT_SYMBOL,
@@ -68,11 +68,11 @@ export const mintGenesis = async (wallet) => {
   if (uploadedMetatdataUrl == null) return;
   console.log("Uploaded meta data url: ", uploadedMetatdataUrl);
   // await mint(connection, wallet, Const.GENESIS_NFT_NAME, Const.GENESIS_NFT_SYMBOL, true, uploadedMetatdataUrl, burnInstruction);
-  let ret = await api.mintNft({name: Const.GENESIS_NFT_NAME, symbol: Const.GENESIS_NFT_SYMBOL, mutable:true, metadataUrl:uploadedMetatdataUrl, playerKey: wallet.publicKey})
+  let ret = await api.mintNft({name: Const.GENESIS_NFT_NAME, symbol: Const.GENESIS_NFT_SYMBOL, mutable:true, metadataUrl:uploadedMetatdataUrl, playerKey: wallet.publicKey, txId})
   console.log('mint result from api', ret)
 }
 
-export const mintLootBox = async (wallet, level, hasPremium, gameMode) => {
+export const mintLootBox = async (wallet, level, hasPremium, gameMode, txId) => {
   let uploadedMetatdataUrl = await uploadMetadataToIpfs({
     name: Const.LOOTBOX_NFT_NAME,
     symbol: Const.LOOTBOX_NFT_SYMBOL,
@@ -94,13 +94,13 @@ export const mintLootBox = async (wallet, level, hasPremium, gameMode) => {
 
   if (uploadedMetatdataUrl == null) return;
   console.log("Uploaded meta data url: ", uploadedMetatdataUrl);
-  let ret = await api.mintNft({name: Const.LOOTBOX_NFT_NAME, symbol: Const.LOOTBOX_NFT_SYMBOL, mutable:false, metadataUrl:uploadedMetatdataUrl, playerKey: wallet.publicKey})
+  let ret = await api.mintNft({name: Const.LOOTBOX_NFT_NAME, symbol: Const.LOOTBOX_NFT_SYMBOL, mutable:false, metadataUrl:uploadedMetatdataUrl, playerKey: wallet.publicKey, txId})
   console.log('mint result from api', ret)
 
   // await mint(connection, wallet, Const.LOOTBOX_NFT_NAME, Const.LOOTBOX_NFT_SYMBOL, false, uploadedMetatdataUrl);
 }
 
-export const mintPotion = async (wallet) => {
+export const mintPotion = async (wallet, txId) => {
   let uploadedMetatdataUrl = await uploadMetadataToIpfs({
     name: Const.POTION_NFT_NAME,
     symbol: Const.POTION_NFT_SYMBOL,
@@ -113,10 +113,24 @@ export const mintPotion = async (wallet) => {
 
   if (uploadedMetatdataUrl == null) return;
   console.log("Uploaded meta data url: ", uploadedMetatdataUrl);
-  let ret = await api.mintNft({name: Const.POTION_NFT_NAME, symbol: Const.POTION_NFT_SYMBOL, mutable:false, metadataUrl:uploadedMetatdataUrl, playerKey: wallet.publicKey})
+  let ret = await api.mintNft({name: Const.POTION_NFT_NAME, symbol: Const.POTION_NFT_SYMBOL, mutable:false, metadataUrl:uploadedMetatdataUrl, playerKey: wallet.publicKey, txId})
   console.log('mint result from api', ret)
 
   // await mint(connection, wallet, Const.POTION_NFT_NAME, Const.POTION_NFT_SYMBOL, false, uploadedMetatdataUrl);
+}
+
+export const createPotionMeta = async () => {
+  let uploadedMetatdataUrl = await uploadMetadataToIpfs({
+    name: Const.POTION_NFT_NAME,
+    symbol: Const.POTION_NFT_SYMBOL,
+    description: Const.POTION_NFT_DESCRIPTION,
+    image: Const.POTION_IMAGE_URL,
+    external_url: "https://ruggedrevenants.io/",
+    collection:{"name":"Rugged Revenants Alchemical Agents", "family": "Rugged Revenants Alchemical Agents"},
+    attributes: [],
+  });
+
+  return uploadedMetatdataUrl
 }
 
 export const mint = async (
@@ -236,5 +250,14 @@ export const payToBackendTx = (from, receiver, amount)=>{
     fromPubkey: from,
     toPubkey: receiver,
     lamports: amount,
+  })
+}
+
+export const setProgramTransaction = (program, ruggedAccount, txId, wallet)=>{
+  return program.transaction.setTransaction(txId, {
+    accounts: {
+      ruggedAccount: ruggedAccount,
+      authority: wallet.publicKey,
+    },
   })
 }
