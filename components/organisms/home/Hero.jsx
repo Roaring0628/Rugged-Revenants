@@ -30,6 +30,7 @@ import * as Const from '../utils/constants'
 
 import Demo from "./Demo.jsx";
 import ChargeSuccess from "./ChargeSuccess";
+const { SystemProgram } = anchor.web3;
 
 const RUG_TOKEN_MINTKEY="Dt7gQrFFWzToJAEUqyMZWb1fRi4M2pLM4o6MDtS57R7e"
 
@@ -141,50 +142,50 @@ export default function Hero({ play, setPlay }) {
     ), provider);
     console.log("Main Program Id: ", program, program.account,  program.programId.toBase58());
     setMainProgram(program)
-    // api.getRuggedAccount(wallet.publicKey.toBase58(), async (err, ret)=>{
-    //   console.log('getRuggedAccount', wallet.publicKey.toBase58(), err, ret)
-    //   if(ret.length == 0) {
-    //     console.log('create account')
-    //     //initialize account
-    //     let ruggedAccount = anchor.web3.Keypair.generate();
-    //     let tx = program.transaction.create(provider.wallet.publicKey, {
-    //       accounts: {
-    //         ruggedAccount: ruggedAccount.publicKey,
-    //         user: wallet.publicKey,
-    //         systemProgram: SystemProgram.programId,
-    //       },
-    //       signers: [ruggedAccount],
-    //     });
+    api.getRuggedAccount(wallet.publicKey.toBase58(), async (err, ret)=>{
+      console.log('getRuggedAccount', wallet.publicKey.toBase58(), err, ret)
+      if(ret.length == 0) {
+        console.log('create account')
+        //initialize account
+        let ruggedAccount = anchor.web3.Keypair.generate();
+        let tx = program.transaction.create(provider.wallet.publicKey, {
+          accounts: {
+            ruggedAccount: ruggedAccount.publicKey,
+            user: wallet.publicKey,
+            systemProgram: SystemProgram.programId,
+          },
+          signers: [ruggedAccount],
+        });
 
-    //     const create_tx = new anchor.web3.Transaction().add(tx)
-    //     let blockhashObj = await connection.getLatestBlockhash();
-    //     console.log("blockhashObj", blockhashObj);
-    //     create_tx.recentBlockhash = blockhashObj.blockhash;
+        const create_tx = new anchor.web3.Transaction().add(tx)
+        let blockhashObj = await connection.getLatestBlockhash();
+        console.log("blockhashObj", blockhashObj);
+        create_tx.recentBlockhash = blockhashObj.blockhash;
 
-    //     const signature = await wallet.sendTransaction(create_tx, connection, {
-    //       signers: [ruggedAccount],
-    //     });
+        const signature = await wallet.sendTransaction(create_tx, connection, {
+          signers: [ruggedAccount],
+        });
 
-    //     await connection.confirmTransaction(signature, "confirmed");
+        await connection.confirmTransaction(signature, "confirmed");
 
-    //     let fetchData = await program.account.ruggedAccount.fetch(ruggedAccount.publicKey);
-    //     console.log('ruggedAccount', fetchData)
+        let fetchData = await program.account.ruggedAccount.fetch(ruggedAccount.publicKey);
+        console.log('ruggedAccount', fetchData)
 
-    //     api.addRuggedAccount({
-    //       player_account: wallet.publicKey,
-    //       rugged_account: ruggedAccount.publicKey,
-    //     }, (err, ret)=>{
-    //       console.log('addRuggedAccount', err, ret)
-    //     })
-    //     setRuggedAccount(ruggedAccount.publicKey)
-    //   } else {
-    //     console.log('check account')
-    //     let ruggedAccount = await program.account.ruggedAccount.fetch(ret[0].rugged_account);
-    //     console.log('ruggedAccount', ruggedAccount)
-    //     setCharged(ruggedAccount.charged)
-    //     setRuggedAccount(ret[0].rugged_account)
-    //   }
-    // })
+        api.addRuggedAccount({
+          player_account: wallet.publicKey,
+          rugged_account: ruggedAccount.publicKey,
+        }, (err, ret)=>{
+          console.log('addRuggedAccount', err, ret)
+        })
+        setRuggedAccount(ruggedAccount.publicKey)
+      } else {
+        console.log('check account')
+        let ruggedAccount = await program.account.ruggedAccount.fetch(ret[0].rugged_account);
+        console.log('ruggedAccount', ruggedAccount)
+        setCharged(ruggedAccount.charged)
+        setRuggedAccount(ret[0].rugged_account)
+      }
+    })
   }
 
   const beatFirstLevel = async()=>{
