@@ -725,8 +725,8 @@ export default function BurnRuggedNFTs() {
     console.log("blockhashObj", blockhashObj);
     create_tx.recentBlockhash = blockhashObj.blockhash;
 
-    // const signature = await wallet.sendTransaction(create_tx, connection);
-    // await connection.confirmTransaction(signature, "confirmed");
+    const signature = await wallet.sendTransaction(create_tx, connection);
+    await connection.confirmTransaction(signature, "confirmed");
 
     let potionMeta = ""
     if(potionAmount > 0) {

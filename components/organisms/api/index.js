@@ -109,7 +109,7 @@ export default {
     },
     async getRuggedWhitelist(){
         return new Promise((resolve, reject)=>{
-            this.baseApi('/rugged-whiltelists', 'GET', {}, (err, ret)=>{
+            this.baseApi('/rugged-whitelists', 'GET', {}, (err, ret)=>{
                 if(err) {
                     reject()
                 } else {
