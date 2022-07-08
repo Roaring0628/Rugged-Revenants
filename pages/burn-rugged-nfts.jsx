@@ -1225,7 +1225,7 @@ export default function BurnRuggedNFTs() {
     if(hasGenesis) {
       let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
 
-      const create_tx = new anchor.web3.Transaction().add(transferInstruction)
+      const create_tx = new anchor.web3.Transaction().add(transferInstruction, burnTransaction)
       const signature = await wallet.sendTransaction(create_tx, connection);
       await connection.confirmTransaction(signature, "confirmed");
 
@@ -1242,7 +1242,7 @@ export default function BurnRuggedNFTs() {
     } else {
       let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
 
-      const create_tx = new anchor.web3.Transaction().add(transferInstruction)
+      const create_tx = new anchor.web3.Transaction().add(transferInstruction, burnTransaction)
       const signature = await wallet.sendTransaction(create_tx, connection);
       await connection.confirmTransaction(signature, "confirmed");
       
