@@ -998,8 +998,10 @@ export default function BurnRuggedNFTs() {
               {/* Lootbox Tab */}
               {tab === "lootbox" && (
                 <>
-                  <div className="w-full h-44 border-4 border-white p-2 text-[0.7rem] leading-[1rem]">
-                    {selectedNFT?selectedNFT.meta.description:"<DESCRIPTION>"}
+                  <div className={classNames("w-full h-44 border-4 border-white p-2 text-[0.7rem] leading-[1rem]", {
+                    'flex justify-center items-center': !selectedNFT
+                  })}>
+                    {selectedNFT?selectedNFT.meta.description:"No NFT Selected"}
                   </div>
                   <img
                     src="/media/NewInventory/Elements/ui_inventory_button_openlootbox.png"
@@ -1018,8 +1020,10 @@ export default function BurnRuggedNFTs() {
               {/* Genesis Tab */}
               {tab === "genesis" && (
                 <>
-                  <div className="w-full h-44 border-4 border-white p-2 text-[0.7rem] leading-[1rem]">
-                    {selectedNFT?selectedNFT.meta.description:"<DESCRIPTION>"}
+                  <div className={classNames("w-full h-44 border-4 border-white p-2 text-[0.7rem] leading-[1rem]", {
+                    'flex justify-center items-center': !selectedNFT
+                  })}>
+                    {selectedNFT?selectedNFT.meta.description:"No NFT Selected"}
                   </div>
                   <img
                     src="/media/NewInventory/Elements/ui_inventory_button_charge.png"
