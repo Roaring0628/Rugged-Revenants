@@ -1039,14 +1039,13 @@ export default function BurnRuggedNFTs() {
   }, [publicKey]);
 
   const init = async () => {
-    let whitelist = await api.getRuggedWhitelist()
+    let whitelist = await api.getRuggedWhitelistAuthorities()
     console.log('whitelist', whitelist)
-    if(whitelist.length > 0) {
-      setWhitelist(whitelist[0])
-    }
+    whitelist = whitelist.map(o=>o.authority)
+    setWhitelist(whitelist)
 
-    fetchData(whitelist[0])
     initMainProgram()
+    fetchData(whitelist)
   }
 
   const fetchData = async (whitelist) => {
@@ -1062,12 +1061,10 @@ export default function BurnRuggedNFTs() {
         programId: TOKEN_PROGRAM_ID,
       }
     );
-    console.log('tokenAccounts', tokenAccounts)
     let tokens = []
     let tokenAddresses = []
     tokenAccounts.value.forEach((e) => {
       const accountInfo = AccountLayout.decode(e.account.data);
-      // console.log('accountInfo', accountInfo)
       if(accountInfo.amount > 0) {
         let pubKey = `${new PublicKey(accountInfo.mint)}`
         if(pubKey === Const.RUG_TOKEN_MINTKEY) {
@@ -1079,23 +1076,43 @@ export default function BurnRuggedNFTs() {
     })
 
     console.log('tokenAddresses', tokenAddresses)
-    let ruggedTokenAddresses = tokenAddresses.filter(o=>whitelist.mint_keys.indexOf(o) != -1)
-    setRuggedTokenAddresses(ruggedTokenAddresses)
+    let ruggedTokenAddresses = [] //tokenAddresses.filter(o=>whitelist.indexOf(o) != -1)
+    let ruggedNftCandidates = []
     for(let address of tokenAddresses) {
       try {
         let tokenmetaPubkey = await metadata.Metadata.getPDA(address);
         
         const tokenmeta = await metadata.Metadata.load(connection, tokenmetaPubkey);
-        if(tokenmeta.data.data.name == Const.GENESIS_NFT_NAME || ruggedTokenAddresses.indexOf(address) > -1) {
+        if(tokenmeta.data.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && tokenmeta.data.data.name == Const.GENESIS_NFT_NAME) {
           const meta = await axios.get(tokenmeta.data.data.uri)
           tokens.push({...tokenmeta.data, meta:meta.data})
-        } else {
+        } else if(whitelist.indexOf(tokenmeta.data.updateAuthority) != -1) {
+          ruggedNftCandidates.push({
+            authority: tokenmeta.data.updateAuthority,
+            address: address
+          })
           tokens.push(tokenmeta.data)
-        }
+        } 
       } catch(e) {
         console.log('e', e)
       }
     }
+    if(ruggedNftCandidates.length > 0) {
+      ruggedTokenAddresses = await api.filterRuggedWhitelist(ruggedNftCandidates)
+      setRuggedTokenAddresses(ruggedTokenAddresses)
+      setTokens(tokens.filter(o=>ruggedTokenAddresses.indexOf(o.mint) != -1))
+      if(ruggedTokenAddresses.length > 0) {
+        for(var address of ruggedTokenAddresses) {
+          let tokenIndex = tokens.findIndex(o=>o.mint == address)
+          if(tokenIndex >= 0) {
+            let tokenmeta = tokens[tokenIndex]
+            const meta = await axios.get(tokenmeta.data.uri)
+            tokens[tokenIndex] = {...tokenmeta, mata: meta.data}
+          }
+        }
+      }
+    }
+
     console.log('tokens', tokens)
     setAllTokens(tokens)
     setTokens(tokens.filter(o=>ruggedTokenAddresses.indexOf(o.mint) != -1))

@@ -107,9 +107,31 @@ export default {
             })
         })
     },
+    async getRuggedWhitelistAuthorities(){
+        return new Promise((resolve, reject)=>{
+            this.baseApi('/rugged-whitelists?type=simple', 'GET', {}, (err, ret)=>{
+                if(err) {
+                    reject()
+                } else {
+                    resolve(ret)
+                }
+            })
+        })
+    },
     async getRuggedWhitelist(){
         return new Promise((resolve, reject)=>{
             this.baseApi('/rugged-whitelists', 'GET', {}, (err, ret)=>{
+                if(err) {
+                    reject()
+                } else {
+                    resolve(ret)
+                }
+            })
+        })
+    },
+    async filterRuggedWhitelist(data){
+        return new Promise((resolve, reject)=>{
+            this.baseApi('/rugged-whitelists/filter', 'POST', data, (err, ret)=>{
                 if(err) {
                     reject()
                 } else {
