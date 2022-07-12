@@ -1,10 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
 import { useState } from "react";
 
-const ConsumeChargeConfirm = ({ closeConfirm }) => {
-  const consumeCharge = () => {
+const ConsumeChargeConfirm = ({ closeConfirm, chargeForLootBox }) => {
+  let [processing, setProcessing] = useState(false) 
+  const consumeCharge = async () => {
     // Logic to consume charge
-
+    setProcessing(true)
+    await chargeForLootBox()
     // Must call this function to open the game after consuming charge
     closeConfirm();
   };
@@ -26,12 +28,14 @@ const ConsumeChargeConfirm = ({ closeConfirm }) => {
           <button
             className="w-32 h-10 relative flex justify-center items-center cursor-pointer border-2 border-[#812991]"
             onClick={consumeCharge}
+            disabled={processing}
           >
             YES
           </button>
           <button
             className="w-32 h-10 relative flex justify-center items-center cursor-pointer border-2 border-[#812991]"
             onClick={closeConfirm}
+            disabled={processing}
           >
             NO
           </button>

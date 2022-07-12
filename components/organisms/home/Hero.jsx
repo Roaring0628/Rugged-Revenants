@@ -23,7 +23,7 @@ import axios from 'axios'
 
 import RugGameIdl from "../idl/rug_game.json";
 
-import { uploadMetadataToIpfs, mint, mintGenesis, mintPotion, mintLootBox, updateMeta, payToBackendTx } from "../utils/mint";
+import { uploadMetadataToIpfs, mint, mintGenesis, mintPotion, mintLootBox, updateMeta, payToBackendTx, setProgramTransaction } from "../utils/mint";
 import {burn, burnTx} from '../utils/nftburn'
 import api from "../api"
 import * as Const from '../utils/constants'
@@ -250,7 +250,11 @@ export default function Hero({ play, setPlay }) {
   const handlePlay = () => {
     if (!play) {
       document.body.style.overflow = "hidden";
-      openConsumeConfirm();
+      if(hasGenesis) {
+        openConsumeConfirm();
+      } else {
+        setPlay(true);
+      }
     } else {
       document.body.style.overflow = "unset";
       setPlay(false);
@@ -260,6 +264,45 @@ export default function Hero({ play, setPlay }) {
     // else document.body.style.overflow = "hidden";
     // setPlay(!play);
   };
+
+  const chargeForLootBox = async () => {
+    let token = tokens.find((t)=>{
+      return t.data.name == Const.GENESIS_NFT_NAME && t.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && t.meta.attributes[0].value > 0
+    })
+
+    console.log('chargeForLootBox', token)
+    let oldMeta = token.meta
+    oldMeta.attributes[0].value = oldMeta.attributes[0].value - 1
+
+    let tx = mainProgram.transaction.charge({
+      accounts: {
+        ruggedAccount: ruggedAccount,
+        authority: provider.wallet.publicKey,
+      },
+    });
+
+    let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
+
+    // let txSignature = window.crypto.randomUUID()
+    // let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
+    const create_tx = new anchor.web3.Transaction().add(
+      transferInstruction, 
+      tx, 
+      // signatureTx
+    )
+    const signature = await wallet.sendTransaction(create_tx, connection);
+    await connection.confirmTransaction(signature, "confirmed");
+
+    console.log('signature', signature)
+    await updateMeta(
+      token, 
+      oldMeta, 
+      wallet.publicKey, 
+      //txSignature
+    )
+    
+    await fetchData()
+  }
 
   const openConsumeConfirm = () => {
     setShowConsumeConfirm(true);
@@ -364,7 +407,7 @@ export default function Hero({ play, setPlay }) {
           </div>
         )}
         {showConsumeConfirm && (
-          <ConsumeChargeConfirm closeConfirm={closeConsumeConfirm} />
+          <ConsumeChargeConfirm closeConfirm={closeConsumeConfirm} chargeForLootBox={chargeForLootBox} />
         )}
         {showChargeSuccess && <ChargeSuccess closeChargeSuccess={closeChargeSuccess} />}
       </section>

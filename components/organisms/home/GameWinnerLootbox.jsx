@@ -21,7 +21,7 @@ const GameWinnerLootbox = ({ closeChest, hasGenesis, solBalance, endGame }) => {
       } else {
         console.log("minting lootbox");
         // Need to add logic to mint lootbox
-        await endGame(2, false)
+        await endGame(2, true)
         closeChest();
       }
     }

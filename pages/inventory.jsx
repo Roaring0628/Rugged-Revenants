@@ -28,6 +28,18 @@ import api from "../components/organisms/api"
 import * as Const from '../components/organisms/utils/constants'
 const { SystemProgram } = anchor.web3;
 
+function getRandomInt(min, max) {       
+  // Create byte array and fill with 1 random number
+  var byteArray = new Uint8Array(1);
+  window.crypto.getRandomValues(byteArray);
+
+  var range = max - min + 1;
+  var max_range = 256;
+  if (byteArray[0] >= Math.floor(max_range / range) * range)
+      return getRandomInt(min, max);
+  return min + (byteArray[0] % range);
+}
+
 const stubTokens = [
   {
     key: 4,
