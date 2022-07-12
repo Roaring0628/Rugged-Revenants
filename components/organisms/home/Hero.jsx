@@ -30,6 +30,8 @@ import * as Const from '../utils/constants'
 
 import Demo from "./Demo.jsx";
 import ChargeSuccess from "./ChargeSuccess";
+import ConsumeChargeConfirm from "./ConsumeChargeConfirm";
+
 const { SystemProgram } = anchor.web3;
 
 const RUG_TOKEN_MINTKEY="Dt7gQrFFWzToJAEUqyMZWb1fRi4M2pLM4o6MDtS57R7e"
@@ -48,6 +50,7 @@ export default function Hero({ play, setPlay }) {
   const [solBalance, setSolBalance] = useState(0)
 
   const [showChargeSuccess, setShowChargeSuccess] = useState(false);
+  const [showConsumeConfirm, setShowConsumeConfirm] = useState(false);
 
   const wallet = useWallet();
   const { publicKey, connected } = useWallet();
@@ -245,10 +248,27 @@ export default function Hero({ play, setPlay }) {
   };
 
   const handlePlay = () => {
-    if (play) document.body.style.overflow = "unset";
-    else document.body.style.overflow = "hidden";
-    setPlay(!play);
+    if (!play) {
+      document.body.style.overflow = "hidden";
+      openConsumeConfirm();
+    } else {
+      document.body.style.overflow = "unset";
+      setPlay(false);
+    }
+    
+    // if (play) document.body.style.overflow = "unset";
+    // else document.body.style.overflow = "hidden";
+    // setPlay(!play);
   };
+
+  const openConsumeConfirm = () => {
+    setShowConsumeConfirm(true);
+  }
+
+  const closeConsumeConfirm = () => {
+    setShowConsumeConfirm(false);
+    setPlay(true);
+  }
 
   const openChargeSuccess = () => {
     setShowChargeSuccess(true);
@@ -342,6 +362,9 @@ export default function Hero({ play, setPlay }) {
               solBalance={solBalance}
             />
           </div>
+        )}
+        {showConsumeConfirm && (
+          <ConsumeChargeConfirm closeConfirm={closeConsumeConfirm} />
         )}
         {showChargeSuccess && <ChargeSuccess closeChargeSuccess={closeChargeSuccess} />}
       </section>
