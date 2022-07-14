@@ -18,8 +18,9 @@ const FAQ = () => {
           </Question>
           <Question question="What is the total supply?">
             <div className="px-6">
-              Generation 1 will consist of 4,000 Revenants sent back in time to
-              stop Solana from getting Rugged.
+              {/* Generation 1 will consist of 4,000 Revenants sent back in time to
+              stop Solana from getting Rugged. */}
+              TBD
             </div>
           </Question>
           <Question question="How many can I mint per wallet?">
@@ -27,11 +28,12 @@ const FAQ = () => {
           </Question>
           <Question question="What is the price per mint?">
             <div className="px-6">
-              <p>
+              {/* <p>
                 Whitelist 1 SOL
                 <br />
                 Public Mint 1.25 SOL
-              </p>
+              </p> */}
+              TBD
             </div>
           </Question>
           <Question question="Wen mint?">
