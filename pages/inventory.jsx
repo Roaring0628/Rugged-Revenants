@@ -26,6 +26,9 @@ import { uploadMetadataToIpfs, mint, mintGenesis, mintPotion, mintLootBox, updat
 import {burn, burnTx} from '../components/organisms/utils/nftburn'
 import api from "../components/organisms/api"
 import * as Const from '../components/organisms/utils/constants'
+
+import OpenLootboxConfirm from "components/organisms/home/OpenLootboxConfirm";
+
 const { SystemProgram } = anchor.web3;
 
 function getRandomInt(min, max) {       
@@ -471,6 +474,8 @@ export default function BurnRuggedNFTs() {
 
   const [allTokens, setAllTokens] = useState([]);
 
+  const [showLootboxConfirm, setShowLootboxConfirm] = useState(false);
+
   const [whitelist, setWhitelist] = useState({})
   const [ruggedTokenAddresses, setRuggedTokenAddresses] = useState([])
   const [charged, setCharged] = useState(false)
@@ -681,6 +686,14 @@ export default function BurnRuggedNFTs() {
 
     const percent = Math.min(level * 6.6, 100)
     return getRandomInt(0, 100) <= percent? 1 : 0;
+  }
+
+  const openLootboxConfirm = () => {
+    setShowLootboxConfirm(true);
+  }
+
+  const closeLootboxConfirm = () => {
+    setShowLootboxConfirm(false);
   }
 
   const openLootbox = async (token) => {
@@ -1023,7 +1036,7 @@ export default function BurnRuggedNFTs() {
                     })}
                     onClick={() => {
                       if (selectedNFT) {
-                        openLootbox(selectedNFT);
+                        openLootboxConfirm();
                       }
                     }}
                   />
@@ -1051,6 +1064,13 @@ export default function BurnRuggedNFTs() {
                   />
                 </>
               )}
+              {showLootboxConfirm && 
+                <OpenLootboxConfirm
+                  closeConfirm={closeLootboxConfirm}
+                  openLootbox={openLootbox}
+                  selectedNFT={selectedNFT}
+                />
+              }
             </div>
           </div>
         </div>
