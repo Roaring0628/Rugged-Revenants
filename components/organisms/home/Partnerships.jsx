@@ -12,7 +12,7 @@ const Partnerships = () => {
             levels, and exclusive in-game characters.
           </p>
         </div>
-        <div className="grid grid-cols-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           <div className="w-full flex flex-col items-center mb-12">
             <div className="w-[70%] h-40 mb-8 pb-4 border-b-4 border-brand-purple flex justify-between items-center">
               <img
