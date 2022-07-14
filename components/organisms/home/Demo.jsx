@@ -48,6 +48,14 @@ const Demo = ({
             // TODO - Need to update this, open lootbox chest when the user beat level 2 for demo
             openLootboxChest();
           }
+
+          handleGameResult(
+            event.data.type === "win" && event.data.hasWon,
+            event.data.type === "die",
+            event.data.level,
+            event.data.levelsComplete,
+            event.data.isLastLevel
+          );
         }
       },
       false
@@ -100,6 +108,21 @@ const Demo = ({
       "RecieveWalletJson",
       jsonString
     );
+  };
+
+  const handleGameResult = (
+    isWin,
+    isDie,
+    currentLevel,
+    completedLevelsCount,
+    isFinalLevel
+  ) => {
+    console.log("win", isWin);
+    console.log("die", isDie);
+    console.log("currentLevel", currentLevel);
+    // we have this completedLevelsCount value when only the user die
+    console.log("completedLevelsCount", completedLevelsCount);
+    console.log("isFinalLevel", isFinalLevel);
   };
 
   const quitGame = () => {

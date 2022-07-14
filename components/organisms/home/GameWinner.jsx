@@ -26,8 +26,12 @@ const GameWinner = ({ closeChest, beatFirstLevel, hasGenesis, solBalance }) => {
           // At least 0.1 SOL to mint (accept) genesis nft
           openBalanceWarning();
         } else {
-          await beatFirstLevel();
-          closeChest();
+          try {
+            await beatFirstLevel();
+            closeChest();
+          } catch (e) {
+            closeChest();
+          }
         }
       }
     }
@@ -43,8 +47,12 @@ const GameWinner = ({ closeChest, beatFirstLevel, hasGenesis, solBalance }) => {
         // At least 0.1 SOL to mint (accept) genesis nft
         openBalanceWarning();
       } else {
-        await beatFirstLevel();
-        closeChest();
+        try {
+          await beatFirstLevel();
+          closeChest();
+        } catch (e) {
+          closeChest();
+        }
       }
     }
   };

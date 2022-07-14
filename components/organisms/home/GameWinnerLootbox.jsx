@@ -19,10 +19,14 @@ const GameWinnerLootbox = ({ closeChest, hasGenesis, solBalance, endGame }) => {
         // At least 0.1 SOL to mint (accept) lootbox
         openBalanceWarning();
       } else {
-        console.log("minting lootbox");
-        // Need to add logic to mint lootbox
-        await endGame(2, true)
-        closeChest();
+        try {
+          console.log("minting lootbox");
+          // Need to add logic to mint lootbox
+          await endGame(2, true)
+          closeChest();
+        } catch (e) {
+          closeChest();
+        }
       }
     }
   };
