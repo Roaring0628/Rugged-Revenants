@@ -5,6 +5,7 @@ import Hero from "components/organisms/home/Hero";
 import ShortAboutOne from "components/organisms/home/ShortAboutOne";
 import ShortAboutTwo from "components/organisms/home/ShortAboutTwo";
 import ShortAboutThree from "components/organisms/home/ShortAboutThree";
+import ShortAboutFour from "components/organisms/home/ShortAboutFour";
 import DemoVideo from "components/organisms/home/DemoVideo";
 import WhyJoin from "components/organisms/home/WhyJoin";
 import Partnerships from "components/organisms/home/Partnerships";
@@ -21,6 +22,7 @@ export default function Home() {
       <ShortAboutOne play={play} setPlay={setPlay} />
       <ShortAboutTwo />
       <ShortAboutThree />
+      <ShortAboutFour />
       <DemoVideo />
       <WhyJoin />
       <Partnerships />

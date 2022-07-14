@@ -108,6 +108,65 @@ const Partnerships = () => {
             </div>
           </div>
         </div>
+        <div className="flex flex-wrap justify-evenly">
+          <div className="w-full md:w-[32%] flex flex-col items-center mb-12">
+            <div className="w-[70%] h-40 mb-8 pb-4 border-b-4 border-brand-purple flex justify-between items-center">
+              <img
+                src="/media/partners/Pesky-Penguins.png"
+                alt=""
+                loading="lazy"
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <div className="px-2 flex flex-col justify-center items-center">
+              <p className="text-sm text-center px-4">
+                Deep in the Antarctic lives a fun and lively group of penguins
+                who work every day to make the Solana community and their home
+                city of Nootopia a better and more prosperous place. But not
+                everybody shares their love and WAGMI vibes; the Dread Magus
+                <strong>Gargolon</strong> would seek to destroy every one of the
+                Pesky Penguins and reclaim Antarctica for himself!
+              </p>
+            </div>
+          </div>
+          <div className="w-full md:w-[32%] flex flex-col items-center mb-12">
+            <div className="w-[70%] h-40 mb-8 pb-4 border-b-4 border-brand-purple flex justify-between items-center">
+              <img
+                src="/media/partners/Great-Goats.png"
+                alt=""
+                loading="lazy"
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <div className="px-2 flex flex-col justify-center items-center">
+              <p className="text-sm text-center px-4">
+                Be a Goat. Where your identity matters. A label for the
+                ecosystem. Followed by the community. #Goatish
+              </p>
+            </div>
+          </div>
+          <div className="w-full md:w-[32%] flex flex-col items-center mb-12">
+            <div className="w-[70%] h-40 mb-8 pb-4 border-b-4 border-brand-purple flex justify-between items-center">
+              <img
+                src="/media/partners/MonkeDAO_FullLogoHoriz_White_PANTONE.png"
+                alt=""
+                loading="lazy"
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <div className="px-2 flex flex-col justify-center items-center">
+              <p className="text-sm text-center px-4">
+                <i>Reject humanity, return to monke</i>… the monkeys' goal is to
+                invade the Solana blockchain with as many individuals as
+                possible, building a large community around them, supported by
+                owner-exclusive advantages. We can whatever fits best on website{" "}
+                <a href="https://brand.monkedao.io/brand-style-guide/logo">
+                  https://brand.monkedao.io/brand-style-guide/logo
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

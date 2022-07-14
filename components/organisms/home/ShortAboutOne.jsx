@@ -31,11 +31,12 @@ const ShortAboutOne = ({ play, setPlay }) => {
               <img src="/media/line.png" alt="line" loading="lazy" />
               <img src="/media/lineDark.png" alt="line" loading="lazy" />
               <img src="/media/lineDark.png" alt="line" loading="lazy" />
+              <img src="/media/lineDark.png" alt="line" loading="lazy" />
             </div>
             <div className="">
               <h1 className="text-3xl mb-6">Rugs to riches</h1>
               <p className="text-sm1 mb-6">
-                Insert token to win NFTs from our game. Earn more token by
+                Use charges to win NFTs from our game. Earn more charges by
                 winning.
               </p>
               <div
