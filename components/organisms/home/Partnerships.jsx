@@ -157,10 +157,7 @@ const Partnerships = () => {
                 <i>Reject humanity, return to monke</i>… the monkeys' goal is to
                 invade the Solana blockchain with as many individuals as
                 possible, building a large community around them, supported by
-                owner-exclusive advantages. We can whatever fits best on website{" "}
-                <a href="https://brand.monkedao.io/brand-style-guide/logo">
-                  https://brand.monkedao.io/brand-style-guide/logo
-                </a>
+                owner-exclusive advantages.
               </p>
             </div>
           </div>
