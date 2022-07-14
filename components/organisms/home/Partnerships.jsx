@@ -12,11 +12,11 @@ const Partnerships = () => {
             levels, and exclusive in-game characters.
           </p>
         </div>
-        <div className="flex flex-wrap justify-evenly">
-          <div className="w-full md:w-[32%] flex flex-col items-center mb-12">
+        <div className="grid grid-cols-3">
+          <div className="w-full flex flex-col items-center mb-12">
             <div className="w-[70%] h-40 mb-8 pb-4 border-b-4 border-brand-purple flex justify-between items-center">
               <img
-                src="/media/partners/SovaFlashy.gif"
+                src="/media/partners/sovana_logo_transparent_background.png"
                 alt="Cyber Samurai"
                 loading="lazy"
                 className="h-full object-contain w-[30%]"
@@ -35,7 +35,7 @@ const Partnerships = () => {
               </p>
             </div>
           </div>
-          <div className="w-full md:w-[32%] flex flex-col items-center mb-12">
+          <div className="w-full flex flex-col items-center mb-12">
             <div className="w-3/5 h-40 mb-8 pb-4 border-b-4 border-brand-purple">
               <img
                 src="/media/partners/PixelBands-Logo.png"
@@ -52,7 +52,7 @@ const Partnerships = () => {
               </p>
             </div>
           </div>
-          <div className="w-full md:w-[32%] flex flex-col items-center mb-12">
+          <div className="w-full flex flex-col items-center mb-12">
             <div className="w-3/5 h-40 mb-8 pb-4 border-b-4 border-brand-purple">
               <img
                 src="/media/partners/DopeCats-Logo.png"
@@ -69,7 +69,7 @@ const Partnerships = () => {
               </p>
             </div>
           </div>
-          <div className="w-full md:w-[40%] flex flex-col items-center mb-12">
+          <div className="w-full flex flex-col items-center mb-12">
             <div className="w-3/5 h-48 mb-8 pb-4 border-b-4 border-brand-purple">
               <img
                 src="/media/partners/Cyber_Samurai.png"
@@ -88,7 +88,7 @@ const Partnerships = () => {
               </p>
             </div>
           </div>
-          <div className="w-full md:w-[40%] flex flex-col items-center mb-12">
+          <div className="w-full flex flex-col items-center mb-12">
             <div className="w-3/5 h-48 mb-8 pb-4 border-b-4 border-brand-purple">
               <img
                 src="/media/partners/hippos.png"
@@ -107,9 +107,7 @@ const Partnerships = () => {
               </p>
             </div>
           </div>
-        </div>
-        <div className="flex flex-wrap justify-evenly">
-          <div className="w-full md:w-[32%] flex flex-col items-center mb-12">
+          <div className="w-full flex flex-col items-center mb-12">
             <div className="w-[70%] h-40 mb-8 pb-4 border-b-4 border-brand-purple flex justify-between items-center">
               <img
                 src="/media/partners/Pesky-Penguins.png"
@@ -129,7 +127,7 @@ const Partnerships = () => {
               </p>
             </div>
           </div>
-          <div className="w-full md:w-[32%] flex flex-col items-center mb-12">
+          <div className="w-full flex flex-col items-center mb-12">
             <div className="w-[70%] h-40 mb-8 pb-4 border-b-4 border-brand-purple flex justify-between items-center">
               <img
                 src="/media/partners/Great-Goats.png"
@@ -145,7 +143,7 @@ const Partnerships = () => {
               </p>
             </div>
           </div>
-          <div className="w-full md:w-[32%] flex flex-col items-center mb-12">
+          <div className="w-full flex flex-col items-center mb-12">
             <div className="w-[70%] h-40 mb-8 pb-4 border-b-4 border-brand-purple flex justify-between items-center">
               <img
                 src="/media/partners/MonkeDAO_FullLogoHoriz_White_PANTONE.png"
