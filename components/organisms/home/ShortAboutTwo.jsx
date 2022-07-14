@@ -14,14 +14,14 @@ const ShortAboutTwo = () => {
               />
             </div>
           </div>
-          <div className="md:w-1/2 pt-10">
+          <div className="md:w-1/2 pt-10 flex flex-col items-center md:block">
             <div className="flex gap-4 mb-6">
               <img src="/media/line.png" alt="line" loading="lazy" />
               <img src="/media/line.png" alt="line" loading="lazy" />
               <img src="/media/lineDark.png" alt="line" loading="lazy" />
               <img src="/media/lineDark.png" alt="line" loading="lazy" />
             </div>
-            <div className="">
+            <div className="text-center md:text-left">
               <h1 className="text-3xl mb-6">What are Rugged Revenants?</h1>
               <p className="text-sm1 mb-6">
                 Rugged revenants are NFTs that holders will use as playable
