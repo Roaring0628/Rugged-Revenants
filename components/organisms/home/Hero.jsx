@@ -104,7 +104,7 @@ export default function Hero({ play, setPlay }) {
       if(accountInfo.amount > 0) {
         let pubKey = `${new PublicKey(accountInfo.mint)}`
         if(pubKey === RUG_TOKEN_MINTKEY) {
-          setRugToken(Math.floor(Number(accountInfo.amount)/1000000000))
+          setRugToken(Math.floor(Number(accountInfo.amount)/1000000))
         } else {
           tokenAddresses.push(pubKey)
         }
