@@ -541,7 +541,7 @@ export default function BurnRuggedNFTs() {
         let tokenmetaPubkey = await metadata.Metadata.getPDA(address);
         
         const tokenmeta = await metadata.Metadata.load(connection, tokenmetaPubkey);
-        if(tokenmeta.data.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && (tokenmeta.data.data.name == Const.GENESIS_NFT_NAME || tokenmeta.data.data.name == Const.LOOTBOX_NFT_NAME)) {
+        if(tokenmeta.data.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && (tokenmeta.data.data.name == Const.GENESIS_NFT_NAME || tokenmeta.data.data.name == Const.LOOTBOX_NFT_NAME || tokenmeta.data.data.symbol == Const.PLAYABLE_NFT_SYMBOL)) {
           const meta = await axios.get(tokenmeta.data.data.uri)
           tokens.push({...tokenmeta.data, meta:meta.data})
         } else {
@@ -623,10 +623,11 @@ export default function BurnRuggedNFTs() {
     let filteredTokens = []
     if (tab === "genesis") {
       // TODO - This is test data, need to set tokens when changing tab
-      filteredTokens = tokens.filter(o=>o.data.name == Const.GENESIS_NFT_NAME)
+      filteredTokens = tokens.filter(o=>o.data.name == Const.GENESIS_NFT_NAME && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY)
     } else if (tab === "player") {
+      filteredTokens = tokens.filter(o=>o.data.symbol == Const.PLAYABLE_NFT_SYMBOL && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY)
     } else {
-      filteredTokens = tokens.filter(o=>o.data.name == Const.LOOTBOX_NFT_NAME)
+      filteredTokens = tokens.filter(o=>o.data.name == Const.LOOTBOX_NFT_NAME && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY)
     }
 
     console.log('filteredTokens', filteredTokens)
@@ -689,7 +690,11 @@ export default function BurnRuggedNFTs() {
   }
 
   const openLootboxConfirm = () => {
-    setShowLootboxConfirm(true);
+    if(charged) {
+      setShowLootboxConfirm(true);
+    } else {
+      openLootbox(selectedNFT)
+    }
   }
 
   const closeLootboxConfirm = () => {
@@ -709,26 +714,29 @@ export default function BurnRuggedNFTs() {
     }
 
     let beatLevel = meta.data.attributes.find(o=>o.trait_type == 'level').value
-    let isWon = meta.data.attributes.find(o=>o.trait_type == 'nft').value != 'No'
+    let isWon = charged && meta.data.attributes.find(o=>o.trait_type == 'nft').value != 'No'
 
     console.log('burn', token)
     let burnInstruction = await burnTx(token.mint, provider.wallet.publicKey, wallet, connection, 1)
     const create_tx = new anchor.web3.Transaction().add(burnInstruction)
 
     let rugTokenAmount = getRugToken(beatLevel, hasGenesis)
-    let potionAmount = getPotion(beatLevel, charged)
+    let potionAmount = charged?getPotion(beatLevel, charged):0
 
     console.log('open lootbox', rugTokenAmount, potionAmount, isWon)
 
-    let tx = mainProgram.transaction.charge({
-      accounts: {
-        ruggedAccount: ruggedAccount,
-        authority: provider.wallet.publicKey,
-      },
-    });
+    if(charged) {
+      let tx = mainProgram.transaction.decharge({
+        accounts: {
+          ruggedAccount: ruggedAccount,
+          authority: provider.wallet.publicKey,
+        },
+      });
+      create_tx.add(tx)
+    }
 
     let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.BACKEND_ACCOUNT_PUBKEY), Const.MINT_FEE);
-    create_tx.add(tx, transferInstruction)
+    create_tx.add(transferInstruction)
 
     if(potionAmount > 0) 
     {
@@ -955,13 +963,13 @@ export default function BurnRuggedNFTs() {
                           100
                         </div> */}
                         <div className="flex justify-start items-center h-6 mb-4 whitespace-nowrap pl-3">
-                          0
+                        {selectedNFT ? selectedNFT.meta.attributes[0].value : 0}
                         </div>
                         <div className="flex justify-start items-center h-6 mb-4 whitespace-nowrap pl-3">
-                          0
+                        {selectedNFT ? selectedNFT.meta.attributes[1].value : 0}
                         </div>
                         <div className="flex justify-start items-center h-6 mb-4 whitespace-nowrap pl-3">
-                          0
+                        {selectedNFT ? selectedNFT.meta.attributes[5].value : 0}
                         </div>
                       </div>
                     </div>
@@ -995,13 +1003,13 @@ export default function BurnRuggedNFTs() {
                           100
                         </div> */}
                         <div className="flex justify-start items-center h-6 mb-4 whitespace-nowrap pl-3">
-                          0
+                        {selectedNFT ? selectedNFT.meta.attributes[2].value : 0}
                         </div>
                         <div className="flex justify-start items-center h-6 mb-4 whitespace-nowrap pl-3">
-                          0
+                        {selectedNFT ? selectedNFT.meta.attributes[3].value : 0}
                         </div>
                         <div className="flex justify-start items-center h-6 mb-4 whitespace-nowrap pl-3">
-                          0
+                        {selectedNFT ? selectedNFT.meta.attributes[4].value : 0}
                         </div>
                       </div>
                     </div>

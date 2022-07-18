@@ -24,6 +24,8 @@ export const LOOTBOX_NFT_NAME = "Rewards Receptacle"
 export const LOOTBOX_NFT_SYMBOL = "$RR"
 export const LOOTBOX_NFT_DESCRIPTION = 'Rugged revenants are NFTs that holders will use as playable characters within the game. They provide in-game benefits like flight and extra lives based on their attributes.'
 
+export const PLAYABLE_NFT_SYMBOL = "Real-RR"
+
 export const MAX_GAME_LEVEL = 10
 export const MAX_CHARGE_COUNT = 99
 export const UPDATE_META_FEE = 10000 //lamports, 0.000005 SOL
