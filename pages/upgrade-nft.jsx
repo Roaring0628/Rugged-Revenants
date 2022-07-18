@@ -8,6 +8,7 @@ import "swiper/css";
 
 import CustomScroll from "components/molecules/CustomScroll";
 import UpgradeConfirm from "components/organisms/upgrade-nft/UpgradeConfirm";
+import UpgradedResult from "components/organisms/upgrade-nft/UpgradedResult";
 
 const stubTokens = [
   {
@@ -475,6 +476,7 @@ const UpgradeNFT = () => {
   const [selectedRugOptionIndex, setSelectedRugOptionIndex] = useState(0);
 
   const [showConsumeConfirm, setShowConsumeConfirm] = useState(false);
+  const [showResult, setShowResult] = useState(false);
 
   useEffect(() => {
     // TODO - Get tokens from wallet and set state
@@ -567,6 +569,14 @@ const UpgradeNFT = () => {
     setShowConsumeConfirm(false);
   };
 
+  const openResult = () => {
+    setShowResult(true);
+  };
+
+  const closeResult = () => {
+    setShowResult(false);
+  };
+
   const upgrade = () => {
     // TODO - Logic to upgrade selected NFT
     console.log(
@@ -576,6 +586,8 @@ const UpgradeNFT = () => {
       selectedRugOption,
       selectedRugOptionIndex + 1
     );
+
+    openResult();
   };
 
   return (
@@ -777,6 +789,8 @@ const UpgradeNFT = () => {
                 upgrade={upgrade}
               />
             )}
+
+            {showResult && <UpgradedResult closeResult={closeResult} />}
           </div>
         </div>
       </div>
