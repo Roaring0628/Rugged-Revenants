@@ -482,6 +482,7 @@ export default function BurnRuggedNFTs() {
   const [staked, setStaked] = useState(false)
   const [ruggedAccount, setRuggedAccount] = useState()
   const [mainProgram, setMainProgram] = useState()
+  const [rugToken, setRugToken] = useState(0)
 
   const { connection } = useConnection();
   const wallet = useWallet();
@@ -529,7 +530,8 @@ export default function BurnRuggedNFTs() {
       if(accountInfo.amount > 0) {
         let pubKey = `${new PublicKey(accountInfo.mint)}`
         if(pubKey === Const.RUG_TOKEN_MINTKEY) {
-          
+          console.log("Rug Token amount", Math.floor(Number(accountInfo.amount)/1000000))
+          setRugToken(Math.floor(Number(accountInfo.amount)/1000000))
         } else {
           tokenAddresses.push(pubKey)
         }
@@ -673,9 +675,39 @@ export default function BurnRuggedNFTs() {
     else return false;
   };
 
-  const upgradeNFT = (token) => {
+  const upgradeNFT = async (token) => {
     // TODO - Logic to upgrade selected NFT, navigate to upgrade page
     console.log(token);
+
+    //consume $RUG, Potion NFT
+
+
+    return
+    //upgrade playableNFT meta
+    let oldMeta = token.meta
+
+    let index = getRandomInt(0, 5)
+    oldMeta.attributes[index].value = String(Number(oldMeta.attributes[index].value) + 1)
+
+    let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
+
+    // let txSignature = window.crypto.randomUUID()
+    // let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
+    const create_tx = new anchor.web3.Transaction().add(
+      transferInstruction, 
+      // signatureTx
+    )
+
+    const signature = await wallet.sendTransaction(create_tx, connection);
+    await connection.confirmTransaction(signature, "confirmed");
+
+    console.log('signature', signature)
+    await updateMeta(
+      token, 
+      oldMeta, 
+      wallet.publicKey, 
+      //txSignature
+    )
   };
 
   const getRugToken = (level, hasGene) => {
