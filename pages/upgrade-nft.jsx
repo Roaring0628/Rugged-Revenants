@@ -458,6 +458,8 @@ const stubPotions = [
   },
 ];
 
+const rugOptions = [50, 100, 150, 200, 250, 300, 350, 400, 450, 500];
+
 const MINIMUN_SOL_BALANCE = 100000000; // 0.1 SOL
 
 const UpgradeNFT = () => {
@@ -468,7 +470,8 @@ const UpgradeNFT = () => {
   const [filteredNFTs, setFilteredNFTs] = useState([]);
   const [selectedNFT, setSelectedNFT] = useState(null);
   const [selectedPotion, setSelectedPotion] = useState(null);
-  const [useRugToken, setUseRugToken] = useState(false);
+  const [selectedRugOption, setSelectedRugOption] = useState(50);
+  const [selectedRugOptionIndex, setSelectedRugOptionIndex] = useState(0);
 
   useEffect(() => {
     // TODO - Get tokens from wallet and set state
@@ -517,6 +520,22 @@ const UpgradeNFT = () => {
     setSelectedPotion(potion);
   };
 
+  const increaseRuggedTokens = () => {
+    const newIndex = selectedRugOptionIndex + 1;
+    if (newIndex < rugOptions.length) {
+      setSelectedRugOptionIndex(newIndex);
+      setSelectedRugOption(rugOptions[newIndex]);
+    }
+  };
+
+  const decreaseRuggedTokens = () => {
+    const newIndex = selectedRugOptionIndex - 1;
+    if (newIndex > -1) {
+      setSelectedRugOptionIndex(newIndex);
+      setSelectedRugOption(rugOptions[newIndex]);
+    }
+  };
+
   const isSameToken = (nft, token) => {
     if (
       nft &&
@@ -539,7 +558,13 @@ const UpgradeNFT = () => {
 
   const upgrade = () => {
     // TODO - Logic to upgrade selected NFT
-    console.log("upgrade", selectedNFT, selectedPotion, useRugToken);
+    console.log(
+      "upgrade",
+      selectedNFT,
+      selectedPotion,
+      selectedRugOption,
+      selectedRugOptionIndex + 1
+    );
   };
 
   return (
@@ -697,35 +722,35 @@ const UpgradeNFT = () => {
                 <div className="w-full h-44 p-4 border-2 border-white text-[0.7rem] leading-[0.9rem]">
                   {selectedPotion ? selectedPotion.description : ""}
                 </div>
+                <div className="w-full flex justify-between items-center">
+                  <button onClick={decreaseRuggedTokens}>
+                    <img
+                      src="/media/upgrade/ui_upgrade_button_decrease.png"
+                      alt=""
+                      className="w-10 h-10"
+                    />
+                  </button>
+                  <div className="flex items-center">
+                    <img
+                      className="w-7 h-7 mr-3"
+                      src="/media/upgrade/ui_upgrade_rugcoin_icon.png"
+                      alt=""
+                    />
+                    <span className="text-lg">$RUG {selectedRugOption}</span>
+                  </div>
+                  <button onClick={increaseRuggedTokens}>
+                    <img
+                      src="/media/upgrade/ui_upgrade_button_increase.png"
+                      alt=""
+                      className="w-10 h-10"
+                    />
+                  </button>
+                </div>
                 <div className="w-full cursor-pointer" onClick={upgrade}>
                   <img
                     src="/media/upgrade/ui_upgrade_button.png"
                     alt=""
                     className="w-full"
-                  />
-                </div>
-                <div className="w-full flex justify-start items-center">
-                  {useRugToken && (
-                    <img
-                      className="w-6 h-6 mr-2 cursor-pointer"
-                      src="/media/upgrade/ui_upgrade_tickbox_checked.png"
-                      alt=""
-                      onClick={() => setUseRugToken(false)}
-                    />
-                  )}
-                  {!useRugToken && (
-                    <img
-                      className="w-6 h-6 mr-2 cursor-pointer"
-                      src="/media/upgrade/ui_upgrade_tickbox.png"
-                      alt=""
-                      onClick={() => setUseRugToken(true)}
-                    />
-                  )}
-                  <span className="text-sm mr-2">USE $RUG TOKEN</span>
-                  <img
-                    className="w-6 h-6"
-                    src="/media/upgrade/ui_upgrade_rugcoin_icon.png"
-                    alt=""
                   />
                 </div>
               </div>
