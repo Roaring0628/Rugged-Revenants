@@ -7,6 +7,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 
 import CustomScroll from "components/molecules/CustomScroll";
+import UpgradeConfirm from "components/organisms/upgrade-nft/UpgradeConfirm";
 
 const stubTokens = [
   {
@@ -473,6 +474,8 @@ const UpgradeNFT = () => {
   const [selectedRugOption, setSelectedRugOption] = useState(50);
   const [selectedRugOptionIndex, setSelectedRugOptionIndex] = useState(0);
 
+  const [showConsumeConfirm, setShowConsumeConfirm] = useState(false);
+
   useEffect(() => {
     // TODO - Get tokens from wallet and set state
     setTokens(stubTokens);
@@ -554,6 +557,14 @@ const UpgradeNFT = () => {
     if (nft && nft.name === token.name && nft.image === token.image)
       return true;
     else return false;
+  };
+
+  const openConsumeConfirm = () => {
+    setShowConsumeConfirm(true);
+  };
+
+  const closeConsumeConfirm = () => {
+    setShowConsumeConfirm(false);
   };
 
   const upgrade = () => {
@@ -746,15 +757,26 @@ const UpgradeNFT = () => {
                     />
                   </button>
                 </div>
-                <div className="w-full cursor-pointer" onClick={upgrade}>
+                <button
+                  className="w-full cursor-pointer disabled:opacity-70"
+                  disabled={!selectedNFT || !selectedPotion}
+                  onClick={openConsumeConfirm}
+                >
                   <img
                     src="/media/upgrade/ui_upgrade_button.png"
                     alt=""
                     className="w-full"
                   />
-                </div>
+                </button>
               </div>
             </div>
+
+            {showConsumeConfirm && (
+              <UpgradeConfirm
+                closeConfirm={closeConsumeConfirm}
+                upgrade={upgrade}
+              />
+            )}
           </div>
         </div>
       </div>
