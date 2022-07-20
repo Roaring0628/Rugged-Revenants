@@ -10,6 +10,42 @@ import CustomScroll from "components/molecules/CustomScroll";
 import UpgradeConfirm from "components/organisms/upgrade-nft/UpgradeConfirm";
 import UpgradedResult from "components/organisms/upgrade-nft/UpgradedResult";
 
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import * as anchor from "@project-serum/anchor";
+import { Program } from "@project-serum/anchor";
+import { useRouter } from 'next/router';
+import * as metadata from "@metaplex-foundation/mpl-token-metadata";
+import {
+  TOKEN_PROGRAM_ID,
+  getOrCreateAssociatedTokenAccount,
+  AccountLayout,
+  createTransferInstruction,
+} from "@solana/spl-token";
+import {PublicKey, sendAndConfirmTransaction} from "@solana/web3.js";
+
+import RugGameIdl from "../components/organisms/idl/rug_game.json";
+
+import { uploadMetadataToIpfs, mint, mintGenesis, mintPotion, mintLootBox, updateMeta, payToBackendTx, createPotionMeta } from "../components/organisms/utils/mint";
+import {burn, burnTx} from '../components/organisms/utils/nftburn'
+import api from "../components/organisms/api"
+import * as Const from '../components/organisms/utils/constants'
+
+import OpenLootboxConfirm from "components/organisms/home/OpenLootboxConfirm";
+
+const { SystemProgram } = anchor.web3;
+
+function getRandomInt(min, max) {       
+  // Create byte array and fill with 1 random number
+  var byteArray = new Uint8Array(1);
+  window.crypto.getRandomValues(byteArray);
+
+  var range = max - min + 1;
+  var max_range = 256;
+  if (byteArray[0] >= Math.floor(max_range / range) * range)
+      return getRandomInt(min, max);
+  return min + (byteArray[0] % range);
+}
+
 const stubTokens = [
   {
     key: 4,
@@ -460,62 +496,168 @@ const stubPotions = [
   },
 ];
 
-const rugOptions = [50, 100, 150, 200, 250, 300, 350, 400, 450, 500];
+const RUG_TOKEN_STEP = 50
 
 const MINIMUN_SOL_BALANCE = 100000000; // 0.1 SOL
 
 const UpgradeNFT = () => {
   const [swiper, setSwiper] = useState(null);
   const [keyword, setKeyword] = useState("");
-  const [tokens, setTokens] = useState([]);
-  const [tokensWithImage, setTokensWithImage] = useState([]);
-  const [filteredNFTs, setFilteredNFTs] = useState([]);
   const [selectedNFT, setSelectedNFT] = useState(null);
   const [selectedPotion, setSelectedPotion] = useState(null);
-  const [selectedRugOption, setSelectedRugOption] = useState(50);
+  const [selectedRugOption, setSelectedRugOption] = useState(0);
   const [selectedRugOptionIndex, setSelectedRugOptionIndex] = useState(0);
-
+  
   const [showConsumeConfirm, setShowConsumeConfirm] = useState(false);
   const [showResult, setShowResult] = useState(false);
 
-  useEffect(() => {
-    // TODO - Get tokens from wallet and set state
-    setTokens(stubTokens);
-  }, []);
+  const [allTokens, setAllTokens] = useState([]);
+  const [playableNfts, setPlayableNfts] = useState([]);
+  const [potionNfts, setPotionNfts] = useState([]);
+
+  const [ruggedAccount, setRuggedAccount] = useState()
+  const [mainProgram, setMainProgram] = useState()
+  const [rugToken, setRugToken] = useState(0)
+
+  const [oldMeta, setOldMeta] = useState()
+  const [newMeta, setNewMeta] = useState()
+
+  const { connection } = useConnection();
+  const wallet = useWallet();
+  const { publicKey, connected } = useWallet();
+  const provider = new anchor.AnchorProvider(connection, wallet);
 
   useEffect(() => {
-    setTokensWithImage([]);
-    const promises = tokens.map(async (token) => {
-      const imageURL = await getImageFromMetadata(token.data.uri);
-      return { ...token, image: imageURL };
-    });
-    Promise.all(promises).then((results) => {
-      setTokensWithImage(results);
-    });
-  }, [tokens]);
-
-  useEffect(() => {
-    searchNFT();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tokensWithImage]);
-
-  const searchNFT = () => {
-    const filteredNFTs = tokensWithImage.filter((token) =>
-      String(token.data.name || "")
-        .toLowerCase()
-        .includes(String(keyword || "").toLowerCase())
-    );
-    setFilteredNFTs(filteredNFTs);
-  };
-
-  const getImageFromMetadata = async (uri) => {
-    try {
-      const meta = await axios.get(uri);
-      return meta.data.image || "";
-    } catch (e) {
-      return "";
+    if(publicKey) {
+      init()
     }
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [publicKey]);
+
+  // useEffect(() => {
+  //   setTokensWithImage([]);
+  //   const promises = tokens.map(async (token) => {
+  //     const imageURL = await getImageFromMetadata(token.data.uri);
+  //     return { ...token, image: imageURL };
+  //   });
+  //   Promise.all(promises).then((results) => {
+  //     setTokensWithImage(results);
+  //   });
+  // }, [tokens]);
+
+  const init = async () => {
+    fetchData()
+    initMainProgram()
+  }
+
+  const fetchData = async () => {
+    let walletInfo = await connection.getAccountInfo(provider.wallet.publicKey)
+    console.log("walletInfo", walletInfo)
+
+    // const tokenMetadata = await metaplex.nfts().findAllByOwner(metaplex.identity().publicKey);
+    // console.log('tokenMetadata', JSON.stringify(tokenMetadata));
+    
+    const tokenAccounts = await connection.getTokenAccountsByOwner(
+      provider.wallet.publicKey,
+      {
+        programId: TOKEN_PROGRAM_ID,
+      }
+    );
+    console.log('tokenAccounts', tokenAccounts)
+    let tokens = []
+    let tokenAddresses = []
+    tokenAccounts.value.forEach((e) => {
+      const accountInfo = AccountLayout.decode(e.account.data);
+      if(accountInfo.amount > 0) {
+        let pubKey = `${new PublicKey(accountInfo.mint)}`
+        if(pubKey === Const.RUG_TOKEN_MINTKEY) {
+          let rugAmount = Math.floor(Number(accountInfo.amount)/1000000)
+          setRugToken(rugAmount)
+          if(rugAmount >= RUG_TOKEN_STEP) {
+            setSelectedRugOption(RUG_TOKEN_STEP)
+          }
+        } else {
+          tokenAddresses.push(pubKey)
+        }
+      }
+    })
+
+    for(let address of tokenAddresses) {
+      try {
+        let tokenmetaPubkey = await metadata.Metadata.getPDA(address);
+        
+        const tokenmeta = await metadata.Metadata.load(connection, tokenmetaPubkey);
+        if(tokenmeta.data.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && (tokenmeta.data.data.symbol == Const.PLAYABLE_NFT_SYMBOL || tokenmeta.data.data.symbol == Const.POTION_NFT_SYMBOL)) {
+          const meta = await axios.get(tokenmeta.data.data.uri)
+          
+          tokens.push({...tokenmeta.data, meta:meta.data})
+        } 
+      } catch(e) {
+        console.log('e', e)
+      }
+    }
+    console.log('tokens', tokens)
+    setAllTokens(tokens)
+    setPlayableNfts(tokens.filter(o=>o.data.symbol === Const.PLAYABLE_NFT_SYMBOL))
+    setPotionNfts(tokens.filter(o=>o.data.symbol === Const.POTION_NFT_SYMBOL))
+    
+    if(ruggedAccount && mainProgram) {
+      let programAccount = await mainProgram.account.ruggedAccount.fetch(ruggedAccount);
+      console.log('ruggedAccount', programAccount)
+    }
+  }
+
+  const initMainProgram = async () => {
+    anchor.setProvider(provider)
+    const program = new Program(RugGameIdl, new anchor.web3.PublicKey(
+      Const.RUG_GAME_PROGRAM_ID
+    ), provider);
+    console.log("Main Program Id: ", program, program.account,  program.programId.toBase58());
+    setMainProgram(program)
+    api.getRuggedAccount(wallet.publicKey.toBase58(), async (err, ret)=>{
+      console.log('getRuggedAccount', wallet.publicKey.toBase58(), err, ret)
+      if(ret.length == 0) {
+        console.log('create account')
+        //initialize account
+        let ruggedAccount = anchor.web3.Keypair.generate();
+        let tx = program.transaction.create(provider.wallet.publicKey, {
+          accounts: {
+            ruggedAccount: ruggedAccount.publicKey,
+            user: wallet.publicKey,
+            systemProgram: SystemProgram.programId,
+          },
+          signers: [ruggedAccount],
+        });
+
+        const create_tx = new anchor.web3.Transaction().add(tx)
+        let blockhashObj = await connection.getLatestBlockhash();
+        console.log("blockhashObj", blockhashObj);
+        create_tx.recentBlockhash = blockhashObj.blockhash;
+
+        const signature = await wallet.sendTransaction(create_tx, connection, {
+          signers: [ruggedAccount],
+        });
+
+        await connection.confirmTransaction(signature, "confirmed");
+
+        let fetchData = await program.account.ruggedAccount.fetch(ruggedAccount.publicKey);
+        console.log('ruggedAccount', fetchData)
+
+        api.addRuggedAccount({
+          player_account: wallet.publicKey,
+          rugged_account: ruggedAccount.publicKey,
+        }, (err, ret)=>{
+          console.log('addRuggedAccount', err, ret)
+        })
+        setRuggedAccount(ruggedAccount.publicKey)
+      } else {
+        console.log('check account')
+        let ruggedAccount = await program.account.ruggedAccount.fetch(ret[0].rugged_account);
+        console.log('ruggedAccount', ruggedAccount)
+        setRuggedAccount(ret[0].rugged_account)
+      }
+    })
+  }
 
   const selectNFT = (token) => {
     setSelectedNFT(token);
@@ -577,19 +719,86 @@ const UpgradeNFT = () => {
     setShowResult(false);
   };
 
-  const upgrade = () => {
-    // TODO - Logic to upgrade selected NFT
+  const upgrade = async () => {
     console.log(
       "upgrade",
       selectedNFT,
       selectedPotion,
-      selectedRugOption,
-      selectedRugOptionIndex + 1
-    );
+      selectedRugOption
+    ); 
+
+    //consume $RUG
+    const fromRugTokenAccount = await getOrCreateAssociatedTokenAccount(connection, wallet, new PublicKey(Const.RUG_TOKEN_MINTKEY), wallet.publicKey);
+    const toRugTokenAccount = await api.getOrCreateAssociatedTokenAccount(Const.RUG_TOKEN_MINTKEY);
+
+    console.log('fromTokenAccount, toTokenAccount', fromRugTokenAccount.address.toBase58(), toRugTokenAccount.result)
+    let rugTokenTransferInstruction = createTransferInstruction(
+      fromRugTokenAccount.address, // source
+      new PublicKey(toRugTokenAccount.result),
+      wallet.publicKey,
+      selectedRugOption * 1000000,
+      [],
+      TOKEN_PROGRAM_ID
+   )
+    
+    //burn Potion NFT
+    let burnInstruction = await burnTx(selectedPotion.mint, provider.wallet.publicKey, wallet, connection, 1)
+
+    //upgrade playableNFT meta
+    let oldMeta = selectedNFT.meta
+    setOldMeta([...JSON.parse(JSON.stringify(oldMeta.attributes))])
+
+    for(var i = 0; i < selectedRugOption/RUG_TOKEN_STEP; i++) {
+      let index = getRandomInt(0, 5)
+      oldMeta.attributes[index].value = String(Number(oldMeta.attributes[index].value) + 1)
+    }
+    setNewMeta([...JSON.parse(JSON.stringify(oldMeta.attributes))])
+
+    let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
+
+    // let txSignature = window.crypto.randomUUID()
+    // let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
+    const create_tx = new anchor.web3.Transaction().add(
+      transferInstruction, 
+      rugTokenTransferInstruction,
+      burnInstruction,
+      // signatureTx
+    )
+
+    const signature = await wallet.sendTransaction(create_tx, connection);
+    await connection.confirmTransaction(signature, "confirmed");
+
+    console.log('signature', signature)
+    await updateMeta(
+      selectedNFT, 
+      oldMeta, 
+      wallet.publicKey, 
+      //txSignature
+    )
+
+    fetchData()
 
     openResult();
   };
 
+  const filteredNFTs = playableNfts.filter((token) =>
+      String(token.data.name || "")
+        .toLowerCase()
+        .includes(String(keyword || "").toLowerCase())
+  );
+
+  const getRugTokenOptions = (maxToken) => {
+    let ret = []
+    for(var i = 0 ; i < Math.floor(maxToken/RUG_TOKEN_STEP); i++) {
+      ret.push((i+1)*RUG_TOKEN_STEP)
+    }
+
+    return ret
+  }
+
+  console.log('filteredNFTs', filteredNFTs)
+  console.log('potionNfts', potionNfts)
+  const rugOptions = getRugTokenOptions(rugToken)
   return (
     <div className="w-full h-[100vh]">
       <div className="h-full w-full relative flex items-center justify-center pt-20">
@@ -610,13 +819,6 @@ const UpgradeNFT = () => {
                       setKeyword(e.target.value);
                     }}
                   />
-                  <button onClick={searchNFT} className="flex-shrink-0">
-                    <img
-                      src="/media/inventory/Inventory_Page/searchicon.png"
-                      alt="search icon"
-                      className="h-12"
-                    />
-                  </button>
                 </div>
                 <div className="h-[80%]">
                   <CustomScroll>
@@ -633,7 +835,7 @@ const UpgradeNFT = () => {
                             onClick={() => selectNFT(token)}
                           >
                             <img
-                              src={token.image}
+                              src={token.meta.image}
                               alt="NFT Image"
                               className="w-full h-full object-cover"
                             />
@@ -661,7 +863,7 @@ const UpgradeNFT = () => {
                   </div>
                   <div className="aspect-square mb-2 cursor-pointer relative w-3/5">
                     <img
-                      src={selectedNFT.image}
+                      src={selectedNFT.meta.image}
                       alt="NFT Image"
                       className="w-full h-full object-cover rounded-xl"
                     />
@@ -686,9 +888,9 @@ const UpgradeNFT = () => {
                   slidesPerView={3}
                   direction="vertical"
                   onSwiper={(swiper) => setSwiper(swiper)}
-                  loop
+                  
                 >
-                  {stubPotions.map((potion, index) => (
+                  {potionNfts.map((potion, index) => (
                     <SwiperSlide key={index}>
                       <div
                         className={classNames(
@@ -703,7 +905,7 @@ const UpgradeNFT = () => {
                         onClick={() => selectPotion(potion)}
                       >
                         <img
-                          src={potion.image}
+                          src={potion.meta.image}
                           alt=""
                           className="w-full aspect-square object-contain"
                         />
@@ -730,48 +932,49 @@ const UpgradeNFT = () => {
               <div className="w-2/3 h-full px-4 flex flex-col justify-between items-center">
                 <div className="w-full flex justify-between items-end mb-4">
                   <span>
-                    {selectedPotion ? selectedPotion.name : "Not Selected"}
+                    {selectedPotion ? selectedPotion.meta.name : "Not Selected"}
                   </span>
                   <div className="border border-white w-24 h-24 p-2">
                     {selectedPotion ? (
                       <img
                         className="w-full h-full object-contain"
-                        src={selectedPotion.image}
+                        src={selectedPotion.meta.image}
                         alt=""
                       />
                     ) : null}
                   </div>
                 </div>
                 <div className="w-full h-44 p-4 border-2 border-white text-[0.7rem] leading-[0.9rem]">
-                  {selectedPotion ? selectedPotion.description : ""}
+                  {selectedPotion ? selectedPotion.meta.description : ""}
                 </div>
                 <div className="w-full flex justify-between items-center">
-                  <button onClick={decreaseRuggedTokens}>
+                  {rugToken >= RUG_TOKEN_STEP && <button onClick={decreaseRuggedTokens}>
                     <img
                       src="/media/upgrade/ui_upgrade_button_decrease.png"
                       alt=""
                       className="w-10 h-10"
                     />
-                  </button>
+                  </button>}
                   <div className="flex items-center">
                     <img
                       className="w-7 h-7 mr-3"
                       src="/media/upgrade/ui_upgrade_rugcoin_icon.png"
                       alt=""
                     />
-                    <span className="text-lg">$RUG {selectedRugOption}</span>
+                    {rugToken >= RUG_TOKEN_STEP && <span className="text-lg">$RUG {selectedRugOption}</span>}
+                    {rugToken < RUG_TOKEN_STEP && <span className="text-lg">$RUG is not enough</span>}
                   </div>
-                  <button onClick={increaseRuggedTokens}>
+                  {rugToken >= RUG_TOKEN_STEP && <button onClick={increaseRuggedTokens}>
                     <img
                       src="/media/upgrade/ui_upgrade_button_increase.png"
                       alt=""
                       className="w-10 h-10"
                     />
-                  </button>
+                  </button>}
                 </div>
                 <button
                   className="w-full cursor-pointer disabled:opacity-70"
-                  disabled={!selectedNFT || !selectedPotion}
+                  disabled={!selectedNFT || !selectedPotion || selectedRugOption < RUG_TOKEN_STEP}
                   onClick={openConsumeConfirm}
                 >
                   <img
@@ -790,7 +993,7 @@ const UpgradeNFT = () => {
               />
             )}
 
-            {showResult && <UpgradedResult closeResult={closeResult} />}
+            {showResult && <UpgradedResult closeResult={closeResult} oldMeta={oldMeta} newMeta={newMeta}/>}
           </div>
         </div>
       </div>

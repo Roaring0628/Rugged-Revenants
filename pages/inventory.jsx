@@ -499,17 +499,11 @@ export default function BurnRuggedNFTs() {
   }, [publicKey]);
 
   const init = async () => {
-    let whitelist = await api.getRuggedWhitelist()
-    console.log('whitelist', whitelist)
-    if(whitelist.length > 0) {
-      setWhitelist(whitelist[0])
-    }
-
-    fetchData(whitelist[0])
+    fetchData()
     initMainProgram()
   }
 
-  const fetchData = async (whitelist) => {
+  const fetchData = async () => {
     let walletInfo = await connection.getAccountInfo(provider.wallet.publicKey)
     console.log("walletInfo", walletInfo)
 
@@ -555,7 +549,7 @@ export default function BurnRuggedNFTs() {
     }
     console.log('tokens', tokens)
     setAllTokens(tokens)
-    selectTab('genesis', tokens)
+    // selectTab('genesis', tokens)
 
     if(ruggedAccount && mainProgram) {
       let programAccount = await mainProgram.account.ruggedAccount.fetch(ruggedAccount);
@@ -678,36 +672,9 @@ export default function BurnRuggedNFTs() {
   const upgradeNFT = async (token) => {
     // TODO - Logic to upgrade selected NFT, navigate to upgrade page
     console.log(token);
-
-    //consume $RUG, Potion NFT
-
+    router.push('/upgrade-nft?id=' + token.mint)
 
     return
-    //upgrade playableNFT meta
-    let oldMeta = token.meta
-
-    let index = getRandomInt(0, 5)
-    oldMeta.attributes[index].value = String(Number(oldMeta.attributes[index].value) + 1)
-
-    let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
-
-    // let txSignature = window.crypto.randomUUID()
-    // let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
-    const create_tx = new anchor.web3.Transaction().add(
-      transferInstruction, 
-      // signatureTx
-    )
-
-    const signature = await wallet.sendTransaction(create_tx, connection);
-    await connection.confirmTransaction(signature, "confirmed");
-
-    console.log('signature', signature)
-    await updateMeta(
-      token, 
-      oldMeta, 
-      wallet.publicKey, 
-      //txSignature
-    )
   };
 
   const getRugToken = (level, hasGene) => {

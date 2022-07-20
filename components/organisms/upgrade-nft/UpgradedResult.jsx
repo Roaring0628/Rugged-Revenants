@@ -2,7 +2,7 @@
 import { useState } from "react";
 import classNames from "classnames";
 
-const UpgradedResult = ({ closeResult }) => {
+const UpgradedResult = ({ closeResult, oldMeta, newMeta }) => {
   const imageURL =
     "https://www.arweave.net/dDhk5dvQibjIzt2ieWn_PeUqZU7cP_5g9Sjs6veRFlg?ext=png";
 
@@ -11,12 +11,26 @@ const UpgradedResult = ({ closeResult }) => {
     "HEALTH REGEN",
     "PROJT COUNT",
     "PROJT REGEN",
+    "PROJT TYPE",
     "LUCK",
     "",
-    "",
   ];
-  const oldAttributes = [100, 100, 100, 100, 100];
-  const newAttributes = [110, 100, 120, 90, 100];
+  const oldAttributes = [
+    oldMeta[0].value, 
+    oldMeta[1].value, 
+    oldMeta[2].value, 
+    oldMeta[3].value, 
+    oldMeta[4].value, 
+    oldMeta[5].value
+  ];
+  const newAttributes = [
+    newMeta[0].value, 
+    newMeta[1].value, 
+    newMeta[2].value, 
+    newMeta[3].value, 
+    newMeta[4].value, 
+    newMeta[5].value
+  ];
 
   return (
     <div className="z-[60] fixed inset-0 w-full h-[100vh]">
