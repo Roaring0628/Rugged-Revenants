@@ -43,431 +43,9 @@ function getRandomInt(min, max) {
   return min + (byteArray[0] % range);
 }
 
-const stubTokens = [
-  {
-    key: 4,
-    updateAuthority: "ApJzcJzoz9ggMWqimXgjnrXaEsmtkUUqbaGyiNPQPpLr",
-    mint: "2Gm1mssWAUdpvw3fFpjbMrf6NS3ijXvBca9xYTqBuc4f",
-    data: {
-      name: "Tina",
-      symbol: "NIPS",
-      uri: "https://arweave.net/h71USlnhM87-tg8hBMdzVU2TGf8e-cY9zhMUUaEOPv8",
-      sellerFeeBasisPoints: 1000,
-      creators: [
-        {
-          address: "ApJzcJzoz9ggMWqimXgjnrXaEsmtkUUqbaGyiNPQPpLr",
-          verified: 1,
-          share: 100,
-        },
-      ],
-    },
-    primarySaleHappened: 0,
-    isMutable: 1,
-    editionNonce: 254,
-    tokenStandard: 0,
-  },
-  {
-    key: 4,
-    updateAuthority: "UK2gDfghVSqUjds6CMv7LB6KFroiAE4x7ipHBTMngCJ",
-    mint: "FYvi4MS2991j61DSxVSbxmrsZPQJ3m5JxaH4sBdR6N3v",
-    data: {
-      name: "Big Shot Foxes #2291",
-      symbol: "BSF",
-      uri: "https://arweave.net/RXocyflVh2TDO4K5S0wjcHRwFk1Di9Ql4xlZygIqx1M",
-      sellerFeeBasisPoints: 1000,
-      creators: [
-        {
-          address: "5aSiBFsYGxgFSEUC7S7MmGqHPWVgaN8rjucps1EZZstT",
-          verified: 1,
-          share: 0,
-        },
-        {
-          address: "GT2Ud8dfL5aqjBpCwE19e7QAx4e979jDR2otrxLza2T5",
-          verified: 0,
-          share: 70,
-        },
-        {
-          address: "2iquoCgWCzbMQfYWQs8KiY4yQczHP5wu2JooqbLehVnf",
-          verified: 0,
-          share: 30,
-        },
-      ],
-    },
-    primarySaleHappened: 1,
-    isMutable: 1,
-    editionNonce: 254,
-    tokenStandard: 0,
-  },
-  {
-    key: 4,
-    updateAuthority: "CzvfXtzBrMdgm16e1bZC32T8qtQjpn2e5aiJXzjKWzTe",
-    mint: "EAZ3C42w7337ehuDT3SFuY7sGsuffUMZJwrhPihnM1pw",
-    data: {
-      name: " Chill Elephant  #2930",
-      symbol: "CEC",
-      uri: "https://arweave.net/hwwY3Eh24zz-QW2nGB2GAkyZtivGo6eFM2lJqb3tcp4",
-      sellerFeeBasisPoints: 1000,
-      creators: [
-        {
-          address: "7JEyyweqHhTgwRwVT86SRv3SwaFVbVcVypFT7byYVNYG",
-          verified: 1,
-          share: 0,
-        },
-        {
-          address: "74idAAp8dMBijDRmcxe27Eu8tgnXLqLQwHqUZxteHX71",
-          verified: 1,
-          share: 100,
-        },
-      ],
-    },
-    primarySaleHappened: 1,
-    isMutable: 1,
-    editionNonce: 254,
-  },
-  {
-    key: 4,
-    updateAuthority: "FopzaU1t8r6AMgDY2Lxi452gyZmQXKG78uaAs76M7AUp",
-    mint: "Hr92y1mhm4hADAwjD8GJ2KMfjcZsdmyyBcFq56AJANiW",
-    data: {
-      name: "Unicorn #12897",
-      symbol: "SU",
-      uri: "https://res.cloudinary.com/radcollab/raw/upload/Unicorns/Platform/SU-Tokens-3/12897_kjhgxc.json",
-      sellerFeeBasisPoints: 750,
-      creators: [
-        {
-          address: "9sH8AvmsbmR6zJKB4GaXQhETqAJBbBwz7zTFDgBiGBkX",
-          verified: 1,
-          share: 0,
-        },
-        {
-          address: "76tYGiLCdK3WLSj7u8dGEfTz6bxqWhPzSJZ5LDTsnxMM",
-          verified: 0,
-          share: 77,
-        },
-        {
-          address: "EGaUoxUBGMp7TB1BtKuFMnxwJDG4KhnURd2r9najmaou",
-          verified: 0,
-          share: 13,
-        },
-        {
-          address: "BUqGF6CqToFHrbyCh76hwF62JgS1CEhbUN4kNi8X5qyt",
-          verified: 0,
-          share: 10,
-        },
-      ],
-    },
-    primarySaleHappened: 1,
-    isMutable: 1,
-    editionNonce: 255,
-  },
-  {
-    key: 4,
-    updateAuthority: "QRYjukfx3tkDm4N9ax6wSZKKtBZuzygrFLPFQd8ob7T",
-    mint: "AKMgCtjJ6MNzfWGayoGUf8QCGEHP5gAkxhQu9PbxzUfF",
-    data: {
-      name: "Chikara Chimps #203",
-      symbol: "CC",
-      uri: "https://arweave.net/JJ2tp3DqvldwBatbtiRTbRvYcTF_DEkz6wLYzQh_9Tw",
-      sellerFeeBasisPoints: 1000,
-      creators: [
-        {
-          address: "9g5qd6PVVLMC7yXevPUFkVur4z6ExeVa43ZiWjZfF9yH",
-          verified: 1,
-          share: 0,
-        },
-        {
-          address: "GdEjLQ6WUVtYAwbVfQhrqgk3Ge8XYUa53htjF4xxHfB1",
-          verified: 0,
-          share: 100,
-        },
-      ],
-    },
-    primarySaleHappened: 1,
-    isMutable: 1,
-    editionNonce: 255,
-  },
-  {
-    key: 4,
-    updateAuthority: "CUBMULPw78bn9GT2okcfeQRwJJpA9GaPXdbEnBKtdrMg",
-    mint: "GcBz3NHEvpAqWkn1866xvmkwwjYFfEavQVe42sN41RM8",
-    data: {
-      name: "The Stoned Frogs #1474",
-      symbol: "TSF",
-      uri: "https://bafybeia46hhjfrus5xkuf4itmruh4hxbsuwb2muufbromtcj4if7mmbjxi.ipfs.nftstorage.link/1474.json",
-      sellerFeeBasisPoints: 800,
-      creators: [
-        {
-          address: "8bxYw3iimsLKnxVUHPKHXAUjkTWRfCA3i76FTV1qSmi",
-          verified: 1,
-          share: 0,
-        },
-        {
-          address: "EgFY9PKziUJeKBwsQAH9zuvKyZLvx37gqtxmj5QtN1CX",
-          verified: 0,
-          share: 66,
-        },
-        {
-          address: "3VzP3K6Zkz7So9LBUfZ3ePJfkcbQi7v2F51ZfvRtHN3F",
-          verified: 0,
-          share: 12,
-        },
-        {
-          address: "13PdymuZs8Pw1WjnGn8K3kqVizxPhCrkvwUPWtvzxMKh",
-          verified: 0,
-          share: 12,
-        },
-        {
-          address: "RRUMF9KYPcvNSmnicNMAFKx5wDYix3wjNa6bA7R6xqA",
-          verified: 0,
-          share: 10,
-        },
-      ],
-    },
-    primarySaleHappened: 1,
-    isMutable: 1,
-    editionNonce: 255,
-    collection: {
-      verified: 1,
-      key: "92N4okBv4oqnNk3ULmPLrss74HiS6TgXfNTX7ZRxiNUw",
-    },
-  },
-  {
-    key: 4,
-    updateAuthority: "26wnm56SEP1bT2JVmcDZduXyJxpws2dFVUtwuMTVjyVn",
-    mint: "7kwhsptpVusRpLaLsaGbuwFp6GJsAhRLaC5sfjVJgGb6",
-    data: {
-      name: "Reels of Change #3160",
-      symbol: "RoC",
-      uri: "https://bafybeibxoqqe4gth4vflmk5gpqknelzoxe4usjvodjyyktmpqxjkpj26zm.ipfs.nftstorage.link/3159.json",
-      sellerFeeBasisPoints: 850,
-      creators: [
-        {
-          address: "2ZuCVQvPC79aujK6sjHQs5MJ1EgqdAFq8X78skfTzSBd",
-          verified: 1,
-          share: 0,
-        },
-        {
-          address: "RRUMF9KYPcvNSmnicNMAFKx5wDYix3wjNa6bA7R6xqA",
-          verified: 0,
-          share: 10,
-        },
-        {
-          address: "9D1YA2RMDET9SmMFLuBHHLM35upKVLHnn4g382RsFW3A",
-          verified: 0,
-          share: 6,
-        },
-        {
-          address: "26wnm56SEP1bT2JVmcDZduXyJxpws2dFVUtwuMTVjyVn",
-          verified: 0,
-          share: 45,
-        },
-        {
-          address: "5WZgmCLu49abdJ3tEKEiiX6KDN34XpK9GqYNzRLGrcVZ",
-          verified: 0,
-          share: 39,
-        },
-      ],
-    },
-    primarySaleHappened: 1,
-    isMutable: 1,
-    editionNonce: 255,
-  },
-  {
-    key: 4,
-    updateAuthority: "BFPrtTwTpXyXyphCSQBNpXKddR2sm2qnrT2w21TRnht2",
-    mint: "F8HQNth38QjSUePKqWfF8g6KqN8rqNtLEShxV2KnYXjK",
-    data: {
-      name: "GOONEY #2304",
-      symbol: "GOONEY",
-      uri: "https://bafybeictkowqlzfin6titfv7qv5ws55pijhoa6p6f25w3gqvjib4u6nire.ipfs.dweb.link/2303.json",
-      sellerFeeBasisPoints: 500,
-      creators: [
-        {
-          address: "EHe8EvTzHCAixLDcyuNRhxXsYvTkjVeowPvp5PRpgckb",
-          verified: 1,
-          share: 0,
-        },
-        {
-          address: "RRUMF9KYPcvNSmnicNMAFKx5wDYix3wjNa6bA7R6xqA",
-          verified: 0,
-          share: 10,
-        },
-        {
-          address: "4eRYAuHB1m5gtz9yPCQQ6vgNm3pmy7Kd82vujPw4wfAK",
-          verified: 0,
-          share: 47,
-        },
-        {
-          address: "HctKfm5Q3R1J33ukk9HnoQe27mYLrLJ52kNUTFaxQHBW",
-          verified: 0,
-          share: 37,
-        },
-        {
-          address: "BFPrtTwTpXyXyphCSQBNpXKddR2sm2qnrT2w21TRnht2",
-          verified: 1,
-          share: 6,
-        },
-      ],
-    },
-    primarySaleHappened: 1,
-    isMutable: 1,
-    editionNonce: 253,
-  },
-  {
-    key: 4,
-    updateAuthority: "95AhJgwSLGc1YBMSSrUJVRabqXjuuFTn6gLNSvT9ji63",
-    mint: "D5KDzHgrmzUR9gvpRjJKWJnU5m9nFQCmfctb7rBF43hV",
-    data: {
-      name: "Ernest In Disguise #4014",
-      symbol: "EID",
-      uri: "https://www.arweave.net/99RKvy6DzgRuPC20aD_3kU_gnzdMqwHb8M4sIwcCQ3M",
-      sellerFeeBasisPoints: 800,
-      creators: [
-        {
-          address: "95AhJgwSLGc1YBMSSrUJVRabqXjuuFTn6gLNSvT9ji63",
-          verified: 1,
-          share: 100,
-        },
-      ],
-    },
-    primarySaleHappened: 0,
-    isMutable: 0,
-    editionNonce: 251,
-  },
-  {
-    key: 4,
-    updateAuthority: "WjtsYNMpMHE6fhp2XYbL4UMF4PAPpEumrgZfuEbYftq",
-    mint: "Fn2K1KMvnjFTTub8bYyDkmbkgvCjGqwQDfeRkZSeGtXT",
-    data: {
-      name: "Dope Pirates #2595",
-      symbol: "DP",
-      uri: "https://arweave.net/8AC-J2Yz0OPXBg2gdKxtHJ2YMrto2LdJf8J_kbVpqIQ",
-      sellerFeeBasisPoints: 1000,
-      creators: [
-        {
-          address: "Pkc7e6BkzpWJXQmYowv8fuPn4wfebNHT8huXqkHtNNA",
-          verified: 1,
-          share: 0,
-        },
-        {
-          address: "8hH8XpN3n7b3T7MjfetaeGHVmQCFDwGQW1quGCBTYgiA",
-          verified: 0,
-          share: 100,
-        },
-      ],
-    },
-    primarySaleHappened: 1,
-    isMutable: 1,
-    editionNonce: 248,
-  },
-  {
-    key: 4,
-    updateAuthority: "2Pi1TvYf8Nku8ppq3Pn4ZEHDNo8fFhZjcLaRHi17Au4C",
-    mint: "5sCNkdzHoGxgjMsKkhmHS1vQ3zE9K5g65Yb52BGgkn4i",
-    data: {
-      name: "Llama Agent #999",
-      symbol: "SLA",
-      uri: "https://arweave.net/K75-8NMcvO4SL2S-FQKLixDG2M9PHmDnUUuMs6btOlg",
-      sellerFeeBasisPoints: 9000,
-      creators: [
-        {
-          address: "8yTHQkZdESpd9FSnmqWthEAtp4JBQF7ewwdC1sbmLNEr",
-          verified: 1,
-          share: 0,
-        },
-        {
-          address: "5JTEZn8o81DgXbPMPJmNuMBYASsE1e8HHBqnCVnZqgnR",
-          verified: 0,
-          share: 30,
-        },
-        {
-          address: "GVidbhwCjV4AFsuuQTwDGTm7gVE7BeBsK6V2jYHZR54n",
-          verified: 0,
-          share: 70,
-        },
-      ],
-    },
-    primarySaleHappened: 1,
-    isMutable: 1,
-    editionNonce: 255,
-    tokenStandard: 0,
-    collection: {
-      verified: 1,
-      key: "GqxAoZaqww9zp6y5RddRhExrwTVySfAjLnheaJVjSvag",
-    },
-  },
-  {
-    key: 4,
-    updateAuthority: "7nHxhSkaGCePXN4KEZ4CUh4HwLAuCZ3yvXM6a91jGeyg",
-    mint: "7Za77TZ7VBdk4AkCTaAygucH3trrA6QUJayXfksxsbHj",
-    data: {
-      name: "Crypto Quest #2479",
-      symbol: "CQ",
-      uri: "https://cryptoquest.mypinata.cloud/ipfs/QmU17QPsqgA7b6fjbTqqDS6SuL2zYTpYuH5ifYqFf41GNC",
-      sellerFeeBasisPoints: 750,
-      creators: [
-        {
-          address: "5DFBQKb8Z4u9ng9v7CCYSjK4jEbsNVpHzvyDARsAybmi",
-          verified: 1,
-          share: 0,
-        },
-        {
-          address: "GzsWL7vkY7djuXfhadSTwUiXshdQxYt3R3Bc2wQGMfQ",
-          verified: 0,
-          share: 7,
-        },
-        {
-          address: "7nHxhSkaGCePXN4KEZ4CUh4HwLAuCZ3yvXM6a91jGeyg",
-          verified: 0,
-          share: 93,
-        },
-      ],
-    },
-    primarySaleHappened: 1,
-    isMutable: 1,
-    editionNonce: 250,
-  },
-  {
-    key: 4,
-    updateAuthority: "79SQqm8SUyLR21cXk5TEGCtkjWnN7NwBjUUY2aYUci8B",
-    mint: "7UpShQ1L5wnRNnuiPWsd1dnGMrwGeY7sKCGrJtJwCL86",
-    data: {
-      name: "Orcanauts #8689",
-      symbol: "ORCANAUT",
-      uri: "https://arweave.net/BAQK0LvmIzggo218MpgUacl1AnhxxYSIWdf34DRWrLo",
-      sellerFeeBasisPoints: 300,
-      creators: [
-        {
-          address: "9aALgDk1Ryx4PQLeeaFRVHpRmR3xUoyFTvR7RVXky23S",
-          verified: 1,
-          share: 0,
-        },
-        {
-          address: "BPbS1AC4KW5SBiz8M2AgPtWXTzR1ekBwMLLQLcwdvZnE",
-          verified: 0,
-          share: 0,
-        },
-        {
-          address: "5dNGzQh9sonyFUcTHrH6wiCczokUMSc79miMEysyVYjK",
-          verified: 0,
-          share: 0,
-        },
-        {
-          address: "E3G6ujBGbusExBAPL5hg62xu5ncWeVh9CLjU9qbusVvs",
-          verified: 0,
-          share: 100,
-        },
-      ],
-    },
-    primarySaleHappened: 1,
-    isMutable: 1,
-    editionNonce: 255,
-  },
-];
-
 export default function BurnRuggedNFTs() {
   const [keyword, setKeyword] = useState("");
-  const [tokens, setTokens] = useState([]);
+  // const [tokens, setTokens] = useState([]);
   const [tokensWithImage, setTokensWithImage] = useState([]);
   const [selectedNFT, setSelectedNFT] = useState(null);
   const [tab, setTab] = useState("genesis"); // player, lootbox, genesis
@@ -476,8 +54,6 @@ export default function BurnRuggedNFTs() {
 
   const [showLootboxConfirm, setShowLootboxConfirm] = useState(false);
 
-  const [whitelist, setWhitelist] = useState({})
-  const [ruggedTokenAddresses, setRuggedTokenAddresses] = useState([])
   const [charged, setCharged] = useState(false)
   const [staked, setStaked] = useState(false)
   const [ruggedAccount, setRuggedAccount] = useState()
@@ -549,7 +125,7 @@ export default function BurnRuggedNFTs() {
     }
     console.log('tokens', tokens)
     setAllTokens(tokens)
-    // selectTab('genesis', tokens)
+    selectTab('genesis', tokens)
 
     if(ruggedAccount && mainProgram) {
       let programAccount = await mainProgram.account.ruggedAccount.fetch(ruggedAccount);
@@ -612,44 +188,30 @@ export default function BurnRuggedNFTs() {
     })
   }
 
-  const selectTab = (tab, tokens) => {
+  const selectTab = (tab) => {
     setTab(tab);
     setSelectedNFT(null);
-
-    let filteredTokens = []
-    if (tab === "genesis") {
-      // TODO - This is test data, need to set tokens when changing tab
-      filteredTokens = tokens.filter(o=>o.data.name == Const.GENESIS_NFT_NAME && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY)
-    } else if (tab === "player") {
-      filteredTokens = tokens.filter(o=>o.data.symbol == Const.PLAYABLE_NFT_SYMBOL && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY)
-    } else {
-      filteredTokens = tokens.filter(o=>o.data.name == Const.LOOTBOX_NFT_NAME && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY)
-    }
-
-    console.log('filteredTokens', filteredTokens)
-
-    setTokens(filteredTokens)
   };
 
-  useEffect(() => {
-    setTokensWithImage([]);
-    const promises = tokens.map(async (token) => {
-      const imageURL = await getImageFromMetadata(token.data.uri);
-      return { ...token, image: imageURL };
-    });
-    Promise.all(promises).then((results) => {
-      setTokensWithImage(results);
-    });
-  }, [tokens]);
+  // useEffect(() => {
+  //   setTokensWithImage([]);
+  //   const promises = tokens.map(async (token) => {
+  //     const imageURL = await getImageFromMetadata(token.data.uri);
+  //     return { ...token, image: imageURL };
+  //   });
+  //   Promise.all(promises).then((results) => {
+  //     setTokensWithImage(results);
+  //   });
+  // }, [tokens]);
 
-  const getImageFromMetadata = async (uri) => {
-    try {
-      const meta = await axios.get(uri);
-      return meta.data.image || "";
-    } catch (e) {
-      return "";
-    }
-  };
+  // const getImageFromMetadata = async (uri) => {
+  //   try {
+  //     const meta = await axios.get(uri);
+  //     return meta.data.image || "";
+  //   } catch (e) {
+  //     return "";
+  //   }
+  // };
 
   const selectNFT = (token) => {
     setSelectedNFT(token);
@@ -782,7 +344,17 @@ export default function BurnRuggedNFTs() {
     router.push('/burn-rugged-nfts')
   };
 
-  const filteredNFTs = tokens.filter((token) =>
+  let filteredTokens = []
+  if (tab === "genesis") {
+    // TODO - This is test data, need to set tokens when changing tab
+    filteredTokens = allTokens.filter(o=>o.data.name == Const.GENESIS_NFT_NAME && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY)
+  } else if (tab === "player") {
+    filteredTokens = allTokens.filter(o=>o.data.symbol == Const.PLAYABLE_NFT_SYMBOL && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY)
+  } else {
+    filteredTokens = allTokens.filter(o=>o.data.name == Const.LOOTBOX_NFT_NAME && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY)
+  }
+
+  const filteredNFTs = filteredTokens.filter((token) =>
       String(token.data.name || "")
         .toLowerCase()
         .includes(String(keyword || "").toLowerCase())
@@ -860,12 +432,12 @@ export default function BurnRuggedNFTs() {
             {/* NFT Table */}
             <div className="h-[55vh]">
               <CustomScroll>
-                {!tokens.length && tab === "player" && (
+                {!filteredTokens.length && tab === "player" && (
                   <p className="text-center">
                     There is currently no Playable Characters in the wallet
                   </p>
                 )}
-                {!tokens.length && tab === "lootbox" && (
+                {!filteredTokens.length && tab === "lootbox" && (
                   <p className="text-center">
                     There is currently no Lootboxes available in the wallet
                   </p>
