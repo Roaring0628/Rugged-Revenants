@@ -67,7 +67,7 @@ const Demo = ({
     //   "https://v6p9d9t4.ssl.hwcdn.net/html/6031302/RuggedWebGL/Build/RuggedWebGL.loader.js";
     // Test purpose loaderUrl
     let loaderUrl =
-      "https://v6p9d9t4.ssl.hwcdn.net/html/6096955/RuggedWebGL_TESTING/Build/RuggedWebGL_TESTING.loader.js";
+      "https://v6p9d9t4.ssl.hwcdn.net/html/6138872/RuggedWebGLTesting/Build/RuggedWebGLTesting.loader.js";
 
     let script = document.createElement("script");
     script.src = loaderUrl;
