@@ -130,6 +130,8 @@ const UpgradeNFT = () => {
           setRugToken(rugAmount)
           if(rugAmount >= RUG_TOKEN_STEP) {
             setSelectedRugOption(RUG_TOKEN_STEP)
+          } else {
+            setSelectedRugOption(0)
           }
         } else {
           tokenAddresses.push(pubKey)
@@ -341,7 +343,7 @@ const UpgradeNFT = () => {
     )
 
     console.log('upgradeResult', upgradeResult)
-
+    setSelectedPotion(null)
     fetchData()
     openResult();
   };
