@@ -79,6 +79,7 @@ const UpgradeNFT = () => {
 
   const router = useRouter()
   console.log(router.query);
+  const rugOptions = [50, 75, 125, 200, 300].filter(o=>o<=rugToken)
 
 
   useEffect(() => {
@@ -309,11 +310,11 @@ const UpgradeNFT = () => {
     let oldMeta = selectedNFT.meta
     setOldMeta([...JSON.parse(JSON.stringify(oldMeta.attributes))])
 
-    for(var i = 0; i < selectedRugOption/RUG_TOKEN_STEP; i++) {
-      let index = getRandomInt(0, 5)
-      oldMeta.attributes[index].value = String(Number(oldMeta.attributes[index].value) + 1)
-    }
-    setNewMeta([...JSON.parse(JSON.stringify(oldMeta.attributes))])
+    // for(var i = 0; i < selectedRugOption/RUG_TOKEN_STEP; i++) {
+    //   let index = getRandomInt(0, 5)
+    //   oldMeta.attributes[index].value = String(Number(oldMeta.attributes[index].value) + 1)
+    // }
+    // setNewMeta([...JSON.parse(JSON.stringify(oldMeta.attributes))])
 
     let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
 
@@ -330,15 +331,18 @@ const UpgradeNFT = () => {
     await connection.confirmTransaction(signature, "confirmed");
 
     console.log('signature', signature)
-    await updateMeta(
-      selectedNFT, 
-      oldMeta, 
-      wallet.publicKey, 
+    let upgradeResult = await api.updatePlayableNftMeta(
+      {
+        key: selectedNFT.mint,
+        tokenAmount: selectedRugOption,
+        playerAccount: wallet.publicKey.toBase58(),
+      }
       //txSignature
     )
 
-    fetchData()
+    console.log('upgradeResult', upgradeResult)
 
+    fetchData()
     openResult();
   };
 
@@ -348,18 +352,8 @@ const UpgradeNFT = () => {
         .includes(String(keyword || "").toLowerCase())
   );
 
-  const getRugTokenOptions = (maxToken) => {
-    let ret = []
-    for(var i = 0 ; i < Math.floor(maxToken/RUG_TOKEN_STEP); i++) {
-      ret.push((i+1)*RUG_TOKEN_STEP)
-    }
-
-    return ret
-  }
-
   console.log('filteredNFTs', filteredNFTs)
   console.log('potionNfts', potionNfts)
-  const rugOptions = getRugTokenOptions(rugToken)
   return (
     <div className="w-full h-[100vh]">
       <div className="h-full w-full relative flex items-center justify-center pt-20">

@@ -74,6 +74,17 @@ export default {
             })
         })
     },
+    async updatePlayableNftMeta(data){
+        return new Promise((resolve, reject)=>{
+            this.baseApi('/players/updatePlayableNftMeta', 'POST', data, (err, ret)=>{
+                if(err) {
+                    reject()
+                } else {
+                    resolve(ret)
+                }
+            })
+        })
+    },
     async transferPremiumNft(data){
         return new Promise((resolve, reject)=>{
             this.baseApi('/players/transferPremiumNft', 'POST', data, (err, ret)=>{
