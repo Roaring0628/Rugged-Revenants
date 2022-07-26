@@ -21,7 +21,7 @@ const OpenLootboxConfirm = ({ closeConfirm, openLootbox, selectedNFT }) => {
           className="absolute top-0 left-0 w-full h-full"
         />
         <div className="relative px-12 pt-24 pb-4 text-center">
-          OPENING THIS LOOTBOX WILL CONSUME{" "}
+          OPENING THIS LOOT WILL CONSUME{" "}
           <span className="underline">1 CHARGE</span> ONE OF YOUR GENESIS NFTS.
           <br />
           <br />

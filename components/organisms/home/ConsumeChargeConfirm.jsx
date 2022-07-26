@@ -22,7 +22,7 @@ const ConsumeChargeConfirm = ({ closeConfirm, chargeForLootBox }) => {
         />
         <div className="relative p-12 text-center">
           Would you like to consume a charge on your Genesis NFT to include an
-          NFT in your lootbox?
+          NFT in your loot?
         </div>
         <div className="flex justify-center pb-8 gap-8">
           <button

@@ -439,7 +439,7 @@ export default function BurnRuggedNFTs() {
                 )}
                 {!filteredTokens.length && tab === "lootbox" && (
                   <p className="text-center">
-                    There is currently no Lootboxes available in the wallet
+                    There is currently no loot available in the wallet
                   </p>
                 )}
                 <div className="grid grid-cols-3 gap-10">
