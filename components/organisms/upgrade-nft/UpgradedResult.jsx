@@ -2,9 +2,8 @@
 import { useState } from "react";
 import classNames from "classnames";
 
-const UpgradedResult = ({ closeResult, oldMeta, newMeta }) => {
-  const imageURL =
-    "https://www.arweave.net/dDhk5dvQibjIzt2ieWn_PeUqZU7cP_5g9Sjs6veRFlg?ext=png";
+const UpgradedResult = ({ closeResult, oldMeta, newMeta, selectedNFTImage }) => {
+  const imageURL = selectedNFTImage;
 
   const attributeTitles = [
     "HEALTH",

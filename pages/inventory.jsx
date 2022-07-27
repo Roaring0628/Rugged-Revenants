@@ -263,7 +263,17 @@ export default function BurnRuggedNFTs() {
   }
 
   const openLootbox = async (token) => {
-    // TODO - Logic to open lootbox NFT
+    //if user don't have charges genesis, he cannot open lootbox
+    let genesisToken = null
+    if(hasGenesis) {
+      genesisToken = allTokens.find(o=>o.data.name == Const.GENESIS_NFT_NAME && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && o.meta.attributes[0].value > 0)
+      if(!genesisToken) {
+        return
+      }
+    } else {
+      return
+    }
+
     console.log(token);
     anchor.setProvider(provider);
 
@@ -297,6 +307,9 @@ export default function BurnRuggedNFTs() {
     }
 
     let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.BACKEND_ACCOUNT_PUBKEY), Const.MINT_FEE);
+    create_tx.add(transferInstruction)
+
+    transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
     create_tx.add(transferInstruction)
 
     if(potionAmount > 0) 
@@ -333,6 +346,16 @@ export default function BurnRuggedNFTs() {
       isWon,
       // txId: txSignature
     })
+
+    //update genesis
+    let newMeta = genesisToken.meta
+    newMeta.attributes[0].value = newMeta.attributes[0].value - 1
+    await updateMeta(
+      genesisToken, 
+      newMeta, 
+      wallet.publicKey, 
+      //txSignature
+    )
 
     await fetchData()
   };

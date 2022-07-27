@@ -54,6 +54,7 @@ const UpgradeNFT = () => {
   const [swiper, setSwiper] = useState(null);
   const [keyword, setKeyword] = useState("");
   const [selectedNFT, setSelectedNFT] = useState(null);
+  const [selectedNFTImage, setSelectedNFTImage] = useState(null);
   const [selectedPotion, setSelectedPotion] = useState(null);
   const [selectedRugOption, setSelectedRugOption] = useState(0);
   const [selectedRugOptionIndex, setSelectedRugOptionIndex] = useState(0);
@@ -343,9 +344,16 @@ const UpgradeNFT = () => {
     )
 
     console.log('upgradeResult', upgradeResult)
+    if(upgradeResult.stauts == 'pending') {
+      //TODO: display update date
+      console.log('Due Date', new Date(upgradeResult.dueDate))
+    } else if(upgradeResult.stauts == 'success'){
+      setNewMeta(upgradeResult.updatedMeta.attributes)
+      setSelectedNFTImage(upgradeResult.updatedMeta.image)
+      openResult();
+    }
     setSelectedPotion(null)
     fetchData()
-    openResult();
   };
 
   const filteredNFTs = playableNfts.filter((token) =>
@@ -550,7 +558,7 @@ const UpgradeNFT = () => {
               />
             )}
 
-            {showResult && <UpgradedResult closeResult={closeResult} oldMeta={oldMeta} newMeta={newMeta}/>}
+            {showResult && <UpgradedResult closeResult={closeResult} oldMeta={oldMeta} newMeta={newMeta} selectedNFTImage={selectedNFTImage}/>}
           </div>
         </div>
       </div>

@@ -250,7 +250,8 @@ export default function Hero({ play, setPlay }) {
   const handlePlay = () => {
     if (!play) {
       document.body.style.overflow = "hidden";
-      if(hasGenesis && !charged) {
+      // if(hasGenesis && !charged) {
+      if(hasGenesis) {
         if(tokens.find(o=>o.data.name == Const.GENESIS_NFT_NAME && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && o.meta.attributes[0].value > 0)) {
           openConsumeConfirm();
         } else {
