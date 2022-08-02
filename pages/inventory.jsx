@@ -242,17 +242,6 @@ export default function BurnRuggedNFTs() {
     return
   };
 
-  const getRugToken = (level, hasGene) => {
-    return level * 2
-  }
-
-  const getPotion = (level, charged) => {
-    if(!charged) return 0
-
-    const percent = Math.min(level * 6.6, 100)
-    return getRandomInt(0, 100) <= percent? 1 : 0;
-  }
-
   const openLootboxConfirm = () => {
     if(charged) {
       setShowLootboxConfirm(true);
@@ -266,7 +255,7 @@ export default function BurnRuggedNFTs() {
   }
 
   const openLootbox = async (token) => {
-    //if user don't have charges genesis, he cannot open lootbox
+    //if user don't have genesis which has charges, he cannot open lootbox
     let genesisToken = null
     if(hasGenesis) {
       genesisToken = allTokens.find(o=>o.data.name == Const.GENESIS_NFT_NAME && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && o.meta.attributes[0].value > 0)
@@ -294,11 +283,6 @@ export default function BurnRuggedNFTs() {
     let burnInstruction = await burnTx(token.mint, provider.wallet.publicKey, wallet, connection, 1)
     const create_tx = new anchor.web3.Transaction().add(burnInstruction)
 
-    let rugTokenAmount = getRugToken(beatLevel, hasGenesis)
-    let potionAmount = charged?getPotion(beatLevel, charged):0
-
-    console.log('open lootbox', rugTokenAmount, potionAmount, nftType)
-
     if(charged) {
       let tx = mainProgram.transaction.decharge({
         accounts: {
@@ -312,14 +296,9 @@ export default function BurnRuggedNFTs() {
     let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.BACKEND_ACCOUNT_PUBKEY), Const.MINT_FEE);
     create_tx.add(transferInstruction)
 
-    transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
+    transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE + Const.MINT_FEE);
     create_tx.add(transferInstruction)
 
-    if(potionAmount > 0) 
-    {
-      transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
-      create_tx.add(transferInstruction)
-    }
     if(nftType != 'No') 
     {
       transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.PREMIUM_ACCOUNT_PUBKEY), Const.MINT_FEE);
@@ -343,8 +322,7 @@ export default function BurnRuggedNFTs() {
     }
     await api.openLootBox({
       key:wallet.publicKey.toBase58(),
-      rugTokenAmount,
-      potionAmount,
+      beatLevel,
       potionMeta,
       nftType,
       // txId: txSignature
