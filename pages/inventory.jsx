@@ -144,6 +144,9 @@ export default function BurnRuggedNFTs() {
     setMainProgram(program)
     api.getRuggedAccount(wallet.publicKey.toBase58(), async (err, ret)=>{
       console.log('getRuggedAccount', wallet.publicKey.toBase58(), err, ret)
+      if(err) {
+        return
+      }
       if(ret.length == 0) {
         console.log('create account')
         //initialize account
@@ -285,7 +288,7 @@ export default function BurnRuggedNFTs() {
     }
 
     let beatLevel = meta.data.attributes.find(o=>o.trait_type == 'level').value
-    let isWon = charged && meta.data.attributes.find(o=>o.trait_type == 'nft').value != 'No'
+    let nftType = charged ? meta.data.attributes.find(o=>o.trait_type == 'nft').value : 'No'
 
     console.log('burn', token)
     let burnInstruction = await burnTx(token.mint, provider.wallet.publicKey, wallet, connection, 1)
@@ -294,7 +297,7 @@ export default function BurnRuggedNFTs() {
     let rugTokenAmount = getRugToken(beatLevel, hasGenesis)
     let potionAmount = charged?getPotion(beatLevel, charged):0
 
-    console.log('open lootbox', rugTokenAmount, potionAmount, isWon)
+    console.log('open lootbox', rugTokenAmount, potionAmount, nftType)
 
     if(charged) {
       let tx = mainProgram.transaction.decharge({
@@ -317,7 +320,7 @@ export default function BurnRuggedNFTs() {
       transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
       create_tx.add(transferInstruction)
     }
-    if(isWon) 
+    if(nftType != 'No') 
     {
       transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.PREMIUM_ACCOUNT_PUBKEY), Const.MINT_FEE);
       create_tx.add(transferInstruction)
@@ -343,7 +346,7 @@ export default function BurnRuggedNFTs() {
       rugTokenAmount,
       potionAmount,
       potionMeta,
-      isWon,
+      nftType,
       // txId: txSignature
     })
 

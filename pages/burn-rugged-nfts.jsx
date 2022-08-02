@@ -1134,6 +1134,9 @@ export default function BurnRuggedNFTs() {
     setMainProgram(program)
     api.getRuggedAccount(wallet.publicKey.toBase58(), async (err, ret)=>{
       console.log('getRuggedAccount', wallet.publicKey.toBase58(), err, ret)
+      if(err) {
+        return
+      }
       if(ret.length == 0) {
         console.log('create account')
         //initialize account

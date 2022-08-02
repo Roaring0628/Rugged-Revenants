@@ -162,4 +162,15 @@ export default {
             })
         })
     },
+    async getGlobalSetting(){
+        return new Promise((resolve, reject)=>{
+            this.baseApi('/setting', 'GET', {}, (err, ret)=>{
+                if(err) {
+                    reject()
+                } else {
+                    resolve(ret)
+                }
+            })
+        })
+    },
 }

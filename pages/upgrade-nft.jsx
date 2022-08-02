@@ -46,7 +46,7 @@ function getRandomInt(min, max) {
   return min + (byteArray[0] % range);
 }
 
-const RUG_TOKEN_STEP = 50
+let RUG_TOKEN_STEP = 50
 
 const MINIMUN_SOL_BALANCE = 100000000; // 0.1 SOL
 
@@ -72,6 +72,7 @@ const UpgradeNFT = () => {
 
   const [oldMeta, setOldMeta] = useState()
   const [newMeta, setNewMeta] = useState()
+  const [globalSetting, setGlobalSetting] = useState()
 
   const { connection } = useConnection();
   const wallet = useWallet();
@@ -79,8 +80,7 @@ const UpgradeNFT = () => {
   const provider = new anchor.AnchorProvider(connection, wallet);
 
   const router = useRouter()
-  console.log(router.query);
-  const rugOptions = [50, 75, 125, 200, 300].filter(o=>o<=rugToken)
+  const rugOptions = globalSetting?globalSetting.upgrade_rugged_tokens.map(o=>o.value).filter(o=>o<=rugToken):[50, 75, 125, 200, 300].filter(o=>o<=rugToken)
 
 
   useEffect(() => {
@@ -90,21 +90,32 @@ const UpgradeNFT = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [publicKey]);
 
-  // useEffect(() => {
-  //   setTokensWithImage([]);
-  //   const promises = tokens.map(async (token) => {
-  //     const imageURL = await getImageFromMetadata(token.data.uri);
-  //     return { ...token, image: imageURL };
-  //   });
-  //   Promise.all(promises).then((results) => {
-  //     setTokensWithImage(results);
-  //   });
-  // }, [tokens]);
-
   const init = async () => {
     fetchData()
     initMainProgram()
+
+    let setting = await api.getGlobalSetting()
+    setGlobalSetting(setting)
+
+    if(setting.upgrade_rugged_tokens && setting.upgrade_rugged_tokens.length > 0) {
+      RUG_TOKEN_STEP = setting.upgrade_rugged_tokens[0].value
+    }
   }
+
+  const getMetadata = async (
+		mint
+		  ) => {
+		return (
+		  await PublicKey.findProgramAddress(
+			[
+			  Buffer.from("metadata"),
+			  TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+			  mint.toBuffer(),
+			],
+			TOKEN_METADATA_PROGRAM_ID
+		  )
+		)[0];
+	};
 
   const fetchData = async () => {
     let walletInfo = await connection.getAccountInfo(provider.wallet.publicKey)
@@ -181,6 +192,9 @@ const UpgradeNFT = () => {
     setMainProgram(program)
     api.getRuggedAccount(wallet.publicKey.toBase58(), async (err, ret)=>{
       console.log('getRuggedAccount', wallet.publicKey.toBase58(), err, ret)
+      if(err) {
+        return
+      }
       if(ret.length == 0) {
         console.log('create account')
         //initialize account
@@ -312,12 +326,6 @@ const UpgradeNFT = () => {
     //upgrade playableNFT meta
     let oldMeta = selectedNFT.meta
     setOldMeta([...JSON.parse(JSON.stringify(oldMeta.attributes))])
-
-    // for(var i = 0; i < selectedRugOption/RUG_TOKEN_STEP; i++) {
-    //   let index = getRandomInt(0, 5)
-    //   oldMeta.attributes[index].value = String(Number(oldMeta.attributes[index].value) + 1)
-    // }
-    // setNewMeta([...JSON.parse(JSON.stringify(oldMeta.attributes))])
 
     let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
 
