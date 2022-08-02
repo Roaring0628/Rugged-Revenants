@@ -316,10 +316,7 @@ export default function BurnRuggedNFTs() {
     const signature = await wallet.sendTransaction(create_tx, connection);
     await connection.confirmTransaction(signature, "confirmed");
 
-    let potionMeta = ""
-    if(potionAmount > 0) {
-      potionMeta = await createPotionMeta()
-    }
+    let potionMeta = await createPotionMeta()
     await api.openLootBox({
       key:wallet.publicKey.toBase58(),
       beatLevel,
