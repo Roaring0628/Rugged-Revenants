@@ -48,7 +48,7 @@ function getRandomInt(min, max) {
 
 let RUG_TOKEN_STEP = 50
 
-const MINIMUN_SOL_BALANCE = 100000000; // 0.1 SOL
+const MINIMUN_SOL_BALANCE = 10000000; // 0.01 SOL
 
 const UpgradeNFT = () => {
   const [swiper, setSwiper] = useState(null);

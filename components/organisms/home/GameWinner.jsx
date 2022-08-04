@@ -2,7 +2,7 @@
 import { useState } from "react";
 
 const CHEST_COMMON_ANIMATION_DURATION = 3500; // 3.5s
-const MINIMUN_SOL_BALANCE = 100000000; // 0.1 SOL
+const MINIMUN_SOL_BALANCE = 10000000; // 0.01 SOL
 
 const GameWinner = ({ closeChest, beatFirstLevel, hasGenesis, solBalance }) => {
   const [inProgress, setInProgress] = useState(false);
