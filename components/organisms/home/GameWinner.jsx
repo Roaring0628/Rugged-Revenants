@@ -23,7 +23,7 @@ const GameWinner = ({ closeChest, beatFirstLevel, hasGenesis, solBalance }) => {
         }, CHEST_COMMON_ANIMATION_DURATION);
       } else {
         if (solBalance < MINIMUN_SOL_BALANCE) {
-          // At least 0.1 SOL to mint (accept) genesis nft
+          // At least 0.01 SOL to mint (accept) genesis nft
           openBalanceWarning();
         } else {
           try {
@@ -44,7 +44,7 @@ const GameWinner = ({ closeChest, beatFirstLevel, hasGenesis, solBalance }) => {
       setAcceptingGenesisNFT(true);
 
       if (solBalance < MINIMUN_SOL_BALANCE) {
-        // At least 0.1 SOL to mint (accept) genesis nft
+        // At least 0.01 SOL to mint (accept) genesis nft
         openBalanceWarning();
       } else {
         try {
@@ -167,7 +167,7 @@ const GameWinner = ({ closeChest, beatFirstLevel, hasGenesis, solBalance }) => {
             className="absolute top-0 left-0 w-full h-full"
           />
           <div className="relative p-4 pt-20 text-center">
-            You must have at least 0.1 SOL in your wallet to MINT your Genesis
+            You must have at least 0.01 SOL in your wallet to MINT your Genesis
             NFT. Please add SOL to your wallet and beat level 1 again to claim
             your Genesis NFT.
           </div>

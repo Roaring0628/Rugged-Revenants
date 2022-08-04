@@ -16,7 +16,7 @@ const GameWinnerLootbox = ({ closeChest, hasGenesis, solBalance, endGame }) => {
       setShowChestAnimation(true);
 
       if (solBalance < MINIMUN_SOL_BALANCE) {
-        // At least 0.1 SOL to mint (accept) lootbox
+        // At least 0.01 SOL to mint (accept) lootbox
         openBalanceWarning();
       } else {
         try {
@@ -98,7 +98,7 @@ const GameWinnerLootbox = ({ closeChest, hasGenesis, solBalance, endGame }) => {
             className="absolute top-0 left-0 w-full h-full"
           />
           <div className="relative p-4 pt-20 text-center">
-            You must have at least 0.1 SOL in your wallet to MINT your Genesis
+            You must have at least 0.01 SOL in your wallet to MINT your Genesis
             NFT. Please add SOL to your wallet and beat level 1 again to claim
             your Genesis NFT.
           </div>
