@@ -28,6 +28,7 @@ import api from "../components/organisms/api"
 import * as Const from '../components/organisms/utils/constants'
 
 import OpenLootboxConfirm from "components/organisms/home/OpenLootboxConfirm";
+import LootboxNotification from "components/organisms/inventory/LootboxNotification";
 
 const { SystemProgram } = anchor.web3;
 
@@ -53,6 +54,8 @@ export default function BurnRuggedNFTs() {
   const [allTokens, setAllTokens] = useState([]);
 
   const [showLootboxConfirm, setShowLootboxConfirm] = useState(false);
+  const [showLootboxNotification, setShowLootboxNotification] = useState(false);
+  const [lootboxNotificationData, setLootboxNotificationData] = useState(null);
 
   const [charged, setCharged] = useState(false)
   const [staked, setStaked] = useState(false)
@@ -254,6 +257,20 @@ export default function BurnRuggedNFTs() {
     setShowLootboxConfirm(false);
   }
 
+  const openLootboxNotification = (rugTokenAmount, potionAmount, hasPremium) => {
+    setLootboxNotificationData({
+      rugTokenAmount,
+      potionAmount,
+      hasPremium,
+    })
+    setShowLootboxNotification(true);
+  }
+
+  const closeLootboxNotification = () => {
+    setShowLootboxNotification(false);
+    setLootboxNotificationData(null)
+  }
+
   const openLootbox = async (token) => {
     //if user don't have genesis which has charges, he cannot open lootbox
     let genesisToken = null
@@ -339,7 +356,10 @@ export default function BurnRuggedNFTs() {
       let {rugTokenAmount, potionAmount, hasPremium} = openResult.result
       console.log("openbox result", rugTokenAmount, potionAmount, hasPremium)
       //TODO : show openbox notification
-  
+      if (rugTokenAmount || potionAmount || hasPremium) {
+        openLootboxNotification(rugTokenAmount, potionAmount, hasPremium);
+      }
+
       await fetchData()
     } catch(e) {
       console.log('error', e)
@@ -657,6 +677,12 @@ export default function BurnRuggedNFTs() {
                   closeConfirm={closeLootboxConfirm}
                   openLootbox={openLootbox}
                   selectedNFT={selectedNFT}
+                />
+              }
+              {showLootboxNotification && 
+                <LootboxNotification
+                  closeNotification={closeLootboxNotification}
+                  lootboxNotificationData={lootboxNotificationData}
                 />
               }
             </div>
