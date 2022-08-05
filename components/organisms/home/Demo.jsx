@@ -14,6 +14,8 @@ const Demo = ({
   const [myGameInstance, setMyGameInstance] = useState(null);
   const [showChest, setShowChest] = useState(false);
   const [showLootboxChest, setShowLootboxChest] = useState(false);
+  const [currentLevel, setCurrentLevel] = useState();
+  const [isWin, setIsWin] = useState(false);
 
   useEffect(() => {
     window.addEventListener(
@@ -126,9 +128,15 @@ const Demo = ({
     console.log("isFinalLevel", isFinalLevel);
 
     if(isDie && currentLevel > 1) {
-      endGame(currentLevel, isWin)
+      setCurrentLevel(currentLevel)
+      setIsWin(isWin)
+      openLootboxChest();
     }
   };
+
+  const endGameBefore = () => {
+    endGame(currentLevel, isWin)
+  }
 
   const quitGame = () => {
     if (myGameInstance) myGameInstance.Quit();
@@ -202,7 +210,7 @@ const Demo = ({
           closeChest={closeLootboxChest}
           hasGenesis={hasGenesis}
           solBalance={solBalance}
-          endGame={endGame}
+          endGame={endGameBefore}
         />
       )}
     </div>

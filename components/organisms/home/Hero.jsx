@@ -250,13 +250,17 @@ export default function Hero({ play, setPlay }) {
         const create_tx = new anchor.web3.Transaction().add(transferInstruction)
         const signature = await wallet.sendTransaction(create_tx, connection);
         await connection.confirmTransaction(signature, "confirmed");
+        setPlay(false);
   
         await mintLootBox(wallet, level, hasWon)
       }
-      await fetchData()
+      // await fetchData()
     } catch(e) {
       console.log("endGame error", e)
     }
+    setTimeout(()=>{
+      handlePlay()
+    }, 10)
   }
 
   // conditionally render demo for desktop only
