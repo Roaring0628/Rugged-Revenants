@@ -318,7 +318,7 @@ export default function BurnRuggedNFTs() {
       await connection.confirmTransaction(signature, "confirmed");
   
       let potionMeta = await createPotionMeta()
-      await api.openLootBox({
+      let openResult = await api.openLootBox({
         key:wallet.publicKey.toBase58(),
         beatLevel,
         potionMeta,
@@ -335,6 +335,10 @@ export default function BurnRuggedNFTs() {
         wallet.publicKey, 
         //txSignature
       )
+
+      let {rugTokenAmount, potionAmount, hasPremium} = openResult.result
+      console.log("openbox result", rugTokenAmount, potionAmount, hasPremium)
+      //TODO : show openbox notification
   
       await fetchData()
     } catch(e) {
