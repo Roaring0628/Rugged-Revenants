@@ -2,11 +2,11 @@
 import { useState } from "react";
 
 const ConsumeChargeConfirm = ({ closeConfirm, chargeForLootBox }) => {
-  let [processing, setProcessing] = useState(false) 
+  let [processing, setProcessing] = useState(false);
   const consumeCharge = async () => {
     // Logic to consume charge
-    setProcessing(true)
-    await chargeForLootBox()
+    setProcessing(true);
+    await chargeForLootBox();
     // Must call this function to open the game after consuming charge
     closeConfirm();
   };
@@ -21,8 +21,8 @@ const ConsumeChargeConfirm = ({ closeConfirm, chargeForLootBox }) => {
           className="absolute top-0 left-0 w-full h-full"
         />
         <div className="relative p-12 text-center">
-          Would you like to consume a charge on your Genesis NFT to include an
-          NFT in your loot?
+          Would you like to include a Premium NFT in your loot if you beat the
+          last level?
         </div>
         <div className="flex justify-center pb-8 gap-8">
           <button
