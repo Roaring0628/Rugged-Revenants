@@ -313,29 +313,33 @@ export default function BurnRuggedNFTs() {
     console.log("blockhashObj", blockhashObj);
     create_tx.recentBlockhash = blockhashObj.blockhash;
 
-    const signature = await wallet.sendTransaction(create_tx, connection);
-    await connection.confirmTransaction(signature, "confirmed");
-
-    let potionMeta = await createPotionMeta()
-    await api.openLootBox({
-      key:wallet.publicKey.toBase58(),
-      beatLevel,
-      potionMeta,
-      nftType,
-      // txId: txSignature
-    })
-
-    //update genesis
-    let newMeta = genesisToken.meta
-    newMeta.attributes[0].value = newMeta.attributes[0].value - 1
-    await updateMeta(
-      genesisToken, 
-      newMeta, 
-      wallet.publicKey, 
-      //txSignature
-    )
-
-    await fetchData()
+    try {
+      const signature = await wallet.sendTransaction(create_tx, connection);
+      await connection.confirmTransaction(signature, "confirmed");
+  
+      let potionMeta = await createPotionMeta()
+      await api.openLootBox({
+        key:wallet.publicKey.toBase58(),
+        beatLevel,
+        potionMeta,
+        nftType,
+        // txId: txSignature
+      })
+  
+      //update genesis
+      let newMeta = genesisToken.meta
+      newMeta.attributes[0].value = newMeta.attributes[0].value - 1
+      await updateMeta(
+        genesisToken, 
+        newMeta, 
+        wallet.publicKey, 
+        //txSignature
+      )
+  
+      await fetchData()
+    } catch(e) {
+      console.log('error', e)
+    }
   };
 
   const chargeGenesisNFT = (token) => {

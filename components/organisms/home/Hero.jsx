@@ -200,10 +200,15 @@ export default function Hero({ play, setPlay }) {
       let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
       const create_tx = new anchor.web3.Transaction().add(transferInstruction)
       const signature = await wallet.sendTransaction(create_tx, connection);
-      await connection.confirmTransaction(signature, "confirmed");
 
-      await mintGenesis(wallet)
-      await fetchData()        
+      try {
+        await connection.confirmTransaction(signature, "confirmed");
+  
+        await mintGenesis(wallet)
+        await fetchData()        
+      } catch(e) {
+        console.log('error', e)
+      }
     } else {
       const token = tokens.find((t)=>{
         return t.data.name == Const.GENESIS_NFT_NAME && t.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && t.meta.attributes[0].value < Const.MAX_CHARGE_COUNT
@@ -213,17 +218,22 @@ export default function Hero({ play, setPlay }) {
         let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
         const create_tx = new anchor.web3.Transaction().add(transferInstruction)
         const signature = await wallet.sendTransaction(create_tx, connection);
-        await connection.confirmTransaction(signature, "confirmed");
-  
-        console.log('selected genesis to charge', token)
-        //upgrade meta of token
-        let newMeta = token.meta
-        localStorage.setItem("old-charges", newMeta.attributes[0].value)
-        newMeta.attributes[0].value = newMeta.attributes[0].value + 1
-        localStorage.setItem("new-charges", newMeta.attributes[0].value)
-        await updateMeta(token, newMeta)
-        
-        await fetchData()
+
+        try {
+          await connection.confirmTransaction(signature, "confirmed");
+    
+          console.log('selected genesis to charge', token)
+          //upgrade meta of token
+          let newMeta = token.meta
+          localStorage.setItem("old-charges", newMeta.attributes[0].value)
+          newMeta.attributes[0].value = newMeta.attributes[0].value + 1
+          localStorage.setItem("new-charges", newMeta.attributes[0].value)
+          await updateMeta(token, newMeta)
+          
+          await fetchData()
+        } catch(e) {
+          console.log("error", e)
+        }
         
         //go to success screen
         // router.push('/charge-success')
@@ -234,15 +244,19 @@ export default function Hero({ play, setPlay }) {
 
   const endGame = async (level, hasWon) => {
     //generate lootbox
-    if(level > 1) {
-      let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
-      const create_tx = new anchor.web3.Transaction().add(transferInstruction)
-      const signature = await wallet.sendTransaction(create_tx, connection);
-      await connection.confirmTransaction(signature, "confirmed");
-
-      await mintLootBox(wallet, level, hasWon)
+    try {
+      if(level > 1) {
+        let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
+        const create_tx = new anchor.web3.Transaction().add(transferInstruction)
+        const signature = await wallet.sendTransaction(create_tx, connection);
+        await connection.confirmTransaction(signature, "confirmed");
+  
+        await mintLootBox(wallet, level, hasWon)
+      }
+      await fetchData()
+    } catch(e) {
+      console.log("endGame error", e)
     }
-    await fetchData()
   }
 
   // conditionally render demo for desktop only
@@ -299,17 +313,22 @@ export default function Hero({ play, setPlay }) {
       // signatureTx
     )
     const signature = await wallet.sendTransaction(create_tx, connection);
-    await connection.confirmTransaction(signature, "confirmed");
 
-    console.log('signature', signature)
-    await updateMeta(
-      token, 
-      oldMeta, 
-      wallet.publicKey, 
-      //txSignature
-    )
-    
-    await fetchData()
+    try {
+      await connection.confirmTransaction(signature, "confirmed");
+  
+      console.log('signature', signature)
+      await updateMeta(
+        token, 
+        oldMeta, 
+        wallet.publicKey, 
+        //txSignature
+      )
+      
+      await fetchData()
+    } catch(e) {
+      console.log("Exception", e)
+    }
   }
 
   const openConsumeConfirm = () => {
