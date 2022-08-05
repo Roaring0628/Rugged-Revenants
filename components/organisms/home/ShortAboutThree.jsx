@@ -5,32 +5,23 @@ const ShortAboutThree = () => {
     <section className="w-full pt-32">
       <div className="container">
         <div className="flex flex-col-reverse md:flex-row">
-          <div className="md:w-1/2 pt-10">
+          <div className="md:w-1/2 pt-10 flex flex-col items-center md:block">
             <div className="flex gap-4 mb-6">
               <img src="/media/line.png" alt="line" loading="lazy" />
               <img src="/media/line.png" alt="line" loading="lazy" />
               <img src="/media/line.png" alt="line" loading="lazy" />
+              <img src="/media/lineDark.png" alt="line" loading="lazy" />
             </div>
-            <div className="">
-              <h1 className="text-3xl mb-6">Use $RUG to win Loot</h1>
+            <div className="text-center md:text-left">
+              <h1 className="text-3xl mb-6">Use Charges to win loot</h1>
               <p className="text-sm1 mb-6">
-                Insert $RUG to win NFTs of value. That's right, you can win
-                valuable NFTs for FREE! There are 3 ways to earn $RUG.
+                Use Charges to win NFTs of value. That’s right, you can win
+                valuable NFTs for FREE! There are 2 ways to earn charges.
                 <br />
                 <br />
                 1. Trade in rugged NFTs
                 <br />
-                2. Play our game
-                <br />
-                3. Buying $RUG on exchanges like the{" "}
-                <a
-                  href="https://famousfoxes.com/tokenmarket"
-                  rel="noreferrer"
-                  target="_blank"
-                  className="underline"
-                >
-                  Famous Fox Token Market
-                </a>
+                2. Play our game&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               </p>
             </div>
           </div>

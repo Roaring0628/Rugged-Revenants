@@ -26,16 +26,17 @@ const ShortAboutOne = ({ play, setPlay }) => {
     <section id="about" className="w-full pt-32">
       <div className="container">
         <div className="flex flex-col-reverse md:flex-row pt-8">
-          <div className="md:w-1/2 pt-20">
+          <div className="md:w-1/2 pt-20 flex flex-col items-center md:block">
             <div className="flex gap-4 mb-6">
               <img src="/media/line.png" alt="line" loading="lazy" />
               <img src="/media/lineDark.png" alt="line" loading="lazy" />
               <img src="/media/lineDark.png" alt="line" loading="lazy" />
+              <img src="/media/lineDark.png" alt="line" loading="lazy" />
             </div>
-            <div className="">
+            <div className="text-center md:text-left">
               <h1 className="text-3xl mb-6">Rugs to riches</h1>
               <p className="text-sm1 mb-6">
-                Insert token to win NFTs from our game. Earn more token by
+                Use charges to win NFTs from our game. Earn more charges by
                 winning.
               </p>
               <div
