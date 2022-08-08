@@ -128,11 +128,13 @@ const Demo = ({
     console.log("completedLevelsCount", completedLevelsCount);
     console.log("isFinalLevel", isFinalLevel);
 
-    if(isDie && currentLevel > 1) {
-      setCurrentLevel(currentLevel)
-      setIsWin(isWin)
-      openLootboxChest();
-    }
+    if(isDie || isFinalLevel) {
+      if(currentLevel > 1) {
+        setCurrentLevel(currentLevel)
+        setIsWin(isWin)
+        openLootboxChest();
+      } 
+    } 
   };
 
   const endGameBefore = () => {
