@@ -41,6 +41,9 @@ export default {
     addRugTokenAccount(data, cb){
         this.baseApi('/rug-token-accounts', 'POST', data, cb)
     },
+    getUpgradeTasks(cb){
+        this.baseApi('/upgrade-tasks', 'GET', {}, cb)
+    },
     async mintRugToken(data){
         return new Promise((resolve, reject)=>{
             this.baseApi('/players/mintRugToken', 'POST', data, (err, ret)=>{

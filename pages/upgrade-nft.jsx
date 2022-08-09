@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { useEffect, useState } from "react";
 import axios from "axios";
+import moment from "moment";
 import classNames from "classnames";
 import { Swiper, SwiperSlide } from "swiper/react";
 
@@ -31,6 +32,7 @@ import api from "../components/organisms/api"
 import * as Const from '../components/organisms/utils/constants'
 
 import OpenLootboxConfirm from "components/organisms/home/OpenLootboxConfirm";
+import CountDown from "components/molecules/CountDown";
 
 const { SystemProgram } = anchor.web3;
 
@@ -65,6 +67,8 @@ const UpgradeNFT = () => {
   const [allTokens, setAllTokens] = useState([]);
   const [playableNfts, setPlayableNfts] = useState([]);
   const [potionNfts, setPotionNfts] = useState([]);
+
+  const [upgradeTasks, setUpgradeTasks] = useState([])
 
   const [ruggedAccount, setRuggedAccount] = useState()
   const [mainProgram, setMainProgram] = useState()
@@ -123,7 +127,26 @@ const UpgradeNFT = () => {
 
     // const tokenMetadata = await metaplex.nfts().findAllByOwner(metaplex.identity().publicKey);
     // console.log('tokenMetadata', JSON.stringify(tokenMetadata));
-    
+
+    let gotUpgradeTasks = false
+    let upgradeTasks = []
+    api.getUpgradeTasks(async (err, ret) => {
+      if(err) {
+        return
+      }
+      if(ret.length > 0) {
+        setUpgradeTasks(ret)
+        upgradeTasks = ret
+        gotUpgradeTasks = true
+      }
+    })
+
+    while (!gotUpgradeTasks) {
+      let sleep = (ms) =>
+        new Promise((resolve) => setTimeout(resolve, ms));
+      await sleep(100);
+    }
+
     const tokenAccounts = await connection.getTokenAccountsByOwner(
       provider.wallet.publicKey,
       {
@@ -178,7 +201,12 @@ const UpgradeNFT = () => {
     if(router.query && router.query.id) {
       const selectedToken = tokens.find(o=>o.mint == router.query.id)
       if(selectedToken) {
-        selectNFT(selectedToken)
+        const filteredTask = upgradeTasks.find(task => task.key === selectedToken.mint)
+        selectNFT({
+          ...selectedToken,
+          isUpgrading: !!filteredTask,
+          upgradeDueDate: filteredTask ? filteredTask.due_date : null,
+        })
       }
     }
   }
@@ -298,6 +326,13 @@ const UpgradeNFT = () => {
     setShowResult(false);
   };
 
+  const checkUpgrading = (token) => {
+    if (!token.isUpgrading) return false
+    const diff = moment().diff(token.upgradeDueDate)
+    if (diff > 0) return false
+    return true
+  }
+
   const upgrade = async () => {
     console.log(
       "upgrade",
@@ -364,11 +399,20 @@ const UpgradeNFT = () => {
     fetchData()
   };
 
-  const filteredNFTs = playableNfts.filter((token) =>
+  let filteredNFTs = playableNfts.filter((token) =>
       String(token.data.name || "")
         .toLowerCase()
         .includes(String(keyword || "").toLowerCase())
   );
+
+  filteredNFTs = filteredNFTs.map(nft => {
+    const filteredTask = upgradeTasks.find(task => task.key === nft.mint)
+    return {
+      ...nft,
+      isUpgrading: !!filteredTask,
+      upgradeDueDate: filteredTask ? filteredTask.due_date : null,
+    }
+  })
 
   console.log('filteredNFTs', filteredNFTs)
   console.log('potionNfts', potionNfts)
@@ -412,6 +456,25 @@ const UpgradeNFT = () => {
                               alt="NFT Image"
                               className="w-full h-full object-cover"
                             />
+                            {checkUpgrading(token) && (
+                              <>
+                                <img
+                                  src="/media/upgrade/ui_upgrade_training_thumbnailicon.png"
+                                  alt="NFT Image"
+                                  className="absolute top-1 right-1 w-6 h-3 object-cover"
+                                />
+                                <div className="absolute bottom-0 w-full h-8 flex items-center justify-center">
+                                  <img
+                                    src="/media/upgrade/ui_upgrade_training_thumbnailbar.png"
+                                    alt="NFT Image"
+                                    className="absolute w-full h-full top-0 object-cover"
+                                  />
+                                  <div className="text-sm relative z-10">
+                                    <CountDown dueDate={token.upgradeDueDate} />
+                                  </div>
+                                </div>
+                              </>
+                            )}
                           </div>
                           <div className="text-[0.6rem] leading-[1rem]">
                             {token.data.name}
@@ -431,6 +494,18 @@ const UpgradeNFT = () => {
               />
               {selectedNFT && (
                 <>
+                  {checkUpgrading(selectedNFT) && (
+                    <div className="aspect-square mb-6 cursor-pointer relative w-2/5">
+                      <img
+                        src="/media/upgrade/ui_upgrade_training_icon.png"
+                        alt="NFT Image"
+                        className="w-full object-cover rounded-xl mb-3"
+                      />
+                      <div className="text-base">
+                        <CountDown dueDate={selectedNFT.upgradeDueDate} />
+                      </div>
+                    </div>
+                  )}
                   <div className="text-sm text-center mb-8 relative w-4/5">
                     {selectedNFT.data.name}
                   </div>
