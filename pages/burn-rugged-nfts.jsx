@@ -1084,7 +1084,7 @@ export default function BurnRuggedNFTs() {
         
         const tokenmeta = await metadata.Metadata.load(connection, tokenmetaPubkey);
         if(tokenmeta.data.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && tokenmeta.data.data.name == Const.GENESIS_NFT_NAME) {
-          const meta = await axios.get(tokenmeta.data.data.uri)
+          const meta = await axios.get(api.get1KinUrl(tokenmeta.data.data.uri))
           tokens.push({...tokenmeta.data, meta:meta.data})
         } else if(whitelist.indexOf(tokenmeta.data.updateAuthority) != -1) {
           ruggedNftCandidates.push({
@@ -1106,7 +1106,7 @@ export default function BurnRuggedNFTs() {
           let tokenIndex = tokens.findIndex(o=>o.mint == address)
           if(tokenIndex >= 0) {
             let tokenmeta = tokens[tokenIndex]
-            const meta = await axios.get(tokenmeta.data.uri)
+            const meta = await axios.get(api.get1KinUrl(tokenmeta.data.uri))
             tokens[tokenIndex] = {...tokenmeta, mata: meta.data}
           }
         }
@@ -1208,7 +1208,7 @@ export default function BurnRuggedNFTs() {
 
   const getImageFromMetadata = async (uri) => {
     try {
-      const meta = await axios.get(uri);
+      const meta = await axios.get(api.get1KinUrl(uri));
       return meta.data.image || "";
     } catch (e) {
       return "";

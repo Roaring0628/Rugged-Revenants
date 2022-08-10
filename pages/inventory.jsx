@@ -289,7 +289,7 @@ export default function BurnRuggedNFTs() {
     anchor.setProvider(provider);
 
     //get token meta
-    const meta = await axios.get(token.data.uri)
+    const meta = await axios.get(api.get1KinUrl(token.data.uri))
     console.log(meta)
     if(!meta || !meta.data) {
       return

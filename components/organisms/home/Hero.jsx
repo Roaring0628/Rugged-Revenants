@@ -118,7 +118,7 @@ export default function Hero({ play, setPlay }) {
   
         const tokenmeta = await metadata.Metadata.load(connection, tokenmetaPubkey);
         if(tokenmeta.data.data.name == Const.GENESIS_NFT_NAME && tokenmeta.data.updateAuthority == Const.NFT_ACCOUNT_PUBKEY) {
-          const meta = await axios.get(tokenmeta.data.data.uri)
+          const meta = await axios.get(api.get1KinUrl(tokenmeta.data.data.uri))
           tokens.push({...tokenmeta.data, meta:meta.data})
         } else 
           tokens.push(tokenmeta.data)

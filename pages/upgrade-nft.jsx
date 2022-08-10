@@ -180,7 +180,7 @@ const UpgradeNFT = () => {
         
         const tokenmeta = await metadata.Metadata.load(connection, tokenmetaPubkey);
         if(tokenmeta.data.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && (tokenmeta.data.data.symbol == Const.PLAYABLE_NFT_SYMBOL || tokenmeta.data.data.symbol == Const.POTION_NFT_SYMBOL)) {
-          const meta = await axios.get(tokenmeta.data.data.uri)
+          const meta = await axios.get(api.get1KinUrl(tokenmeta.data.data.uri))
           
           tokens.push({...tokenmeta.data, meta:meta.data})
         } 
