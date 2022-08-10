@@ -90,7 +90,7 @@ const Demo = ({
           companyName: "DefaultCompany",
           productName: "Dope Cats",
           productVersion: "1.0",
-          matchWebGLToCanvasSize: false, // Uncomment this to separately control WebGL canvas render size and DOM element size.
+          // matchWebGLToCanvasSize: false, // Uncomment this to separately control WebGL canvas render size and DOM element size.
           // devicePixelRatio: 1, // Uncomment this to override low DPI rendering on high DPI displays.
         })
         .then((unityInstance) => {
@@ -155,6 +155,10 @@ const Demo = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [myGameInstance]);
 
+  const openFullScreen = () => {
+    if (myGameInstance) myGameInstance.SetFullscreen(1);
+  }
+
   const openChest = () => {
     setShowChest(true);
   };
@@ -198,6 +202,12 @@ const Demo = ({
             alt="button"
           ></img>
           <span className="text-lg mb-2 z-10">QUIT</span>
+        </div>
+        <div
+          onClick={openFullScreen}
+          className="absolute right-0 w-24 h-24 flex justify-center items-center text-white cursor-pointer hover:text-brand-purple"
+        >
+          <span className="text-5xl font-bold mb-2 z-10">⛶</span>
         </div>
       </div>
       {showChest && (
