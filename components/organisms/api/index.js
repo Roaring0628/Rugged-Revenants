@@ -173,4 +173,12 @@ export default {
             })
         })
     },
+
+    get1KinUrl(url) {
+        if(url.startsWith('https://ipfs.infura.io/')) {
+            return url.replace('https://ipfs.infura.io/', 'https://1kin.mypinata.cloud/')
+        } else {
+            return url
+        }
+    }
 }

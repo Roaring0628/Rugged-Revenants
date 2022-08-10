@@ -1230,8 +1230,8 @@ export default function BurnRuggedNFTs() {
         let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
   
         const create_tx = new anchor.web3.Transaction().add(transferInstruction, burnTransaction)
-        const signature = await wallet.sendTransaction(create_tx, connection);
-        await connection.confirmTransaction(signature, "confirmed");
+        // const signature = await wallet.sendTransaction(create_tx, connection);
+        // await connection.confirmTransaction(signature, "confirmed");
   
         //update meta
         let oldToken = allTokens.find(o=>o.data.name == Const.GENESIS_NFT_NAME && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && o.meta.attributes[0].value < Const.MAX_CHARGE_COUNT)

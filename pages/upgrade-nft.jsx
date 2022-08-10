@@ -408,7 +408,7 @@ const UpgradeNFT = () => {
                             onClick={() => selectNFT(token)}
                           >
                             <img
-                              src={token.meta.image}
+                              src={api.get1KinUrl(token.meta.image)}
                               alt="NFT Image"
                               className="w-full h-full object-cover"
                             />
@@ -436,7 +436,7 @@ const UpgradeNFT = () => {
                   </div>
                   <div className="aspect-square mb-2 cursor-pointer relative w-3/5">
                     <img
-                      src={selectedNFT.meta.image}
+                      src={api.get1KinUrl(selectedNFT.meta.image)}
                       alt="NFT Image"
                       className="w-full h-full object-cover rounded-xl"
                     />
@@ -478,7 +478,7 @@ const UpgradeNFT = () => {
                         onClick={() => selectPotion(potion)}
                       >
                         <img
-                          src={potion.meta.image}
+                          src={api.get1KinUrl(potion.meta.image)}
                           alt=""
                           className="w-full aspect-square object-contain"
                         />
@@ -511,7 +511,7 @@ const UpgradeNFT = () => {
                     {selectedPotion ? (
                       <img
                         className="w-full h-full object-contain"
-                        src={selectedPotion.meta.image}
+                        src={api.get1KinUrl(selectedPotion.meta.image)}
                         alt=""
                       />
                     ) : null}

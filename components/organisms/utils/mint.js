@@ -15,6 +15,7 @@ import * as Const from './constants'
 import RugGameIdl from "../idl/rug_game.json";
 import { PublicKey } from "@solana/web3.js";
 import api from "../api";
+import axios from "axios";
 
 const TOKEN_METADATA_PROGRAM_ID = new anchor.web3.PublicKey(
   "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
@@ -27,12 +28,25 @@ const ipfs = ipfsClient.create({
 });
 
 export const uploadMetadataToIpfs = async (metadata) => {
-  const uploadedMetadata = await ipfs.add(JSON.stringify(metadata));
+  // const uploadedMetadata = await ipfs.add(JSON.stringify(metadata));
+  var config = {
+    method: 'post',
+    url: 'https://api.pinata.cloud/pinning/pinJSONToIPFS',
+    headers: { 
+      'Content-Type': 'application/json', 
+      'Authorization': Const.PINATA_JWT
+    },
+    data : JSON.stringify(metadata)
+  };
+  
+  const res = await axios(config);
+  
+  console.log(res.data);
 
-  if (uploadedMetadata == null) {
+  if (res.data == null) {
     return null;
   } else {
-    return `https://ipfs.infura.io/ipfs/${uploadedMetadata.path}`;
+    return `https://1kin.mypinata.cloud/ipfs/${res.data.IpfsHash}`;
   }
 };
 

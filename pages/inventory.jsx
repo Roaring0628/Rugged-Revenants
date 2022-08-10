@@ -70,6 +70,7 @@ export default function BurnRuggedNFTs() {
   const hasGenesis = allTokens.filter(o=>o.data.name == Const.GENESIS_NFT_NAME && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY).length > 0
   const router = useRouter();
 
+  console.log('hasGenesis', hasGenesis)
   useEffect(() => {
     if(publicKey) {
       init()
@@ -117,7 +118,8 @@ export default function BurnRuggedNFTs() {
         
         const tokenmeta = await metadata.Metadata.load(connection, tokenmetaPubkey);
         if(tokenmeta.data.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && (tokenmeta.data.data.name == Const.GENESIS_NFT_NAME || tokenmeta.data.data.name == Const.LOOTBOX_NFT_NAME || tokenmeta.data.data.symbol == Const.PLAYABLE_NFT_SYMBOL)) {
-          const meta = await axios.get(tokenmeta.data.data.uri)
+          console.log('tokenmeta.data.data.uri', api.get1KinUrl(tokenmeta.data.data.uri))
+          const meta = await axios.get(api.get1KinUrl(tokenmeta.data.data.uri))
           tokens.push({...tokenmeta.data, meta:meta.data})
         } else {
           tokens.push(tokenmeta.data)
@@ -484,7 +486,7 @@ export default function BurnRuggedNFTs() {
                         onClick={() => selectNFT(token)}
                       >
                         <img
-                          src={token.meta.image}
+                          src={api.get1KinUrl(token.meta.image)}
                           alt="NFT Image"
                           className="w-full h-full object-cover"
                         />
@@ -507,7 +509,7 @@ export default function BurnRuggedNFTs() {
               <div className="w-48 h-48 relative p-1">
                 {selectedNFT && (
                   <img
-                    src={selectedNFT.meta.image}
+                    src={api.get1KinUrl(selectedNFT.meta.image)}
                     alt="NFT Image"
                     className="w-full h-full object-cover rounded-[2rem]"
                   />
