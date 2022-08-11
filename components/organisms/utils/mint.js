@@ -57,24 +57,25 @@ export const updateMeta = async (token, newMeta, playerAccount, txId)=>{
 }
 
 export const mintGenesis = async (wallet, txId) => {
-  let uploadedMetatdataUrl = await uploadMetadataToIpfs({
-    name: Const.GENESIS_NFT_NAME,
-    symbol: Const.GENESIS_NFT_SYMBOL,
-    description: Const.GENESIS_NFT_DESCRIPTION,
-    image: Const.GENESIS_IMAGE_URL,
-    external_url: "https://ruggedrevenants.io/",
-    collection:{"name":"Dope Cats", "family": "Dope Cats"},
-    attributes: [
-      {
-        trait_type: "charges",
-        value: 3,
-      },
-      {
-        trait_type: "Collection",
-        value: "Dope Cat Revenants",
-      },
-    ],
-  });
+  // let uploadedMetatdataUrl = await uploadMetadataToIpfs({
+  //   name: Const.GENESIS_NFT_NAME,
+  //   symbol: Const.GENESIS_NFT_SYMBOL,
+  //   description: Const.GENESIS_NFT_DESCRIPTION,
+  //   image: Const.GENESIS_IMAGE_URL,
+  //   external_url: "https://ruggedrevenants.io/",
+  //   collection:{"name":"Dope Cats", "family": "Dope Cats"},
+  //   attributes: [
+  //     {
+  //       trait_type: "charges",
+  //       value: 3,
+  //     },
+  //     {
+  //       trait_type: "Collection",
+  //       value: "Dope Cat Revenants",
+  //     },
+  //   ],
+  // });
+  let uploadedMetatdataUrl = Const.DEFAULT_GENESIS_META
 
   if (uploadedMetatdataUrl == null) return;
   console.log("Uploaded meta data url: ", uploadedMetatdataUrl);
@@ -112,15 +113,16 @@ export const mintLootBox = async (wallet, level, hasPremium, gameMode, txId) => 
 }
 
 export const mintPotion = async (wallet, txId) => {
-  let uploadedMetatdataUrl = await uploadMetadataToIpfs({
-    name: Const.POTION_NFT_NAME,
-    symbol: Const.POTION_NFT_SYMBOL,
-    description: Const.POTION_NFT_DESCRIPTION,
-    image: Const.POTION_IMAGE_URL,
-    external_url: "https://ruggedrevenants.io/",
-    collection:{"name":"Rugged Revenants Alchemical Agents", "family": "Rugged Revenants Alchemical Agents"},
-    attributes: [],
-  });
+  // let uploadedMetatdataUrl = await uploadMetadataToIpfs({
+  //   name: Const.POTION_NFT_NAME,
+  //   symbol: Const.POTION_NFT_SYMBOL,
+  //   description: Const.POTION_NFT_DESCRIPTION,
+  //   image: Const.POTION_IMAGE_URL,
+  //   external_url: "https://ruggedrevenants.io/",
+  //   collection:{"name":"Rugged Revenants Alchemical Agents", "family": "Rugged Revenants Alchemical Agents"},
+  //   attributes: [],
+  // });
+  let uploadedMetatdataUrl = Const.DEFAULT_POTION_META
 
   if (uploadedMetatdataUrl == null) return;
   console.log("Uploaded meta data url: ", uploadedMetatdataUrl);
@@ -131,17 +133,18 @@ export const mintPotion = async (wallet, txId) => {
 }
 
 export const createPotionMeta = async () => {
-  let uploadedMetatdataUrl = await uploadMetadataToIpfs({
-    name: Const.POTION_NFT_NAME,
-    symbol: Const.POTION_NFT_SYMBOL,
-    description: Const.POTION_NFT_DESCRIPTION,
-    image: Const.POTION_IMAGE_URL,
-    external_url: "https://ruggedrevenants.io/",
-    collection:{"name":"Rugged Revenants Alchemical Agents", "family": "Rugged Revenants Alchemical Agents"},
-    attributes: [],
-  });
+  // let uploadedMetatdataUrl = await uploadMetadataToIpfs({
+  //   name: Const.POTION_NFT_NAME,
+  //   symbol: Const.POTION_NFT_SYMBOL,
+  //   description: Const.POTION_NFT_DESCRIPTION,
+  //   image: Const.POTION_IMAGE_URL,
+  //   external_url: "https://ruggedrevenants.io/",
+  //   collection:{"name":"Rugged Revenants Alchemical Agents", "family": "Rugged Revenants Alchemical Agents"},
+  //   attributes: [],
+  // });
 
-  return uploadedMetatdataUrl
+  // return uploadedMetatdataUrl
+  return Const.DEFAULT_POTION_META
 }
 
 export const mint = async (
