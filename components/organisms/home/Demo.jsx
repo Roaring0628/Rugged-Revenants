@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import GameWinner from "./GameWinner";
 import GameWinnerLootbox from "./GameWinnerLootbox";
 
@@ -12,6 +12,7 @@ const Demo = ({
   endGame,
 }) => {
   const [myGameInstance, setMyGameInstance] = useState(null);
+  const myGameInstanceRef = useRef();
   const [showChest, setShowChest] = useState(false);
   const [showLootboxChest, setShowLootboxChest] = useState(false);
   const [currentLevel, setCurrentLevel] = useState();
@@ -38,6 +39,7 @@ const Demo = ({
             event.data.level == 1
           ) {
             // Handle 5% of the time the users beat level 1
+            closeFullScreen();
             openChest();
           }
 
@@ -96,6 +98,7 @@ const Demo = ({
         .then((unityInstance) => {
           window.myGameInstance = unityInstance;
           setMyGameInstance(unityInstance);
+          myGameInstanceRef.current = unityInstance;
         });
     };
     document.body.appendChild(script);
@@ -128,6 +131,8 @@ const Demo = ({
     console.log("completedLevelsCount", completedLevelsCount);
     console.log("isFinalLevel", isFinalLevel);
 
+    closeFullScreen();
+
     if(isDie || isFinalLevel) {
       if(currentLevel > 1) {
         setCurrentLevel(currentLevel)
@@ -158,6 +163,11 @@ const Demo = ({
 
   const openFullScreen = () => {
     if (myGameInstance) myGameInstance.SetFullscreen(1);
+  }
+
+  const closeFullScreen = () => {
+    if (myGameInstance) myGameInstance.SetFullscreen(0);
+    else if (myGameInstanceRef.current) myGameInstanceRef.current.SetFullscreen(0);
   }
 
   const openChest = () => {
