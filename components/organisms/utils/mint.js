@@ -21,14 +21,11 @@ const TOKEN_METADATA_PROGRAM_ID = new anchor.web3.PublicKey(
   "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
 );
 
-const ipfs = ipfsClient.create({
-  host: "ipfs.infura.io",
-  port: 5001,
-  protocol: "https",
-});
-
 export const uploadMetadataToIpfs = async (metadata) => {
   // const uploadedMetadata = await ipfs.add(JSON.stringify(metadata));
+  if(metadata.image) {
+    metadata.image = api.get1KinUrl(metadata.image)
+  }
   var config = {
     method: 'post',
     url: 'https://api.pinata.cloud/pinning/pinJSONToIPFS',
