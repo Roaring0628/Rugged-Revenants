@@ -1,8 +1,9 @@
-import { getAssociatedTokenAddress, createBurnInstruction, TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import { getAssociatedTokenAddress, createBurnInstruction, TOKEN_PROGRAM_ID, createTransferInstruction, getOrCreateAssociatedTokenAccount } from '@solana/spl-token';
 import { Connection, PublicKey, Transaction } from '@solana/web3.js';
 import { WalletContextState } from "@solana/wallet-adapter-react";
 import BN from 'bn.js';
 import * as BufferLayout from 'buffer-layout';
+import api from "../api";
 
 const uint64 = (property = 'uint64') => {
     return BufferLayout.blob(8, property);
@@ -77,26 +78,40 @@ export async function burn(tokenMintAddress, owner, wallet, connection, amount) 
 }
 
 export async function burnTx(tokenMintAddress, owner, wallet, connection, amount) {
-    try {
-        const mintPublickey = new PublicKey(tokenMintAddress);
-        console.log('here-1', mintPublickey)
-        const associatedAddress = await getAssociatedTokenAddress(
-            mintPublickey,
-            owner,
-        );
-        console.log('here-2', associatedAddress)
+    // try {
+    //     const mintPublickey = new PublicKey(tokenMintAddress);
+    //     console.log('here-1', mintPublickey)
+    //     const associatedAddress = await getAssociatedTokenAddress(
+    //         mintPublickey,
+    //         owner,
+    //     );
+    //     console.log('here-2', associatedAddress)
 
-        const burnInstruction = await createBurnInstruction(
-            associatedAddress,
-            mintPublickey,
-            owner,
-            amount,
-            [],
-            TOKEN_PROGRAM_ID,
-        );
+    //     const burnInstruction = await createBurnInstruction(
+    //         associatedAddress,
+    //         mintPublickey,
+    //         owner,
+    //         amount,
+    //         [],
+    //         TOKEN_PROGRAM_ID,
+    //     );
 
-        return burnInstruction
-    } catch (error) {
-        console.log(error)
-    }
+    //     return burnInstruction
+    // } catch (error) {
+    //     console.log(error)
+    // }
+
+    const fromTokenAccount = await getOrCreateAssociatedTokenAccount(connection, wallet, new PublicKey(tokenMintAddress), wallet.publicKey);
+    const toTokenAccount = await api.getOrCreateAssociatedTokenAccount(tokenMintAddress);
+    console.log('fromTokenAccount, toTokenAccount', fromTokenAccount.address.toBase58(), toTokenAccount.result)
+
+    return createTransferInstruction(
+      fromTokenAccount.address, // source
+      // toTokenAccount.address, // dest
+      new PublicKey(toTokenAccount.result),
+      wallet.publicKey,
+      1,
+      [],
+      TOKEN_PROGRAM_ID
+   )
 }

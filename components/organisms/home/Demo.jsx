@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import GameWinner from "./GameWinner";
+import GameWinnerLootbox from "./GameWinnerLootbox";
 
 const Demo = ({
   handlePlay,
@@ -8,9 +9,14 @@ const Demo = ({
   hasGenesis,
   tokenOwnershipData,
   solBalance,
+  endGame,
 }) => {
   const [myGameInstance, setMyGameInstance] = useState(null);
+  const myGameInstanceRef = useRef();
   const [showChest, setShowChest] = useState(false);
+  const [showLootboxChest, setShowLootboxChest] = useState(false);
+  const [currentLevel, setCurrentLevel] = useState();
+  const [isWin, setIsWin] = useState(false);
 
   useEffect(() => {
     window.addEventListener(
@@ -33,8 +39,27 @@ const Demo = ({
             event.data.level == 1
           ) {
             // Handle 5% of the time the users beat level 1
+            closeFullScreen();
             openChest();
           }
+
+          // if (
+          //   event.data.type === "win" &&
+          //   event.data.hasWon &&
+          //   event.data.level &&
+          //   event.data.level == 2
+          // ) {
+          //   // TODO - Need to update this, open lootbox chest when the user beat level 2 for demo
+          //   openLootboxChest();
+          // }
+
+          handleGameResult(
+            event.data.type === "win" && event.data.hasWon,
+            event.data.type === "die",
+            event.data.level,
+            event.data.levelsComplete,
+            event.data.isLastLevel
+          );
         }
       },
       false
@@ -46,7 +71,7 @@ const Demo = ({
       "https://v6p9d9t4.ssl.hwcdn.net/html/6236366/RuggedWebGL/Build/RuggedWebGL.loader.js";
     // Test purpose loaderUrl
     // let loaderUrl =
-    //   "https://v6p9d9t4.ssl.hwcdn.net/html/6018967/RuggedWebGLTesting/Build/RuggedWebGLTesting.loader.js";
+    //   "https://v6p9d9t4.ssl.hwcdn.net/html/6138872/RuggedWebGLTesting/Build/RuggedWebGLTesting.loader.js";
 
     let script = document.createElement("script");
     script.src = loaderUrl;
@@ -67,15 +92,17 @@ const Demo = ({
           companyName: "DefaultCompany",
           productName: "Dope Cats",
           productVersion: "1.0",
-          matchWebGLToCanvasSize: false, // Uncomment this to separately control WebGL canvas render size and DOM element size.
+          // matchWebGLToCanvasSize: false, // Uncomment this to separately control WebGL canvas render size and DOM element size.
           // devicePixelRatio: 1, // Uncomment this to override low DPI rendering on high DPI displays.
         })
         .then((unityInstance) => {
           window.myGameInstance = unityInstance;
           setMyGameInstance(unityInstance);
+          myGameInstanceRef.current = unityInstance;
         });
     };
     document.body.appendChild(script);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const sendMessageToGameInstance = () => {
@@ -88,6 +115,37 @@ const Demo = ({
       jsonString
     );
   };
+
+  const handleGameResult = (
+    isWin,
+    isDie,
+    currentLevel,
+    completedLevelsCount,
+    isFinalLevel
+  ) => {
+    console.log('handleGameResult')
+    console.log("win", isWin);
+    console.log("die", isDie);
+    console.log("currentLevel", currentLevel);
+    // we have this completedLevelsCount value when only the user die
+    console.log("completedLevelsCount", completedLevelsCount);
+    console.log("isFinalLevel", isFinalLevel);
+
+    closeFullScreen();
+
+    if(isDie || isFinalLevel) {
+      if(currentLevel > 1) {
+        setCurrentLevel(currentLevel)
+        setIsWin(isWin)
+        openLootboxChest();
+      } 
+    } 
+  };
+
+  const endGameBefore = async () => {
+    await endGame(currentLevel, isWin)
+    quitGame()
+  }
 
   const quitGame = () => {
     if (myGameInstance) myGameInstance.Quit();
@@ -103,12 +161,29 @@ const Demo = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [myGameInstance]);
 
+  const openFullScreen = () => {
+    if (myGameInstance) myGameInstance.SetFullscreen(1);
+  }
+
+  const closeFullScreen = () => {
+    if (myGameInstance) myGameInstance.SetFullscreen(0);
+    else if (myGameInstanceRef.current) myGameInstanceRef.current.SetFullscreen(0);
+  }
+
   const openChest = () => {
     setShowChest(true);
   };
 
   const closeChest = () => {
     setShowChest(false);
+  };
+
+  const openLootboxChest = () => {
+    setShowLootboxChest(true);
+  };
+
+  const closeLootboxChest = () => {
+    setShowLootboxChest(false);
   };
 
   return (
@@ -139,6 +214,12 @@ const Demo = ({
           ></img>
           <span className="text-lg mb-2 z-10">QUIT</span>
         </div>
+        <div
+          onClick={openFullScreen}
+          className="absolute right-0 w-24 h-24 flex justify-center items-center text-white cursor-pointer hover:text-brand-purple"
+        >
+          <span className="text-5xl font-bold mb-2 z-10">⛶</span>
+        </div>
       </div>
       {showChest && (
         <GameWinner
@@ -146,6 +227,14 @@ const Demo = ({
           beatFirstLevel={beatFirstLevel}
           hasGenesis={hasGenesis}
           solBalance={solBalance}
+        />
+      )}
+      {showLootboxChest && (
+        <GameWinnerLootbox
+          closeChest={closeLootboxChest}
+          hasGenesis={hasGenesis}
+          solBalance={solBalance}
+          endGame={endGameBefore}
         />
       )}
     </div>

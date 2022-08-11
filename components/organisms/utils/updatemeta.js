@@ -7,7 +7,7 @@ import {PublicKey, sendAndConfirmTransaction} from "@solana/web3.js";
 import {uploadMetadataToIpfs} from './mint'
 
 const ipfs = ipfsClient.create({
-  host: "ipfs.infura.io",
+  host: "1kin.mypinata.cloud",
   port: 5001,
   protocol: "https",
 });
