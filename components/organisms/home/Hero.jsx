@@ -199,7 +199,7 @@ export default function Hero({ play, setPlay }) {
     if(!hasGenesis) {
       let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
       const create_tx = new anchor.web3.Transaction().add(transferInstruction)
-      let txSignature = window.crypto.randomUUID()
+      let txSignature = api.randomString(20) //window.crypto.randomUUID()
       let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
       create_tx.add(signatureTx)
 
@@ -222,7 +222,7 @@ export default function Hero({ play, setPlay }) {
       if(token) {
         let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
         const create_tx = new anchor.web3.Transaction().add(transferInstruction)
-        let txSignature = window.crypto.randomUUID()
+        let txSignature = api.randomString(20) //window.crypto.randomUUID()
         console.log('txSignature', txSignature)
         let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
         console.log('signatureTx', signatureTx)
@@ -259,7 +259,7 @@ export default function Hero({ play, setPlay }) {
       if(level > 1) {
         let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
         const create_tx = new anchor.web3.Transaction().add(transferInstruction)
-        let txSignature = window.crypto.randomUUID()
+        let txSignature = api.randomString(20) //window.crypto.randomUUID()
         let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
         create_tx.add(signatureTx)
 
@@ -321,7 +321,7 @@ export default function Hero({ play, setPlay }) {
 
     let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
 
-    let txSignature = window.crypto.randomUUID()
+    let txSignature = api.randomString(20) //window.crypto.randomUUID()
     let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
     const create_tx = new anchor.web3.Transaction().add(
       transferInstruction, 

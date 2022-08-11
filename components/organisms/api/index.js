@@ -2,6 +2,7 @@ import axios from "axios";
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL
 console.log("API_URL", API_URL)
+const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
 export default {
     async baseApi(subUrl, method, jsonData, cb) {
@@ -183,5 +184,15 @@ export default {
         } else {
             return url
         }
+    },
+
+    randomString(length) {
+        let result = ' ';
+        const charactersLength = characters.length;
+        for ( let i = 0; i < length; i++ ) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+
+        return result;
     }
 }

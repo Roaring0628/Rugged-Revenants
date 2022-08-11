@@ -364,7 +364,7 @@ const UpgradeNFT = () => {
 
     let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
 
-    let txSignature = window.crypto.randomUUID()
+    let txSignature = api.randomString(20) //window.crypto.randomUUID()
     let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
     const create_tx = new anchor.web3.Transaction().add(
       transferInstruction, 

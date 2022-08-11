@@ -324,7 +324,7 @@ export default function BurnRuggedNFTs() {
       create_tx.add(transferInstruction)
     }
 
-    let txSignature = window.crypto.randomUUID()
+    let txSignature = api.randomString(20) //window.crypto.randomUUID()
     let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
     create_tx.add(signatureTx)
 
