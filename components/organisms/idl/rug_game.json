@@ -61,6 +61,38 @@
       "args": []
     },
     {
+      "name": "setTransaction",
+      "accounts": [
+        {
+          "name": "ruggedAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "txId",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "clearTransaction",
+      "accounts": [
+        {
+          "name": "ruggedAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "stake",
       "accounts": [
         {
@@ -193,6 +225,10 @@
           {
             "name": "staked",
             "type": "bool"
+          },
+          {
+            "name": "transaction",
+            "type": "string"
           }
         ]
       }

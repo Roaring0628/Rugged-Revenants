@@ -22,7 +22,7 @@ import {PublicKey, sendAndConfirmTransaction} from "@solana/web3.js";
 
 import RugGameIdl from "../components/organisms/idl/rug_game.json";
 
-import { uploadMetadataToIpfs, mint, mintGenesis, mintPotion, mintLootBox, updateMeta, payToBackendTx, createPotionMeta } from "../components/organisms/utils/mint";
+import { uploadMetadataToIpfs, mint, mintGenesis, mintPotion, mintLootBox, updateMeta, payToBackendTx, createPotionMeta, setProgramTransaction } from "../components/organisms/utils/mint";
 import {burn, burnTx} from '../components/organisms/utils/nftburn'
 import api from "../components/organisms/api"
 import * as Const from '../components/organisms/utils/constants'
@@ -324,9 +324,9 @@ export default function BurnRuggedNFTs() {
       create_tx.add(transferInstruction)
     }
 
-    // let txSignature = window.crypto.randomUUID()
-    // let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
-    // create_tx.add(signatureTx)
+    let txSignature = window.crypto.randomUUID()
+    let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
+    create_tx.add(signatureTx)
 
     let blockhashObj = await connection.getLatestBlockhash();
     console.log("blockhashObj", blockhashObj);
@@ -342,7 +342,7 @@ export default function BurnRuggedNFTs() {
         beatLevel,
         potionMeta,
         nftType,
-        // txId: txSignature
+        txId: txSignature
       })
   
       //update genesis

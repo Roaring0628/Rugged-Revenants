@@ -199,12 +199,17 @@ export default function Hero({ play, setPlay }) {
     if(!hasGenesis) {
       let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
       const create_tx = new anchor.web3.Transaction().add(transferInstruction)
+      let txSignature = window.crypto.randomUUID()
+      let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
+      create_tx.add(signatureTx)
+
       const signature = await wallet.sendTransaction(create_tx, connection);
+      
 
       try {
         await connection.confirmTransaction(signature, "confirmed");
   
-        await mintGenesis(wallet)
+        await mintGenesis(wallet, txSignature)
         await fetchData()        
       } catch(e) {
         console.log('error', e)
@@ -217,6 +222,12 @@ export default function Hero({ play, setPlay }) {
       if(token) {
         let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
         const create_tx = new anchor.web3.Transaction().add(transferInstruction)
+        let txSignature = window.crypto.randomUUID()
+        console.log('txSignature', txSignature)
+        let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
+        console.log('signatureTx', signatureTx)
+        create_tx.add(signatureTx)
+
         const signature = await wallet.sendTransaction(create_tx, connection);
 
         try {
@@ -228,7 +239,7 @@ export default function Hero({ play, setPlay }) {
           localStorage.setItem("old-charges", newMeta.attributes[0].value)
           newMeta.attributes[0].value = newMeta.attributes[0].value + 1
           localStorage.setItem("new-charges", newMeta.attributes[0].value)
-          await updateMeta(token, newMeta)
+          await updateMeta(token, newMeta, wallet.publicKey, txSignature)
           
           await fetchData()
         } catch(e) {
@@ -248,11 +259,15 @@ export default function Hero({ play, setPlay }) {
       if(level > 1) {
         let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
         const create_tx = new anchor.web3.Transaction().add(transferInstruction)
+        let txSignature = window.crypto.randomUUID()
+        let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
+        create_tx.add(signatureTx)
+
         const signature = await wallet.sendTransaction(create_tx, connection);
         await connection.confirmTransaction(signature, "confirmed");
         setPlay(false);
   
-        await mintLootBox(wallet, level, hasWon)
+        await mintLootBox(wallet, level, hasWon, 'Premium', txSignature)
       }
       // await fetchData()
     } catch(e) {
@@ -306,12 +321,12 @@ export default function Hero({ play, setPlay }) {
 
     let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
 
-    // let txSignature = window.crypto.randomUUID()
-    // let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
+    let txSignature = window.crypto.randomUUID()
+    let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
     const create_tx = new anchor.web3.Transaction().add(
       transferInstruction, 
       tx, 
-      // signatureTx
+      signatureTx
     )
     const signature = await wallet.sendTransaction(create_tx, connection);
 
@@ -323,7 +338,7 @@ export default function Hero({ play, setPlay }) {
         token, 
         oldMeta, 
         wallet.publicKey, 
-        //txSignature
+        txSignature
       )
       
       await fetchData()

@@ -364,13 +364,13 @@ const UpgradeNFT = () => {
 
     let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
 
-    // let txSignature = window.crypto.randomUUID()
-    // let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
+    let txSignature = window.crypto.randomUUID()
+    let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
     const create_tx = new anchor.web3.Transaction().add(
       transferInstruction, 
       rugTokenTransferInstruction,
       burnInstruction,
-      // signatureTx
+      signatureTx
     )
 
     const signature = await wallet.sendTransaction(create_tx, connection);
@@ -382,8 +382,8 @@ const UpgradeNFT = () => {
         key: selectedNFT.mint,
         tokenAmount: selectedRugOption,
         playerAccount: wallet.publicKey.toBase58(),
-      }
-      //txSignature
+        txId: txSignature,
+      },
     )
 
     console.log('upgradeResult', upgradeResult)
