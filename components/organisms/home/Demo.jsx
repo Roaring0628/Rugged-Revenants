@@ -137,8 +137,9 @@ const Demo = ({
     } 
   };
 
-  const endGameBefore = () => {
-    endGame(currentLevel, isWin)
+  const endGameBefore = async () => {
+    await endGame(currentLevel, isWin)
+    quitGame()
   }
 
   const quitGame = () => {

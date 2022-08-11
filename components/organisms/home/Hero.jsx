@@ -258,9 +258,6 @@ export default function Hero({ play, setPlay }) {
     } catch(e) {
       console.log("endGame error", e)
     }
-    setTimeout(()=>{
-      handlePlay()
-    }, 10)
   }
 
   // conditionally render demo for desktop only
