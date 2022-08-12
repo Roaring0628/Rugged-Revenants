@@ -20,11 +20,14 @@ const FAQ = () => {
             <div className="px-6">
               {/* Generation 1 will consist of 4,000 Revenants sent back in time to
               stop Solana from getting Rugged. */}
-              TBD
+              “5,555”
             </div>
           </Question>
           <Question question="How many can I mint per wallet?">
-            <div className="px-6">Each wallet can mint 2 NFTs.</div>
+            <div className="px-6">
+              Whales can mint 5, OG can mint 2, Whitelist can mint 1, Public can
+              mint 3
+            </div>
           </Question>
           <Question question="What is the price per mint?">
             <div className="px-6">
@@ -33,11 +36,13 @@ const FAQ = () => {
                 <br />
                 Public Mint 1.25 SOL
               </p> */}
-              TBD
+              Mint price is 1 Sol
             </div>
           </Question>
           <Question question="Wen mint?">
-            <div className="px-6">TBA</div>
+            <div className="px-6">
+              We will mint on Sunday, August 14 on the Magic Eden Launchpad
+            </div>
           </Question>
           <Question question="What if I have other questions?">
             <div className="px-6">
