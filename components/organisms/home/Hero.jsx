@@ -100,7 +100,7 @@ export default function Hero({ play, setPlay }) {
     let tokenAddresses = []
     tokenAccounts.value.forEach((e) => {
       const accountInfo = AccountLayout.decode(e.account.data);
-      // console.log('accountInfo', accountInfo)
+      console.log('accountInfo', accountInfo.mint.toBase58(), accountInfo.owner.toBase58())
       if(accountInfo.amount > 0) {
         let pubKey = `${new PublicKey(accountInfo.mint)}`
         if(pubKey === RUG_TOKEN_MINTKEY) {
@@ -112,6 +112,7 @@ export default function Hero({ play, setPlay }) {
     })
 
     console.log('tokenAddresses', tokenAddresses)
+    let timeStart = Date.now()
     for(let address of tokenAddresses) {
       try {
         let tokenmetaPubkey = await metadata.Metadata.getPDA(address);
@@ -120,13 +121,14 @@ export default function Hero({ play, setPlay }) {
         if(tokenmeta.data.data.name == Const.GENESIS_NFT_NAME && tokenmeta.data.updateAuthority == Const.NFT_ACCOUNT_PUBKEY) {
           const meta = await axios.get(api.get1KinUrl(tokenmeta.data.data.uri))
           tokens.push({...tokenmeta.data, meta:meta.data})
-        } else 
-          tokens.push(tokenmeta.data)
+        } else {
+          // tokens.push(tokenmeta.data)
+        }
       } catch(e) {
         console.log('e', e)
       }
     }
-    console.log('tokens', tokens)
+    console.log('tokens', tokens.length, Date.now() - timeStart)
     setTokens(tokens)
     setGotTokens(true);
 
