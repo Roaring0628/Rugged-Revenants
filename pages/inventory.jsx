@@ -29,6 +29,9 @@ import * as Const from '../components/organisms/utils/constants'
 
 import OpenLootboxConfirm from "components/organisms/home/OpenLootboxConfirm";
 import LootboxNotification from "components/organisms/inventory/LootboxNotification";
+import {
+  getParsedNftAccountsByOwner,
+} from "@nfteyez/sol-rayz";
 
 const { SystemProgram } = anchor.web3;
 
@@ -83,54 +86,47 @@ export default function BurnRuggedNFTs() {
     initMainProgram()
   }
 
+  const updateTokenMetas = async (tokens) => {
+    tokens = await Promise.all(tokens.map(async (token)=>{
+      const meta = await axios.get(api.get1KinUrl(token.data.uri))
+      return {...token, meta: meta.data}
+    }))
+
+    console.log('updateTokenMetas', tokens)
+    setAllTokens(tokens)
+  }
+
   const fetchData = async () => {
     let walletInfo = await connection.getAccountInfo(provider.wallet.publicKey)
     console.log("walletInfo", walletInfo)
 
-    // const tokenMetadata = await metaplex.nfts().findAllByOwner(metaplex.identity().publicKey);
-    // console.log('tokenMetadata', JSON.stringify(tokenMetadata));
-    
-    const tokenAccounts = await connection.getTokenAccountsByOwner(
-      provider.wallet.publicKey,
-      {
-        programId: TOKEN_PROGRAM_ID,
-      }
-    );
-    console.log('tokenAccounts', tokenAccounts)
-    let tokens = []
-    let tokenAddresses = []
-    tokenAccounts.value.forEach((e) => {
-      const accountInfo = AccountLayout.decode(e.account.data);
-      if(accountInfo.amount > 0) {
-        let pubKey = `${new PublicKey(accountInfo.mint)}`
-        if(pubKey === Const.RUG_TOKEN_MINTKEY) {
-          console.log("Rug Token amount", Math.floor(Number(accountInfo.amount)/1000000))
-          setRugToken(Math.floor(Number(accountInfo.amount)/1000000))
-        } else {
-          tokenAddresses.push(pubKey)
-        }
-      }
-    })
+    const nftArray = await getParsedNftAccountsByOwner({
+      publicAddress: provider.wallet.publicKey.toBase58(),
+      connection: connection,
+    }); 
 
-    for(let address of tokenAddresses) {
-      try {
-        let tokenmetaPubkey = await metadata.Metadata.getPDA(address);
+    let filteredNfts = nftArray.filter(tokenmeta=>(tokenmeta.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && (tokenmeta.data.name == Const.GENESIS_NFT_NAME || tokenmeta.data.name == Const.LOOTBOX_NFT_NAME || tokenmeta.data.symbol == Const.PLAYABLE_NFT_SYMBOL)))
+    
+    // for(let address of tokenAddresses) {
+    //   try {
+    //     let tokenmetaPubkey = await metadata.Metadata.getPDA(address);
         
-        const tokenmeta = await metadata.Metadata.load(connection, tokenmetaPubkey);
-        if(tokenmeta.data.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && (tokenmeta.data.data.name == Const.GENESIS_NFT_NAME || tokenmeta.data.data.name == Const.LOOTBOX_NFT_NAME || tokenmeta.data.data.symbol == Const.PLAYABLE_NFT_SYMBOL)) {
-          console.log('tokenmeta.data.data.uri', api.get1KinUrl(tokenmeta.data.data.uri))
-          const meta = await axios.get(api.get1KinUrl(tokenmeta.data.data.uri))
-          tokens.push({...tokenmeta.data, meta:meta.data})
-        } else {
-          tokens.push(tokenmeta.data)
-        }
-      } catch(e) {
-        console.log('e', e)
-      }
-    }
-    console.log('tokens', tokens)
-    setAllTokens(tokens)
-    selectTab('genesis', tokens)
+    //     const tokenmeta = await metadata.Metadata.load(connection, tokenmetaPubkey);
+    //     if(tokenmeta.data.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && (tokenmeta.data.data.name == Const.GENESIS_NFT_NAME || tokenmeta.data.data.name == Const.LOOTBOX_NFT_NAME || tokenmeta.data.data.symbol == Const.PLAYABLE_NFT_SYMBOL)) {
+    //       console.log('tokenmeta.data.data.uri', api.get1KinUrl(tokenmeta.data.data.uri))
+    //       const meta = await axios.get(api.get1KinUrl(tokenmeta.data.data.uri))
+    //       tokens.push({...tokenmeta.data, meta:meta.data})
+    //     } else {
+    //       tokens.push(tokenmeta.data)
+    //     }
+    //   } catch(e) {
+    //     console.log('e', e)
+    //   }
+    // }
+    console.log('tokens', filteredNfts)
+    setAllTokens(filteredNfts)
+    updateTokenMetas(filteredNfts)
+    selectTab('genesis', filteredNfts)
 
     if(ruggedAccount && mainProgram) {
       let programAccount = await mainProgram.account.ruggedAccount.fetch(ruggedAccount);
@@ -485,11 +481,11 @@ export default function BurnRuggedNFTs() {
                         )}
                         onClick={() => selectNFT(token)}
                       >
-                        <img
+                        {token.meta && <img
                           src={api.get1KinUrl(token.meta.image)}
                           alt="NFT Image"
                           className="w-full h-full object-cover"
-                        />
+                        />}
                       </div>
                       <div className="text-[0.6rem] leading-[0.8rem]">
                         {token.data.name}

@@ -33,6 +33,9 @@ import * as Const from '../components/organisms/utils/constants'
 
 import OpenLootboxConfirm from "components/organisms/home/OpenLootboxConfirm";
 import CountDown from "components/molecules/CountDown";
+import {
+  getParsedNftAccountsByOwner,
+} from "@nfteyez/sol-rayz";
 
 const { SystemProgram } = anchor.web3;
 
@@ -153,9 +156,7 @@ const UpgradeNFT = () => {
         programId: TOKEN_PROGRAM_ID,
       }
     );
-    console.log('tokenAccounts', tokenAccounts)
     let tokens = []
-    let tokenAddresses = []
     tokenAccounts.value.forEach((e) => {
       const accountInfo = AccountLayout.decode(e.account.data);
       if(accountInfo.amount > 0) {
@@ -168,21 +169,21 @@ const UpgradeNFT = () => {
           } else {
             setSelectedRugOption(0)
           }
-        } else {
-          tokenAddresses.push(pubKey)
-        }
+        } 
       }
     })
 
-    for(let address of tokenAddresses) {
+    const nftArray = await getParsedNftAccountsByOwner({
+      publicAddress: provider.wallet.publicKey.toBase58(),
+      connection: connection,
+    }); 
+
+    for(let tokenmeta of nftArray) {
       try {
-        let tokenmetaPubkey = await metadata.Metadata.getPDA(address);
-        
-        const tokenmeta = await metadata.Metadata.load(connection, tokenmetaPubkey);
-        if(tokenmeta.data.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && (tokenmeta.data.data.symbol == Const.PLAYABLE_NFT_SYMBOL || tokenmeta.data.data.symbol == Const.POTION_NFT_SYMBOL)) {
-          const meta = await axios.get(api.get1KinUrl(tokenmeta.data.data.uri))
+        if(tokenmeta.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && (tokenmeta.data.symbol == Const.PLAYABLE_NFT_SYMBOL || tokenmeta.data.symbol == Const.POTION_NFT_SYMBOL)) {
+          const meta = await axios.get(api.get1KinUrl(tokenmeta.data.uri))
           
-          tokens.push({...tokenmeta.data, meta:meta.data})
+          tokens.push({...tokenmeta, meta:meta.data})
         } 
       } catch(e) {
         console.log('e', e)
