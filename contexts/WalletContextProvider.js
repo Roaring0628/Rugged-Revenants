@@ -17,8 +17,9 @@ import { useCallback, useMemo } from "react";
 
 const WalletContextProvider = (props) => {
   const network = WalletAdapterNetwork.Mainnet;
-  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
-
+  const endpoint = "https://sleek-quiet-lambo.solana-mainnet.discover.quiknode.pro/05d4d05ed2a939d8da3cecbf417383d1192c0d40/" //useMemo(() => clusterApiUrl(network), [network]);
+  // const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+  console.log('endpoint', endpoint)
   const wallets = useMemo(
     () => [
       new PhantomWalletAdapter(),

@@ -69,6 +69,10 @@ export async function burn(tokenMintAddress, owner, wallet, connection, amount) 
 
         const BurnTransaction = new Transaction().add(burnInstruction);
 
+        let blockhashObj = await connection.getLatestBlockhash();
+        console.log("blockhashObj", blockhashObj);
+        BurnTransaction.recentBlockhash = blockhashObj.blockhash;
+
         const BurnandCloseSignature = await wallet.sendTransaction(BurnTransaction, connection);
 
         return await connection.confirmTransaction(BurnandCloseSignature, 'processed');

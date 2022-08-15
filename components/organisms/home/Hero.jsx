@@ -32,9 +32,14 @@ import Demo from "./Demo.jsx";
 import ChargeSuccess from "./ChargeSuccess";
 import ConsumeChargeConfirm from "./ConsumeChargeConfirm";
 
+import {
+  getParsedNftAccountsByOwner,
+} from "@nfteyez/sol-rayz";
+
 const { SystemProgram } = anchor.web3;
 
 const RUG_TOKEN_MINTKEY="Dt7gQrFFWzToJAEUqyMZWb1fRi4M2pLM4o6MDtS57R7e"
+const METADATA_PROGRAM = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s";
 
 export default function Hero({ play, setPlay }) {
   const [isDesktop, setDesktop] = useState(false);
@@ -65,11 +70,11 @@ export default function Hero({ play, setPlay }) {
   const hasCyberSamurai = tokens.filter(o=>o.data.symbol == 'CSAMURAI'||o.data.symbol == 'CSCOMIC'||o.data.name.startsWith("Cyber Samurai")).length > 0
   const hasRRGen1 = tokens.filter(o=>o.data.symbol == 'RRDC').length > 0
 
-  const burnAvailable = !hasGenesis || tokens.filter(o=>o.meta && o.meta.attributes[0].value < 3).length > 0
+  // const burnAvailable = !hasGenesis || tokens.filter(o=>o.meta && o.meta.attributes[0].value < 3).length > 0
 
   console.log('hasGenesis', hasGenesis)
   console.log('solBalance', solBalance)
-  
+
   const tokenOwnershipData = { hasDopeCat, hasPixelBand, hasHippo, hasCyberSamurai, hasSovanaEgg: hasSovanaEgg || hasRRGen1, hasRRGen1 };
   console.log(tokenOwnershipData);
 
@@ -87,6 +92,20 @@ export default function Hero({ play, setPlay }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [publicKey]);
 
+  const updateTokenMetas = async (tokens) => {
+    tokens = await Promise.all(tokens.map(async (token)=>{
+      if(token.updateAuthority == Const.NFT_ACCOUNT_PUBKEY) {
+        const meta = await axios.get(api.get1KinUrl(token.data.uri))
+        return {...token, meta: meta.data}
+      } else {
+        return {...token}
+      }
+    }))
+
+    console.log('updateTokenMetas', tokens)
+    setTokens(tokens)
+  }
+
   const fetchData = async () => {
     let walletInfo = await connection.getAccountInfo(provider.wallet.publicKey)
     console.log("walletInfo", walletInfo)
@@ -94,45 +113,15 @@ export default function Hero({ play, setPlay }) {
       setSolBalance(walletInfo.lamports)
     }
 
-    const tokenAccounts = await connection.getTokenAccountsByOwner(
-      provider.wallet.publicKey,
-      {
-        programId: TOKEN_PROGRAM_ID,
-      }
-    );
-    console.log('tokenAccounts', tokenAccounts)
-    let tokens = []
-    let tokenAddresses = []
-    tokenAccounts.value.forEach((e) => {
-      const accountInfo = AccountLayout.decode(e.account.data);
-      // console.log('accountInfo', accountInfo)
-      if(accountInfo.amount > 0) {
-        let pubKey = `${new PublicKey(accountInfo.mint)}`
-        if(pubKey === RUG_TOKEN_MINTKEY) {
-          setRugToken(Math.floor(Number(accountInfo.amount)/1000000))
-        } else {
-          tokenAddresses.push(pubKey)
-        }
-      }
-    })
+    let timeStart = Date.now()
+    const nftArray = await getParsedNftAccountsByOwner({
+      publicAddress: provider.wallet.publicKey.toBase58(),
+      connection: connection,
+    }); 
 
-    console.log('tokenAddresses', tokenAddresses)
-    for(let address of tokenAddresses) {
-      try {
-        let tokenmetaPubkey = await metadata.Metadata.getPDA(address);
-  
-        const tokenmeta = await metadata.Metadata.load(connection, tokenmetaPubkey);
-        if(tokenmeta.data.data.name == Const.GENESIS_NFT_NAME && tokenmeta.data.updateAuthority == Const.NFT_ACCOUNT_PUBKEY) {
-          const meta = await axios.get(api.get1KinUrl(tokenmeta.data.data.uri))
-          tokens.push({...tokenmeta.data, meta:meta.data})
-        } else 
-          tokens.push(tokenmeta.data)
-      } catch(e) {
-        console.log('e', e)
-      }
-    }
-    console.log('tokens', tokens)
-    setTokens(tokens)
+    console.log('tokens', nftArray.length, Date.now() - timeStart)
+    setTokens(nftArray)
+    updateTokenMetas(nftArray)
     setGotTokens(true);
 
     if(ruggedAccount && mainProgram) {
@@ -208,6 +197,10 @@ export default function Hero({ play, setPlay }) {
       let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
       create_tx.add(signatureTx)
 
+      let blockhashObj = await connection.getLatestBlockhash();
+      console.log("blockhashObj", blockhashObj);
+      create_tx.recentBlockhash = blockhashObj.blockhash;
+
       const signature = await wallet.sendTransaction(create_tx, connection);
       
 
@@ -232,6 +225,10 @@ export default function Hero({ play, setPlay }) {
         let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
         console.log('signatureTx', signatureTx)
         create_tx.add(signatureTx)
+
+        let blockhashObj = await connection.getLatestBlockhash();
+        console.log("blockhashObj", blockhashObj);
+        create_tx.recentBlockhash = blockhashObj.blockhash;
 
         const signature = await wallet.sendTransaction(create_tx, connection);
 
@@ -267,6 +264,10 @@ export default function Hero({ play, setPlay }) {
         let txSignature = api.randomString(20) //window.crypto.randomUUID()
         let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
         create_tx.add(signatureTx)
+
+        let blockhashObj = await connection.getLatestBlockhash();
+        console.log("blockhashObj", blockhashObj);
+        create_tx.recentBlockhash = blockhashObj.blockhash;
 
         const signature = await wallet.sendTransaction(create_tx, connection);
         await connection.confirmTransaction(signature, "confirmed");
@@ -333,6 +334,11 @@ export default function Hero({ play, setPlay }) {
       tx, 
       signatureTx
     )
+
+    let blockhashObj = await connection.getLatestBlockhash();
+    console.log("blockhashObj", blockhashObj);
+    create_tx.recentBlockhash = blockhashObj.blockhash;
+
     const signature = await wallet.sendTransaction(create_tx, connection);
 
     try {

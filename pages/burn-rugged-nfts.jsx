@@ -26,6 +26,10 @@ import { uploadMetadataToIpfs, mint, mintGenesis, mintPotion, mintLootBox, updat
 import {burn, burnTx} from '../components/organisms/utils/nftburn'
 import api from "../components/organisms/api"
 import * as Const from '../components/organisms/utils/constants'
+import {
+  getParsedNftAccountsByOwner,
+} from "@nfteyez/sol-rayz";
+
 const { SystemProgram } = anchor.web3;
 
 export default function BurnRuggedNFTs() {
@@ -84,48 +88,32 @@ export default function BurnRuggedNFTs() {
     // const tokenMetadata = await metaplex.nfts().findAllByOwner(metaplex.identity().publicKey);
     // console.log('tokenMetadata', JSON.stringify(tokenMetadata));
     
-    const tokenAccounts = await connection.getTokenAccountsByOwner(
-      provider.wallet.publicKey,
-      {
-        programId: TOKEN_PROGRAM_ID,
-      }
-    );
     let tokens = []
-    let tokenAddresses = []
-    tokenAccounts.value.forEach((e) => {
-      const accountInfo = AccountLayout.decode(e.account.data);
-      if(accountInfo.amount > 0) {
-        let pubKey = `${new PublicKey(accountInfo.mint)}`
-        if(pubKey === Const.RUG_TOKEN_MINTKEY) {
-          
-        } else {
-          tokenAddresses.push(pubKey)
-        }
-      }
-    })
+    
+    const nftArray = await getParsedNftAccountsByOwner({
+      publicAddress: provider.wallet.publicKey.toBase58(),
+      connection: connection,
+    }); 
 
-    console.log('tokenAddresses', tokenAddresses)
     let ruggedTokenAddresses = [] //tokenAddresses.filter(o=>whitelist.indexOf(o) != -1)
     let ruggedNftCandidates = []
-    for(let address of tokenAddresses) {
+    for(let tokenmeta of nftArray) {
       try {
-        let tokenmetaPubkey = await metadata.Metadata.getPDA(address);
-        
-        const tokenmeta = await metadata.Metadata.load(connection, tokenmetaPubkey);
-        if(tokenmeta.data.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && tokenmeta.data.data.name == Const.GENESIS_NFT_NAME) {
-          const meta = await axios.get(api.get1KinUrl(tokenmeta.data.data.uri))
-          tokens.push({...tokenmeta.data, meta:meta.data})
-        } else if(whitelist.indexOf(tokenmeta.data.updateAuthority) != -1) {
+        if(tokenmeta.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && tokenmeta.data.name == Const.GENESIS_NFT_NAME) {
+          const meta = await axios.get(api.get1KinUrl(tokenmeta.data.uri))
+          tokens.push({...tokenmeta, meta:meta.data})
+        } else if(whitelist.indexOf(tokenmeta.updateAuthority) != -1) {
           ruggedNftCandidates.push({
-            authority: tokenmeta.data.updateAuthority,
+            authority: tokenmeta.updateAuthority,
             address: address
           })
-          tokens.push(tokenmeta.data)
+          tokens.push(tokenmeta)
         } 
       } catch(e) {
         console.log('e', e)
       }
     }
+
     if(ruggedNftCandidates.length > 0) {
       ruggedTokenAddresses = await api.filterRuggedWhitelist(ruggedNftCandidates)
       setRuggedTokenAddresses(ruggedTokenAddresses)
@@ -259,6 +247,11 @@ export default function BurnRuggedNFTs() {
         let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
   
         const create_tx = new anchor.web3.Transaction().add(transferInstruction, burnTransaction)
+
+        let blockhashObj = await connection.getLatestBlockhash();
+        console.log("blockhashObj", blockhashObj);
+        create_tx.recentBlockhash = blockhashObj.blockhash;
+
         const signature = await wallet.sendTransaction(create_tx, connection);
         await connection.confirmTransaction(signature, "confirmed");
   
@@ -279,6 +272,10 @@ export default function BurnRuggedNFTs() {
         let txSignature = api.randomString(20) //window.crypto.randomUUID()
         let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
         create_tx.add(signatureTx)
+        
+        let blockhashObj = await connection.getLatestBlockhash();
+        console.log("blockhashObj", blockhashObj);
+        create_tx.recentBlockhash = blockhashObj.blockhash;
         
         const signature = await wallet.sendTransaction(create_tx, connection);
         await connection.confirmTransaction(signature, "confirmed");
