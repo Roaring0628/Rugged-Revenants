@@ -111,6 +111,17 @@ export default {
             })
         })
     },
+    async getOrCreateAssociatedBurnTokenAccount(key){
+        return new Promise((resolve, reject)=>{
+            this.baseApi('/players/getOrCreateAssociatedBurnTokenAccount', 'POST', {key}, (err, ret)=>{
+                if(err) {
+                    reject()
+                } else {
+                    resolve(ret)
+                }
+            })
+        })
+    },
     async unstake(playerAccount, tokenAccount){
         return new Promise((resolve, reject)=>{
             this.baseApi('/players/unstake', 'POST', {playerAccount, tokenAccount}, (err, ret)=>{

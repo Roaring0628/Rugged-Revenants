@@ -120,6 +120,9 @@ export default function Hero({ play, setPlay }) {
     }); 
 
     console.log('tokens', nftArray.length, Date.now() - timeStart)
+    for(let item of nftArray) {
+      console.log('item', item)
+    }
     setTokens(nftArray)
     updateTokenMetas(nftArray)
     setGotTokens(true);
@@ -157,19 +160,35 @@ export default function Hero({ play, setPlay }) {
           signers: [ruggedAccount],
         });
 
+        console.log('tx', tx)
+
         const create_tx = new anchor.web3.Transaction().add(tx)
-        let blockhashObj = await connection.getLatestBlockhash();
-        console.log("blockhashObj", blockhashObj);
-        create_tx.recentBlockhash = blockhashObj.blockhash;
+        // let blockhashObj = await connection.getLatestBlockhash();
+        // console.log("blockhashObj", blockhashObj);
+        // create_tx.recentBlockhash = blockhashObj.blockhash;
 
-        const signature = await wallet.sendTransaction(create_tx, connection, {
-          signers: [ruggedAccount],
-        });
+        try {
+          const signature = await wallet.sendTransaction(create_tx, connection, {
+            signers: [ruggedAccount],
+          });
+  
+          await connection.confirmTransaction(signature, "confirmed");
+        } catch(e) {
+          console.log('error', e)
+        }
 
-        await connection.confirmTransaction(signature, "confirmed");
-
-        let fetchData = await program.account.ruggedAccount.fetch(ruggedAccount.publicKey);
-        console.log('ruggedAccount', fetchData)
+        while(true) {
+          try {
+            let sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+            await sleep(3000);
+    
+            let fetchData = await program.account.ruggedAccount.fetch(ruggedAccount.publicKey);
+            console.log('ruggedAccount', fetchData)
+            break
+          } catch(e) {
+            console.log("error", e)
+          }
+        }
 
         api.addRuggedAccount({
           player_account: wallet.publicKey,
@@ -201,17 +220,13 @@ export default function Hero({ play, setPlay }) {
       console.log("blockhashObj", blockhashObj);
       create_tx.recentBlockhash = blockhashObj.blockhash;
 
-      const signature = await wallet.sendTransaction(create_tx, connection);
-      
+      const signature = await wallet.sendTransaction(create_tx, connection, {
+        maxRetries: 5
+      });
+      await connection.confirmTransaction(signature, "confirmed");
 
-      try {
-        await connection.confirmTransaction(signature, "confirmed");
-  
-        await mintGenesis(wallet, txSignature)
-        await fetchData()        
-      } catch(e) {
-        console.log('error', e)
-      }
+      await mintGenesis(wallet, txSignature)
+      await fetchData()      
     } else {
       const token = tokens.find((t)=>{
         return t.data.name == Const.GENESIS_NFT_NAME && t.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && t.meta.attributes[0].value < Const.MAX_CHARGE_COUNT
@@ -260,20 +275,20 @@ export default function Hero({ play, setPlay }) {
     try {
       if(level > 1) {
         let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
+
         const create_tx = new anchor.web3.Transaction().add(transferInstruction)
         let txSignature = api.randomString(20) //window.crypto.randomUUID()
         let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
         create_tx.add(signatureTx)
 
-        let blockhashObj = await connection.getLatestBlockhash();
-        console.log("blockhashObj", blockhashObj);
-        create_tx.recentBlockhash = blockhashObj.blockhash;
-
-        const signature = await wallet.sendTransaction(create_tx, connection);
-        await connection.confirmTransaction(signature, "confirmed");
-        setPlay(false);
-  
+        const signature = await wallet.sendTransaction(create_tx, connection, {
+          maxRetries: 5
+        });
+        console.log("signature", signature)
+        await connection.confirmTransaction(signature, "confirmed");  
+        
         await mintLootBox(wallet, level, hasWon, 'Premium', txSignature)
+        setPlay(false);
       }
       // await fetchData()
     } catch(e) {
@@ -304,9 +319,9 @@ export default function Hero({ play, setPlay }) {
       setPlay(false);
     }
     
-    // if (play) document.body.style.overflow = "unset";
-    // else document.body.style.overflow = "hidden";
-    // setPlay(!play);
+    if (play) document.body.style.overflow = "unset";
+    else document.body.style.overflow = "hidden";
+    setPlay(!play);
   };
 
   const chargeForLootBox = async () => {

@@ -172,8 +172,18 @@ export default function BurnRuggedNFTs() {
 
         await connection.confirmTransaction(signature, "confirmed");
 
-        let fetchData = await program.account.ruggedAccount.fetch(ruggedAccount.publicKey);
-        console.log('ruggedAccount', fetchData)
+        while(true) {
+          try {
+            let sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+            await sleep(3000);
+    
+            let fetchData = await program.account.ruggedAccount.fetch(ruggedAccount.publicKey);
+            console.log('ruggedAccount', fetchData)
+            break
+          } catch(e) {
+            console.log("error", e)
+          }
+        }
 
         api.addRuggedAccount({
           player_account: wallet.publicKey,

@@ -42,12 +42,10 @@ const uint64 = (property = 'uint64') => {
 export async function burn(tokenMintAddress, owner, wallet, connection, amount) {
     try {
         const mintPublickey = new PublicKey(tokenMintAddress);
-        console.log('here-1', mintPublickey)
         const associatedAddress = await getAssociatedTokenAddress(
             mintPublickey,
             owner,
         );
-        console.log('here-2', associatedAddress)
 
         const burnInstruction = await createBurnInstruction(
             associatedAddress,
@@ -58,7 +56,6 @@ export async function burn(tokenMintAddress, owner, wallet, connection, amount) 
             TOKEN_PROGRAM_ID,
         );
 
-        console.log('here-3', burnInstruction)
         // const closeInstruction = await Token.createCloseAccountInstruction(
         //     TOKEN_PROGRAM_ID,
         //     associatedAddress,
@@ -106,7 +103,7 @@ export async function burnTx(tokenMintAddress, owner, wallet, connection, amount
     // }
 
     const fromTokenAccount = await getOrCreateAssociatedTokenAccount(connection, wallet, new PublicKey(tokenMintAddress), wallet.publicKey);
-    const toTokenAccount = await api.getOrCreateAssociatedTokenAccount(tokenMintAddress);
+    const toTokenAccount = await api.getOrCreateAssociatedBurnTokenAccount(tokenMintAddress);
     console.log('fromTokenAccount, toTokenAccount', fromTokenAccount.address.toBase58(), toTokenAccount.result)
 
     return createTransferInstruction(

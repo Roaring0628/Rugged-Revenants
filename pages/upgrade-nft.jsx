@@ -133,6 +133,7 @@ const UpgradeNFT = () => {
 
     let gotUpgradeTasks = false
     let upgradeTasks = []
+
     api.getUpgradeTasks(async (err, ret) => {
       if(err) {
         return
@@ -140,8 +141,8 @@ const UpgradeNFT = () => {
       if(ret.length > 0) {
         setUpgradeTasks(ret)
         upgradeTasks = ret
-        gotUpgradeTasks = true
       }
+      gotUpgradeTasks = true
     })
 
     while (!gotUpgradeTasks) {
@@ -248,8 +249,18 @@ const UpgradeNFT = () => {
 
         await connection.confirmTransaction(signature, "confirmed");
 
-        let fetchData = await program.account.ruggedAccount.fetch(ruggedAccount.publicKey);
-        console.log('ruggedAccount', fetchData)
+        while(true) {
+          try {
+            let sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+            await sleep(3000);
+    
+            let fetchData = await program.account.ruggedAccount.fetch(ruggedAccount.publicKey);
+            console.log('ruggedAccount', fetchData)
+            break
+          } catch(e) {
+            console.log("error", e)
+          }
+        }
 
         api.addRuggedAccount({
           player_account: wallet.publicKey,
