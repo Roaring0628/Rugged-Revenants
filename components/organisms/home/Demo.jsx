@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import { useEffect, useState, useRef } from "react";
+import Script from "next/script";
 import GameWinner from "./GameWinner";
 import GameWinnerLootbox from "./GameWinnerLootbox";
 import { useContext } from 'react';
@@ -70,11 +71,11 @@ const Demo = ({
 
     // For new build of game: Need to update loaderUrl, and download build files and replace them
     // Live loaderUrl
-    let loaderUrl =
-      "https://v6p9d9t4.ssl.hwcdn.net/html/6236366/RuggedWebGL/Build/RuggedWebGL.loader.js";
-    // Test purpose loaderUrl
     // let loaderUrl =
-    //   "https://v6p9d9t4.ssl.hwcdn.net/html/6138872/RuggedWebGLTesting/Build/RuggedWebGLTesting.loader.js";
+    //   "https://v6p9d9t4.ssl.hwcdn.net/html/6236366/RuggedWebGL/Build/RuggedWebGL.loader.js";
+    // Test purpose loaderUrl
+    let loaderUrl =
+      "https://v6p9d9t4.ssl.hwcdn.net/html/6329858/RuggedWebGLTesting/Build/RuggedWebGLTesting.loader.js";
 
     let script = document.createElement("script");
     script.src = loaderUrl;
@@ -83,13 +84,13 @@ const Demo = ({
       window
         .createUnityInstance(document.querySelector("#unity-canvas"), {
           // Live build files
-          dataUrl: "/Build/RuggedWebGL.data.unityweb",
-          frameworkUrl: "/Build/RuggedWebGL.framework.js.unityweb",
-          codeUrl: "/Build/RuggedWebGL.wasm.unityweb",
+          // dataUrl: "/Build/RuggedWebGL.data.unityweb",
+          // frameworkUrl: "/Build/RuggedWebGL.framework.js.unityweb",
+          // codeUrl: "/Build/RuggedWebGL.wasm.unityweb",
           // Test purpose files
-          // dataUrl: "/Build/RuggedWebGLTesting.data.unityweb",
-          // frameworkUrl: "/Build/RuggedWebGLTesting.framework.js.unityweb",
-          // codeUrl: "/Build/RuggedWebGLTesting.wasm.unityweb",
+          dataUrl: "/Build/RuggedWebGLTesting.data.unityweb",
+          frameworkUrl: "/Build/RuggedWebGLTesting.framework.js.unityweb",
+          codeUrl: "/Build/RuggedWebGLTesting.wasm.unityweb",
 
           streamingAssetsUrl: "StreamingAssets",
           companyName: "DefaultCompany",
@@ -99,6 +100,7 @@ const Demo = ({
           // devicePixelRatio: 1, // Uncomment this to override low DPI rendering on high DPI displays.
         })
         .then((unityInstance) => {
+          window.unityInstance = unityInstance;
           window.myGameInstance = unityInstance;
           setMyGameInstance(unityInstance);
           myGameInstanceRef.current = unityInstance;
@@ -111,12 +113,18 @@ const Demo = ({
   const sendMessageToGameInstance = () => {
     // let testObject = { hasDopeCat: true, hasPixelBand: false };
     // console.log("TOKEN OWNERSHIP DATA: ", tokenOwnershipData);
-    let jsonString = JSON.stringify(tokenOwnershipData);
+    let { rrGen1MetaArray, ...tokenOwnershipData1 } = tokenOwnershipData;
+    let jsonString = JSON.stringify(tokenOwnershipData1);
     myGameInstance.SendMessage(
       "JavascriptHook",
       "RecieveWalletJson",
       jsonString
     );
+    (rrGen1MetaArray || []).forEach((token) => {
+      if (!token.meta) return;
+      let metaString = JSON.stringify(token.meta);
+      myGameInstance.SendMessage("JavascriptHook", "ReceiveAttributeJson", metaString);
+    })
   };
 
   const handleGameResult = (
@@ -202,6 +210,21 @@ const Demo = ({
 
   return (
     <div className="game-wrapper">
+      <Script id="firebase-script">
+        {`
+          var firebaseConfig = {
+            apiKey: "AIzaSyBvgWGvvytGS4U8MwPAlwcdZwpgOv9erws",
+            authDomain: "rugged-revenants.firebaseapp.com",
+            databaseURL: "https://rugged-revenants-default-rtdb.firebaseio.com",
+            projectId: "rugged-revenants",
+            storageBucket: "rugged-revenants.appspot.com",
+            messagingSenderId: "424403245267",
+            appId: "1:424403245267:web:cdb2820c1060c915161c26",
+            measurementId: "G-PS6WZT7XML"
+          };
+          if (firebase) firebase.initializeApp(firebaseConfig);
+        `}
+      </Script>
       <div className="demo-wrapper">
         <img
           className="tv-screen"

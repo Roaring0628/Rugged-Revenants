@@ -74,14 +74,14 @@ export default function Hero({ play, setPlay }) {
   const hasSovanaEgg = tokens.filter(o=>o.data.symbol == 'Sovana Egg').length > 0
   const hasCyberSamurai = tokens.filter(o=>o.data.symbol == 'CSAMURAI'||o.data.symbol == 'CSCOMIC'||o.data.name.startsWith("Cyber Samurai")).length > 0
   const hasRRGen1 = tokens.filter(o=>o.data.symbol == 'RRDC').length > 0
-  const hasRV1 = tokens.filter(o=>o.data.symbol == '$RCV1' && o.updateAuthority == Const.PREMIUM_MINT_PUBKEY).length > 0
+  const rrGen1MetaArray = tokens.filter(o=>o.data.symbol == 'RRDC')
 
   // const burnAvailable = !hasGenesis || tokens.filter(o=>o.meta && o.meta.attributes[0].value < 3).length > 0
 
   console.log('hasGenesis', hasGenesis)
   console.log('solBalance', solBalance)
 
-  const tokenOwnershipData = { hasDopeCat, hasPixelBand, hasHippo, hasCyberSamurai, hasSovanaEgg: hasSovanaEgg || hasRRGen1, hasRRGen1 };
+  const tokenOwnershipData = { hasDopeCat, hasPixelBand, hasHippo, hasCyberSamurai, hasSovanaEgg: hasSovanaEgg || hasRRGen1, hasRRGen1, rrGen1MetaArray };
   console.log(tokenOwnershipData);
 
   useEffect(() => {
@@ -101,6 +101,9 @@ export default function Hero({ play, setPlay }) {
   const updateTokenMetas = async (tokens) => {
     tokens = await Promise.all(tokens.map(async (token)=>{
       if(token.updateAuthority == Const.NFT_ACCOUNT_PUBKEY) {
+        const meta = await axios.get(api.get1KinUrl(token.data.uri))
+        return {...token, meta: meta.data}
+      } else if (token.data && token.data.symbol == 'RRDC') {
         const meta = await axios.get(api.get1KinUrl(token.data.uri))
         return {...token, meta: meta.data}
       } else {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
+import Script from "next/script";
 import Header from "components/organisms/layout/Header";
 import Footer from "components/organisms/layout/Footer";
 import MetaTags from "components/organisms/layout/MetaTags";
@@ -54,6 +55,22 @@ function MyApp({ Component, pageProps }) {
           }}
         />
       </Head>
+      <Script
+        src="https://www.gstatic.com/firebasejs/7.19.1/firebase-app.js"
+        strategy="beforeInteractive"
+      />
+      <Script
+        src="https://www.gstatic.com/firebasejs/7.19.1/firebase-database.js"
+        strategy="beforeInteractive"
+      />
+      <Script
+        src="https://www.gstatic.com/firebasejs/7.19.1/firebase-auth.js"
+        strategy="beforeInteractive"
+      />
+      <Script
+        src="https://www.gstatic.com/firebasejs/7.19.1/firebase-storage.js"
+        strategy="beforeInteractive"
+      />
       <WalletContextProvider>
         <NotificationContextProvider>
           <LoadingContextProvider>
