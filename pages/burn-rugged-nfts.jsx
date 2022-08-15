@@ -113,7 +113,7 @@ export default function BurnRuggedNFTs() {
         console.log('e', e)
       }
     }
-    
+
     if(ruggedNftCandidates.length > 0) {
       ruggedTokenAddresses = await api.filterRuggedWhitelist(ruggedNftCandidates)
       setRuggedTokenAddresses(ruggedTokenAddresses)
@@ -247,6 +247,11 @@ export default function BurnRuggedNFTs() {
         let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
   
         const create_tx = new anchor.web3.Transaction().add(transferInstruction, burnTransaction)
+
+        let blockhashObj = await connection.getLatestBlockhash();
+        console.log("blockhashObj", blockhashObj);
+        create_tx.recentBlockhash = blockhashObj.blockhash;
+
         const signature = await wallet.sendTransaction(create_tx, connection);
         await connection.confirmTransaction(signature, "confirmed");
   
@@ -267,6 +272,10 @@ export default function BurnRuggedNFTs() {
         let txSignature = api.randomString(20) //window.crypto.randomUUID()
         let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
         create_tx.add(signatureTx)
+        
+        let blockhashObj = await connection.getLatestBlockhash();
+        console.log("blockhashObj", blockhashObj);
+        create_tx.recentBlockhash = blockhashObj.blockhash;
         
         const signature = await wallet.sendTransaction(create_tx, connection);
         await connection.confirmTransaction(signature, "confirmed");

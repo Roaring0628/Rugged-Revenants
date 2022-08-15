@@ -52,6 +52,11 @@ export const updateMeta = async (connection, wallet, token, newMeta, txs)=>{
         updateTx.add(tx)
       }
     }
+
+    let blockhashObj = await connection.getLatestBlockhash();
+    console.log("blockhashObj", blockhashObj);
+    updateTx.recentBlockhash = blockhashObj.blockhash;
+
     const signature = await wallet.sendTransaction(updateTx, connection);
     const result = await connection.confirmTransaction(signature, "confirmed");
     return result

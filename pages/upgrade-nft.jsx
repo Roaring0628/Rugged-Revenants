@@ -374,6 +374,10 @@ const UpgradeNFT = () => {
       signatureTx
     )
 
+    let blockhashObj = await connection.getLatestBlockhash();
+    console.log("blockhashObj", blockhashObj);
+    create_tx.recentBlockhash = blockhashObj.blockhash;
+
     const signature = await wallet.sendTransaction(create_tx, connection);
     await connection.confirmTransaction(signature, "confirmed");
 

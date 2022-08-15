@@ -191,6 +191,10 @@ export default function Hero({ play, setPlay }) {
       let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
       create_tx.add(signatureTx)
 
+      let blockhashObj = await connection.getLatestBlockhash();
+      console.log("blockhashObj", blockhashObj);
+      create_tx.recentBlockhash = blockhashObj.blockhash;
+
       const signature = await wallet.sendTransaction(create_tx, connection);
       
 
@@ -215,6 +219,10 @@ export default function Hero({ play, setPlay }) {
         let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
         console.log('signatureTx', signatureTx)
         create_tx.add(signatureTx)
+
+        let blockhashObj = await connection.getLatestBlockhash();
+        console.log("blockhashObj", blockhashObj);
+        create_tx.recentBlockhash = blockhashObj.blockhash;
 
         const signature = await wallet.sendTransaction(create_tx, connection);
 
@@ -250,6 +258,10 @@ export default function Hero({ play, setPlay }) {
         let txSignature = api.randomString(20) //window.crypto.randomUUID()
         let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
         create_tx.add(signatureTx)
+
+        let blockhashObj = await connection.getLatestBlockhash();
+        console.log("blockhashObj", blockhashObj);
+        create_tx.recentBlockhash = blockhashObj.blockhash;
 
         const signature = await wallet.sendTransaction(create_tx, connection);
         await connection.confirmTransaction(signature, "confirmed");
@@ -316,6 +328,11 @@ export default function Hero({ play, setPlay }) {
       tx, 
       signatureTx
     )
+
+    let blockhashObj = await connection.getLatestBlockhash();
+    console.log("blockhashObj", blockhashObj);
+    create_tx.recentBlockhash = blockhashObj.blockhash;
+
     const signature = await wallet.sendTransaction(create_tx, connection);
 
     try {
