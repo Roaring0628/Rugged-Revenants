@@ -7,6 +7,8 @@ import MetaTags from "components/organisms/layout/MetaTags";
 import WalletContextProvider from "contexts/WalletContextProvider";
 import { NotificationContextProvider } from "contexts/NotificationContext";
 import NotificationModal from "components/molecules/NotificationModal";
+import { LoadingContextProvider } from "contexts/LoadingContext";
+import LoadingModal from "components/molecules/LoadingModal";
 import "@solana/wallet-adapter-react-ui/styles.css";
 
 import "styles/globals.scss";
@@ -54,11 +56,14 @@ function MyApp({ Component, pageProps }) {
       </Head>
       <WalletContextProvider>
         <NotificationContextProvider>
-          <NotificationModal />
-          <MetaTags />
-          <Header />
-          <Component {...pageProps} />
-          {!hideFooter && <Footer />}
+          <LoadingContextProvider>
+            <NotificationModal />
+            <LoadingModal />
+            <MetaTags />
+            <Header />
+            <Component {...pageProps} />
+            {!hideFooter && <Footer />}
+          </LoadingContextProvider>
         </NotificationContextProvider>
       </WalletContextProvider>
     </>
