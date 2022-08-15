@@ -125,7 +125,7 @@ export default function Hero({ play, setPlay }) {
       console.log('item', item)
     }
     setTokens(nftArray)
-    updateTokenMetas(nftArray)
+    await updateTokenMetas(nftArray)
     setGotTokens(true);
 
     if(ruggedAccount && mainProgram) {
