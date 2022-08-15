@@ -9,7 +9,7 @@ const NotificationModal = ({}) => {
   return (
     <>
       {showModal && (
-        <div className="z-[60] fixed inset-0 w-full h-[100vh]">
+        <div className="z-[999] fixed inset-0 w-full h-[100vh]">
           <div className="absolute top-0 left-0 w-full h-full bg-black opacity-50"></div>
           <div className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] z-10 w-[32rem] h-[18rem] flex flex-col justify-between">
             <img
