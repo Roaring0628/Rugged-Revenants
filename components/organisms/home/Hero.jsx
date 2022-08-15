@@ -89,8 +89,12 @@ export default function Hero({ play, setPlay }) {
 
   const updateTokenMetas = async (tokens) => {
     tokens = await Promise.all(tokens.map(async (token)=>{
-      const meta = await axios.get(api.get1KinUrl(token.data.uri))
-      return {...token, meta: meta.data}
+      if(token.updateAuthority == Const.NFT_ACCOUNT_PUBKEY) {
+        const meta = await axios.get(api.get1KinUrl(token.data.uri))
+        return {...token, meta: meta.data}
+      } else {
+        return {...token}
+      }
     }))
 
     console.log('updateTokenMetas', tokens)
@@ -109,13 +113,10 @@ export default function Hero({ play, setPlay }) {
       publicAddress: provider.wallet.publicKey.toBase58(),
       connection: connection,
     }); 
-    let genesisNfts = nftArray.filter(o=>o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY)
-    tokens.push(genesisNfts)
-    console.log('genesisNfts', genesisNfts)
 
-    console.log('tokens', genesisNfts.length, Date.now() - timeStart)
-    setTokens(genesisNfts)
-    updateTokenMetas(genesisNfts)
+    console.log('tokens', nftArray.length, Date.now() - timeStart)
+    setTokens(nftArray)
+    updateTokenMetas(nftArray)
     setGotTokens(true);
 
     if(ruggedAccount && mainProgram) {
