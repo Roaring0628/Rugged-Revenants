@@ -24,11 +24,13 @@ const NotificationContextProvider = ({ children }) => {
       noCallback,
     });
     setIsConditional(isConditional);
+    document.body.style.overflow = "hidden";
     setShowModal(true);
   };
 
   const closeNotificationModal = (isYes) => {
     setMessage("");
+    document.body.style.overflow = "unset";
     setShowModal(false);
     if (isYes && callbacks && callbacks.yesCallback) {
       callbacks.yesCallback();
