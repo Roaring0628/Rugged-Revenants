@@ -285,11 +285,18 @@ export default function BurnRuggedNFTs() {
   }
 
   const openLootbox = async (token) => {
+    //get token meta
+    const meta = token.meta
+        
+    let beatLevel = meta.attributes.find(o=>o.trait_type == 'level').value
+    let nftType = meta.attributes.find(o=>o.trait_type == 'nft').value
+    const requiredCharges = nftType == 'No'?1:25
     //if user don't have genesis which has charges, he cannot open lootbox
     let genesisToken = null
     if(hasGenesis) {
-      genesisToken = allTokens.find(o=>o.data.name == Const.GENESIS_NFT_NAME && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && o.meta.attributes[0].value > 0)
+      genesisToken = allTokens.find(o=>o.data.name == Const.GENESIS_NFT_NAME && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && o.meta.attributes[0].value >= requiredCharges)
       if(!genesisToken) {
+        openNotificationModal("You don't have enough charges to open lootbox", ()=>{}, ()=>{}, false)
         return true
       }
     } else {
@@ -299,17 +306,7 @@ export default function BurnRuggedNFTs() {
     console.log(token);
     anchor.setProvider(provider);
 
-    //get token meta
-    const meta = await axios.get(api.get1KinUrl(token.data.uri))
-    console.log(meta)
-    if(!meta || !meta.data) {
-      return true
-    }
-
     openLoadingModal()
-
-    let beatLevel = meta.data.attributes.find(o=>o.trait_type == 'level').value
-    let nftType = meta.data.attributes.find(o=>o.trait_type == 'nft').value
 
     console.log('burn', token)
     let burnInstruction = await burnTx(token.mint, provider.wallet.publicKey, wallet, connection, 1)
@@ -350,7 +347,7 @@ export default function BurnRuggedNFTs() {
   
       //update genesis
       let newMeta = genesisToken.meta
-      newMeta.attributes[0].value = newMeta.attributes[0].value - 1
+      newMeta.attributes[0].value = newMeta.attributes[0].value - requiredCharges
       await updateMeta(
         genesisToken, 
         newMeta, 

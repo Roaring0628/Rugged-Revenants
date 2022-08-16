@@ -11,6 +11,10 @@ const OpenLootboxConfirm = ({ closeConfirm, openLootbox, selectedNFT }) => {
     closeConfirm();
   };
 
+  const meta = selectedNFT?.meta
+  let nftType = meta?meta.attributes.find(o=>o.trait_type == 'nft').value:'No'
+  const requiredCharges = nftType == 'No'?1:25
+
   return (
     <div className="z-[60] fixed inset-0 w-full h-[100vh]">
       <div className="absolute top-0 left-0 w-full h-full bg-black opacity-50"></div>
@@ -22,7 +26,7 @@ const OpenLootboxConfirm = ({ closeConfirm, openLootbox, selectedNFT }) => {
         />
         <div className="relative px-12 pt-24 pb-4 text-center">
           OPENING THIS LOOT WILL CONSUME{" "}
-          <span className="underline">1 CHARGE</span> ONE OF YOUR GENESIS NFTS.
+          <span className="underline">{requiredCharges} {requiredCharges>1?'CHARGES':'CHARGE'}</span>   FROM ONE OF YOUR GENESIS NFTS.
           <br />
           <br />
           <span className="text-sm ">
