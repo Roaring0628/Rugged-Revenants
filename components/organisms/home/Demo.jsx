@@ -2,6 +2,8 @@
 import { useEffect, useState, useRef } from "react";
 import GameWinner from "./GameWinner";
 import GameWinnerLootbox from "./GameWinnerLootbox";
+import { useContext } from 'react';
+import { NotificationContext } from "contexts/NotificationContext";
 
 const Demo = ({
   handlePlay,
@@ -17,6 +19,7 @@ const Demo = ({
   const [showLootboxChest, setShowLootboxChest] = useState(false);
   const [currentLevel, setCurrentLevel] = useState();
   const [isWin, setIsWin] = useState(false);
+  const { openNotificationModal } = useContext(NotificationContext);
 
   useEffect(() => {
     window.addEventListener(
@@ -143,7 +146,18 @@ const Demo = ({
   };
 
   const endGameBefore = async () => {
-    await endGame(currentLevel, isWin)
+      if(await endGame(currentLevel, isWin)) {
+        quitGame()
+        return
+      }
+      
+      openNotificationModal("Transaction has been failed because of network status is bad. Are you going to try again to get reward?", okEndGameCallback, noEndGameCallback, true)
+  }
+
+  const okEndGameCallback = async () => {
+    endGameBefore()
+  }
+  const noEndGameCallback = async () => {
     quitGame()
   }
 

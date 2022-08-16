@@ -8,6 +8,10 @@ import classNames from "classnames";
 import CustomScroll from "components/molecules/CustomScroll";
 
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useContext } from 'react';
+import { NotificationContext } from "contexts/NotificationContext";
+import { LoadingContext } from "contexts/LoadingContext";
+
 import * as anchor from "@project-serum/anchor";
 import { Program } from "@project-serum/anchor";
 import { useRouter } from 'next/router';
@@ -59,6 +63,7 @@ export default function BurnRuggedNFTs() {
   const [showLootboxConfirm, setShowLootboxConfirm] = useState(false);
   const [showLootboxNotification, setShowLootboxNotification] = useState(false);
   const [lootboxNotificationData, setLootboxNotificationData] = useState(null);
+  const { openLoadingModal, closeLoadingModal } = useContext(LoadingContext);
 
   const [charged, setCharged] = useState(false)
   const [staked, setStaked] = useState(false)
@@ -72,6 +77,7 @@ export default function BurnRuggedNFTs() {
   const provider = new anchor.AnchorProvider(connection, wallet);
   const hasGenesis = allTokens.filter(o=>o.data.name == Const.GENESIS_NFT_NAME && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY).length > 0
   const router = useRouter();
+  const { openNotificationModal } = useContext(NotificationContext);
 
   console.log('hasGenesis', hasGenesis)
   useEffect(() => {
@@ -257,8 +263,23 @@ export default function BurnRuggedNFTs() {
     if(charged) {
       setShowLootboxConfirm(true);
     } else {
-      openLootbox(selectedNFT)
+      openLootboxBefore()
     }
+  }
+
+  const openLootboxBefore = async () => {
+    if(await openLootbox(selectedNFT)) {
+      return
+    }
+    openNotificationModal("Transaction has been failed because of network status is bad. Are you going to try again to get reward?", okOpenLootboxCallback, noOpenLootboxCallback, true)
+  }
+
+  const okOpenLootboxCallback = () => {
+    openLootboxBefore()
+  }
+
+  const noOpenLootboxCallback = async () => {
+    
   }
 
   const closeLootboxConfirm = () => {
@@ -285,10 +306,10 @@ export default function BurnRuggedNFTs() {
     if(hasGenesis) {
       genesisToken = allTokens.find(o=>o.data.name == Const.GENESIS_NFT_NAME && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && o.meta.attributes[0].value > 0)
       if(!genesisToken) {
-        return
+        return true
       }
     } else {
-      return
+      return true
     }
 
     console.log(token);
@@ -298,8 +319,10 @@ export default function BurnRuggedNFTs() {
     const meta = await axios.get(api.get1KinUrl(token.data.uri))
     console.log(meta)
     if(!meta || !meta.data) {
-      return
+      return true
     }
+
+    openLoadingModal()
 
     let beatLevel = meta.data.attributes.find(o=>o.trait_type == 'level').value
     let nftType = charged ? meta.data.attributes.find(o=>o.trait_type == 'nft').value : 'No'
@@ -369,8 +392,12 @@ export default function BurnRuggedNFTs() {
       }
 
       await fetchData()
+      closeLoadingModal()
+      return true
     } catch(e) {
       console.log('error', e)
+      closeLoadingModal()
+      return false
     }
   };
 

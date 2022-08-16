@@ -6,6 +6,7 @@ const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012345678
 
 export default {
     async baseApi(subUrl, method, jsonData, cb) {
+        const startTime = Date.now()
         try {
             const request = {
             method,
@@ -18,14 +19,17 @@ export default {
             
             axios(request)
             .then((response) => {
+                console.log(`API[${method}] ${subUrl} - ${Date.now() - startTime} (1)`)
                 if(cb)
                 cb(null, response.data);
             })
             .catch((error) => {
+                console.log(`API[${method}] ${subUrl} - ${Date.now() - startTime} (2)`)
                 if(cb)
                 cb(error, null);
             });
         } catch (error) {
+            console.log(`API[${method}] ${subUrl} - ${Date.now() - startTime} (3)`)
             if(cb)
             cb(error);
         }
