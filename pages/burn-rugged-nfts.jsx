@@ -43,8 +43,6 @@ export default function BurnRuggedNFTs() {
 
   const [whitelist, setWhitelist] = useState({})
   const [ruggedTokenAddresses, setRuggedTokenAddresses] = useState([])
-  const [charged, setCharged] = useState(false)
-  const [staked, setStaked] = useState(false)
   const [ruggedAccount, setRuggedAccount] = useState()
   const [mainProgram, setMainProgram] = useState()
   const [selectedGenesisNft, setSelectedGenesisNft] = useState()
@@ -133,13 +131,6 @@ export default function BurnRuggedNFTs() {
     console.log('tokens', tokens)
     setAllTokens(tokens)
     setTokens(tokens.filter(o=>ruggedTokenAddresses.indexOf(o.mint) != -1))
-
-    if(ruggedAccount && mainProgram) {
-      let programAccount = await mainProgram.account.ruggedAccount.fetch(ruggedAccount);
-      console.log('ruggedAccount', programAccount)
-      setCharged(programAccount.charged)
-      setStaked(programAccount.staked)
-    }
   }
 
   const initMainProgram = async () => {
@@ -200,9 +191,6 @@ export default function BurnRuggedNFTs() {
         setRuggedAccount(ruggedAccount.publicKey)
       } else {
         console.log('check account')
-        let ruggedAccount = await program.account.ruggedAccount.fetch(ret[0].rugged_account);
-        console.log('ruggedAccount', ruggedAccount)
-        setCharged(ruggedAccount.charged)
         setRuggedAccount(ret[0].rugged_account)
       }
     })

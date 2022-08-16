@@ -51,7 +51,6 @@ export default function Hero({ play, setPlay }) {
   const [gotTokens, setGotTokens] = useState(false);
   const [gameLevel, setGameLevel] = useState(0)
   const [charged, setCharged] = useState(false)
-  const [staked, setStaked] = useState(false)
   const [ruggedAccount, setRuggedAccount] = useState()
   const [rugToken, setRugToken] = useState(0)
   const [mainProgram, setMainProgram] = useState()
@@ -133,13 +132,6 @@ export default function Hero({ play, setPlay }) {
     setTokens(nftArray)
     await updateTokenMetas(nftArray)
     setGotTokens(true);
-
-    if(ruggedAccount && mainProgram) {
-      let programAccount = await mainProgram.account.ruggedAccount.fetch(ruggedAccount);
-      console.log('ruggedAccount', programAccount)
-      setCharged(programAccount.charged)
-      setStaked(programAccount.staked)
-    }
   }
 
   const initMainProgram = async () => {
@@ -206,9 +198,6 @@ export default function Hero({ play, setPlay }) {
         setRuggedAccount(ruggedAccount.publicKey)
       } else {
         console.log('check account')
-        let ruggedAccount = await program.account.ruggedAccount.fetch(ret[0].rugged_account);
-        console.log('ruggedAccount', ruggedAccount)
-        setCharged(ruggedAccount.charged)
         setRuggedAccount(ret[0].rugged_account)
       }
     })
@@ -288,6 +277,8 @@ export default function Hero({ play, setPlay }) {
   }
 
   const endGame = async (level, hasWon) => {
+    if(!ruggedAccount) return true
+
     //generate lootbox
     if(level > 1) {
       openLoadingModal()
@@ -305,7 +296,7 @@ export default function Hero({ play, setPlay }) {
         console.log("signature", signature)
         await connection.confirmTransaction(signature, "confirmed");  
         
-        await mintLootBox(wallet, level, hasWon, 'Premium', txSignature)
+        await mintLootBox(wallet, level, charged?hasWon:false, 'Premium', txSignature)
         await fetchData()
         closeLoadingModal()
         setPlay(false);
@@ -327,6 +318,7 @@ export default function Hero({ play, setPlay }) {
   };
 
   const handlePlay = () => {
+    setCharged(false)
     if (!play) {
       document.body.style.overflow = "hidden";
       // if(hasGenesis && !charged) {
@@ -360,12 +352,12 @@ export default function Hero({ play, setPlay }) {
     let oldMeta = token.meta
     oldMeta.attributes[0].value = oldMeta.attributes[0].value - 1
 
-    let tx = mainProgram.transaction.charge({
-      accounts: {
-        ruggedAccount: ruggedAccount,
-        authority: provider.wallet.publicKey,
-      },
-    });
+    // let tx = mainProgram.transaction.charge({
+    //   accounts: {
+    //     ruggedAccount: ruggedAccount,
+    //     authority: provider.wallet.publicKey,
+    //   },
+    // });
 
     let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
 
@@ -373,7 +365,7 @@ export default function Hero({ play, setPlay }) {
     let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
     const create_tx = new anchor.web3.Transaction().add(
       transferInstruction, 
-      tx, 
+      // tx, 
       signatureTx
     )
 
@@ -392,6 +384,8 @@ export default function Hero({ play, setPlay }) {
         wallet.publicKey, 
         txSignature
       )
+
+      setCharged(true)
       closeLoadingModal()
       fetchData()
     } catch(e) {

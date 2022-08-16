@@ -65,8 +65,6 @@ export default function BurnRuggedNFTs() {
   const [lootboxNotificationData, setLootboxNotificationData] = useState(null);
   const { openLoadingModal, closeLoadingModal } = useContext(LoadingContext);
 
-  const [charged, setCharged] = useState(false)
-  const [staked, setStaked] = useState(false)
   const [ruggedAccount, setRuggedAccount] = useState()
   const [mainProgram, setMainProgram] = useState()
   const [rugToken, setRugToken] = useState(0)
@@ -133,13 +131,6 @@ export default function BurnRuggedNFTs() {
     setAllTokens(filteredNfts)
     updateTokenMetas(filteredNfts)
     selectTab('genesis', filteredNfts)
-
-    if(ruggedAccount && mainProgram) {
-      let programAccount = await mainProgram.account.ruggedAccount.fetch(ruggedAccount);
-      console.log('ruggedAccount', programAccount)
-      setCharged(programAccount.charged)
-      setStaked(programAccount.staked)
-    }
   }
 
   const initMainProgram = async () => {
@@ -200,9 +191,6 @@ export default function BurnRuggedNFTs() {
         setRuggedAccount(ruggedAccount.publicKey)
       } else {
         console.log('check account')
-        let ruggedAccount = await program.account.ruggedAccount.fetch(ret[0].rugged_account);
-        console.log('ruggedAccount', ruggedAccount)
-        setCharged(ruggedAccount.charged)
         setRuggedAccount(ret[0].rugged_account)
       }
     })
@@ -260,11 +248,7 @@ export default function BurnRuggedNFTs() {
   };
 
   const openLootboxConfirm = () => {
-    if(charged) {
-      setShowLootboxConfirm(true);
-    } else {
-      openLootboxBefore()
-    }
+    setShowLootboxConfirm(true);
   }
 
   const openLootboxBefore = async () => {
@@ -325,21 +309,11 @@ export default function BurnRuggedNFTs() {
     openLoadingModal()
 
     let beatLevel = meta.data.attributes.find(o=>o.trait_type == 'level').value
-    let nftType = charged ? meta.data.attributes.find(o=>o.trait_type == 'nft').value : 'No'
+    let nftType = meta.data.attributes.find(o=>o.trait_type == 'nft').value
 
     console.log('burn', token)
     let burnInstruction = await burnTx(token.mint, provider.wallet.publicKey, wallet, connection, 1)
     const create_tx = new anchor.web3.Transaction().add(burnInstruction)
-
-    if(charged) {
-      let tx = mainProgram.transaction.decharge({
-        accounts: {
-          ruggedAccount: ruggedAccount,
-          authority: provider.wallet.publicKey,
-        },
-      });
-      create_tx.add(tx)
-    }
 
     let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.BACKEND_ACCOUNT_PUBKEY), Const.MINT_FEE);
     create_tx.add(transferInstruction)
