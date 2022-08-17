@@ -45,25 +45,15 @@ const Demo = ({
             // Handle 5% of the time the users beat level 1
             closeFullScreen();
             openChest();
+          } else {
+            handleGameResult(
+              event.data.type === "win" && event.data.hasWon,
+              event.data.type === "die",
+              event.data.level,
+              event.data.levelsComplete,
+              event.data.isLastLevel
+            );
           }
-
-          // if (
-          //   event.data.type === "win" &&
-          //   event.data.hasWon &&
-          //   event.data.level &&
-          //   event.data.level == 2
-          // ) {
-          //   // TODO - Need to update this, open lootbox chest when the user beat level 2 for demo
-          //   openLootboxChest();
-          // }
-
-          handleGameResult(
-            event.data.type === "win" && event.data.hasWon,
-            event.data.type === "die",
-            event.data.level,
-            event.data.levelsComplete,
-            event.data.isLastLevel
-          );
         }
       },
       false
@@ -150,8 +140,14 @@ const Demo = ({
         setIsWin(isWin)
         openLootboxChest();
       } 
-    } 
+    } else {
+      goToNextLevel()
+    }
   };
+
+  const goToNextLevel = () => {
+    if (window.myGameInstance) window.myGameInstance.SendMessage("JavascriptHook", "NextLevel");
+  }
 
   const endGameBefore = async () => {
       if(await endGame(currentLevel, isWin)) {
@@ -198,6 +194,7 @@ const Demo = ({
 
   const closeChest = () => {
     setShowChest(false);
+    goToNextLevel();
   };
 
   const openLootboxChest = () => {
@@ -206,6 +203,7 @@ const Demo = ({
 
   const closeLootboxChest = () => {
     setShowLootboxChest(false);
+    goToNextLevel();
   };
 
   return (
