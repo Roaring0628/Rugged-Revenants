@@ -36,24 +36,11 @@ const Demo = ({
           // console.log("========= UNITY MESSAGE =========");
           // console.log(event.data);
 
-          if (
-            event.data.type === "win" &&
-            event.data.hasWon &&
-            event.data.level &&
-            event.data.level == 1
-          ) {
-            // Handle 5% of the time the users beat level 1
-            closeFullScreen();
-            openChest();
-          } else {
-            handleGameResult(
-              event.data.type === "win" && event.data.hasWon,
-              event.data.type === "die",
-              event.data.level,
-              event.data.levelsComplete,
-              event.data.isLastLevel
-            );
-          }
+          handleGameResult(
+            event.data.type,
+            event.data.level,
+            event.data.sessionID
+          );
         }
       },
       false
@@ -118,26 +105,23 @@ const Demo = ({
   };
 
   const handleGameResult = (
-    isWin,
-    isDie,
+    type,
     currentLevel,
-    completedLevelsCount,
-    isFinalLevel
+    sessionID,
   ) => {
     console.log('handleGameResult')
-    console.log("win", isWin);
-    console.log("die", isDie);
+    console.log("type", type);
     console.log("currentLevel", currentLevel);
-    // we have this completedLevelsCount value when only the user die
-    console.log("completedLevelsCount", completedLevelsCount);
-    console.log("isFinalLevel", isFinalLevel);
 
     closeFullScreen();
 
-    if(isDie || isFinalLevel) {
-      if(currentLevel > 1) {
-        setCurrentLevel(currentLevel)
-        setIsWin(isWin)
+    if (type == "level" && currentLevel == 1) {
+      // Handle 5% of the time the users beat level 1
+      openChest();
+    } else if(type == "die" || type == "win") {
+      if(currentLevel > 1 || type == "win") { // now, when the user clear all levels, i don't get level number
+        setCurrentLevel(currentLevel || 7) // now, when the user clear all levels, i don't get level number
+        setIsWin(type == "win")
         openLootboxChest();
       } 
     } else {
