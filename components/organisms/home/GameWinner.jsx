@@ -1,5 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { useState } from "react";
+import { useContext } from 'react';
+import { NotificationContext } from "contexts/NotificationContext";
 
 const CHEST_COMMON_ANIMATION_DURATION = 3500; // 3.5s
 const MINIMUN_SOL_BALANCE = 10000000; // 0.01 SOL
@@ -10,6 +12,7 @@ const GameWinner = ({ closeChest, beatFirstLevel, hasGenesis, solBalance }) => {
   const [showWon, setShowWon] = useState(false);
   const [showChestAnimation, setShowChestAnimation] = useState(false);
   const [showBalanceWarning, setShowBalanceWarning] = useState(false);
+  const { openNotificationModal } = useContext(NotificationContext);
 
   const openWon = async () => {
     if (!inProgress) {
@@ -26,16 +29,26 @@ const GameWinner = ({ closeChest, beatFirstLevel, hasGenesis, solBalance }) => {
           // At least 0.01 SOL to mint (accept) genesis nft
           openBalanceWarning();
         } else {
-          try {
-            await beatFirstLevel();
-            closeChest();
-          } catch (e) {
-            closeChest();
-          }
+          processBeatFirstLevel()
         }
       }
     }
   };
+
+  const processBeatFirstLevel = async () => {
+    if(await beatFirstLevel()) {
+      closeChest();
+      return 
+    }
+    openNotificationModal("Transaction has been failed because of network status is bad. Are you going to try again to get reward?", okBeatFirstLevelCallback, noBeatFirstLevelCallback, true)
+  }
+
+  const okBeatFirstLevelCallback = async () => {
+    processBeatFirstLevel()
+  }
+  const noBeatFirstLevelCallback = async () => {
+    closeChest();
+  }
 
   const acceptGenesisNFT = async () => {
     // Logic to accept Genesis NFT

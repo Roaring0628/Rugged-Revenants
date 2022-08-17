@@ -10,6 +10,9 @@ import * as anchor from "@project-serum/anchor";
 import { Program } from "@project-serum/anchor";
 import { useRouter } from 'next/router';
 
+import { useContext } from 'react';
+import { LoadingContext } from "contexts/LoadingContext";
+
 // import { Metadata } from "@metaplex-foundation/mpl-token-metadata";
 import * as metadata from "@metaplex-foundation/mpl-token-metadata";
 import {
@@ -48,7 +51,6 @@ export default function Hero({ play, setPlay }) {
   const [gotTokens, setGotTokens] = useState(false);
   const [gameLevel, setGameLevel] = useState(0)
   const [charged, setCharged] = useState(false)
-  const [staked, setStaked] = useState(false)
   const [ruggedAccount, setRuggedAccount] = useState()
   const [rugToken, setRugToken] = useState(0)
   const [mainProgram, setMainProgram] = useState()
@@ -56,6 +58,9 @@ export default function Hero({ play, setPlay }) {
 
   const [showChargeSuccess, setShowChargeSuccess] = useState(false);
   const [showConsumeConfirm, setShowConsumeConfirm] = useState(false);
+
+  const { openLoadingModal, closeLoadingModal } = useContext(LoadingContext);
+
 
   const wallet = useWallet();
   const { publicKey, connected } = useWallet();
@@ -69,13 +74,14 @@ export default function Hero({ play, setPlay }) {
   const hasSovanaEgg = tokens.filter(o=>o.data.symbol == 'Sovana Egg').length > 0
   const hasCyberSamurai = tokens.filter(o=>o.data.symbol == 'CSAMURAI'||o.data.symbol == 'CSCOMIC'||o.data.name.startsWith("Cyber Samurai")).length > 0
   const hasRRGen1 = tokens.filter(o=>o.data.symbol == 'RRDC').length > 0
+  const rrGen1MetaArray = tokens.filter(o=>o.data.symbol == 'RRDC')
 
   // const burnAvailable = !hasGenesis || tokens.filter(o=>o.meta && o.meta.attributes[0].value < 3).length > 0
 
   console.log('hasGenesis', hasGenesis)
   console.log('solBalance', solBalance)
 
-  const tokenOwnershipData = { hasDopeCat, hasPixelBand, hasHippo, hasCyberSamurai, hasSovanaEgg: hasSovanaEgg || hasRRGen1, hasRRGen1 };
+  const tokenOwnershipData = { hasDopeCat, hasPixelBand, hasHippo, hasCyberSamurai, hasSovanaEgg: hasSovanaEgg || hasRRGen1, hasRRGen1, rrGen1MetaArray };
   console.log(tokenOwnershipData);
 
   useEffect(() => {
@@ -95,6 +101,9 @@ export default function Hero({ play, setPlay }) {
   const updateTokenMetas = async (tokens) => {
     tokens = await Promise.all(tokens.map(async (token)=>{
       if(token.updateAuthority == Const.NFT_ACCOUNT_PUBKEY) {
+        const meta = await axios.get(api.get1KinUrl(token.data.uri))
+        return {...token, meta: meta.data}
+      } else if (token.data && token.data.symbol == 'RRDC') {
         const meta = await axios.get(api.get1KinUrl(token.data.uri))
         return {...token, meta: meta.data}
       } else {
@@ -120,16 +129,12 @@ export default function Hero({ play, setPlay }) {
     }); 
 
     console.log('tokens', nftArray.length, Date.now() - timeStart)
-    setTokens(nftArray)
-    updateTokenMetas(nftArray)
-    setGotTokens(true);
-
-    if(ruggedAccount && mainProgram) {
-      let programAccount = await mainProgram.account.ruggedAccount.fetch(ruggedAccount);
-      console.log('ruggedAccount', programAccount)
-      setCharged(programAccount.charged)
-      setStaked(programAccount.staked)
+    for(let item of nftArray) {
+      console.log('item', item)
     }
+    setTokens(nftArray)
+    await updateTokenMetas(nftArray)
+    setGotTokens(true);
   }
 
   const initMainProgram = async () => {
@@ -157,19 +162,35 @@ export default function Hero({ play, setPlay }) {
           signers: [ruggedAccount],
         });
 
+        console.log('tx', tx)
+
         const create_tx = new anchor.web3.Transaction().add(tx)
-        let blockhashObj = await connection.getLatestBlockhash();
-        console.log("blockhashObj", blockhashObj);
-        create_tx.recentBlockhash = blockhashObj.blockhash;
+        // let blockhashObj = await connection.getLatestBlockhash();
+        // console.log("blockhashObj", blockhashObj);
+        // create_tx.recentBlockhash = blockhashObj.blockhash;
 
-        const signature = await wallet.sendTransaction(create_tx, connection, {
-          signers: [ruggedAccount],
-        });
+        try {
+          const signature = await wallet.sendTransaction(create_tx, connection, {
+            signers: [ruggedAccount],
+          });
+  
+          await connection.confirmTransaction(signature, "confirmed");
+        } catch(e) {
+          console.log('error', e)
+        }
 
-        await connection.confirmTransaction(signature, "confirmed");
-
-        let fetchData = await program.account.ruggedAccount.fetch(ruggedAccount.publicKey);
-        console.log('ruggedAccount', fetchData)
+        while(true) {
+          try {
+            let sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+            await sleep(3000);
+    
+            let fetchData = await program.account.ruggedAccount.fetch(ruggedAccount.publicKey);
+            console.log('ruggedAccount', fetchData)
+            break
+          } catch(e) {
+            console.log("error", e)
+          }
+        }
 
         api.addRuggedAccount({
           player_account: wallet.publicKey,
@@ -180,9 +201,6 @@ export default function Hero({ play, setPlay }) {
         setRuggedAccount(ruggedAccount.publicKey)
       } else {
         console.log('check account')
-        let ruggedAccount = await program.account.ruggedAccount.fetch(ret[0].rugged_account);
-        console.log('ruggedAccount', ruggedAccount)
-        setCharged(ruggedAccount.charged)
         setRuggedAccount(ret[0].rugged_account)
       }
     })
@@ -190,94 +208,110 @@ export default function Hero({ play, setPlay }) {
 
   const beatFirstLevel = async()=>{
     console.log('called beatFirstLevel', hasGenesis)
-    if(!hasGenesis) {
-      let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
-      const create_tx = new anchor.web3.Transaction().add(transferInstruction)
-      let txSignature = api.randomString(20) //window.crypto.randomUUID()
-      let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
-      create_tx.add(signatureTx)
-
-      let blockhashObj = await connection.getLatestBlockhash();
-      console.log("blockhashObj", blockhashObj);
-      create_tx.recentBlockhash = blockhashObj.blockhash;
-
-      const signature = await wallet.sendTransaction(create_tx, connection);
-      
-
-      try {
-        await connection.confirmTransaction(signature, "confirmed");
-  
-        await mintGenesis(wallet, txSignature)
-        await fetchData()        
-      } catch(e) {
-        console.log('error', e)
-      }
-    } else {
-      const token = tokens.find((t)=>{
-        return t.data.name == Const.GENESIS_NFT_NAME && t.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && t.meta.attributes[0].value < Const.MAX_CHARGE_COUNT
-      })
-
-      if(token) {
-        let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
-        const create_tx = new anchor.web3.Transaction().add(transferInstruction)
-        let txSignature = api.randomString(20) //window.crypto.randomUUID()
-        console.log('txSignature', txSignature)
-        let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
-        console.log('signatureTx', signatureTx)
-        create_tx.add(signatureTx)
-
-        let blockhashObj = await connection.getLatestBlockhash();
-        console.log("blockhashObj", blockhashObj);
-        create_tx.recentBlockhash = blockhashObj.blockhash;
-
-        const signature = await wallet.sendTransaction(create_tx, connection);
-
-        try {
-          await connection.confirmTransaction(signature, "confirmed");
-    
-          console.log('selected genesis to charge', token)
-          //upgrade meta of token
-          let newMeta = token.meta
-          localStorage.setItem("old-charges", newMeta.attributes[0].value)
-          newMeta.attributes[0].value = newMeta.attributes[0].value + 1
-          localStorage.setItem("new-charges", newMeta.attributes[0].value)
-          await updateMeta(token, newMeta, wallet.publicKey, txSignature)
-          
-          await fetchData()
-        } catch(e) {
-          console.log("error", e)
-        }
-        
-        //go to success screen
-        // router.push('/charge-success')
-        openChargeSuccess();
-      }
-    }
-  }
-
-  const endGame = async (level, hasWon) => {
-    //generate lootbox
+    openLoadingModal()
     try {
-      if(level > 1) {
+      if(!hasGenesis) {
         let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
         const create_tx = new anchor.web3.Transaction().add(transferInstruction)
         let txSignature = api.randomString(20) //window.crypto.randomUUID()
         let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
         create_tx.add(signatureTx)
-
+  
         let blockhashObj = await connection.getLatestBlockhash();
         console.log("blockhashObj", blockhashObj);
         create_tx.recentBlockhash = blockhashObj.blockhash;
-
-        const signature = await wallet.sendTransaction(create_tx, connection);
-        await connection.confirmTransaction(signature, "confirmed");
-        setPlay(false);
   
-        await mintLootBox(wallet, level, hasWon, 'Premium', txSignature)
+        const signature = await wallet.sendTransaction(create_tx, connection, {
+          maxRetries: 5
+        });
+        await connection.confirmTransaction(signature, "confirmed");
+  
+        await mintGenesis(wallet, txSignature)
+        fetchData()      
+      } else {
+        const token = tokens.find((t)=>{
+          return t.data.name == Const.GENESIS_NFT_NAME && t.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && t.meta.attributes[0].value < Const.MAX_CHARGE_COUNT
+        })
+  
+        if(token) {
+          let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
+          const create_tx = new anchor.web3.Transaction().add(transferInstruction)
+          let txSignature = api.randomString(20) //window.crypto.randomUUID()
+          console.log('txSignature', txSignature)
+          let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
+          console.log('signatureTx', signatureTx)
+          create_tx.add(signatureTx)
+  
+          let blockhashObj = await connection.getLatestBlockhash();
+          console.log("blockhashObj", blockhashObj);
+          create_tx.recentBlockhash = blockhashObj.blockhash;
+  
+          const signature = await wallet.sendTransaction(create_tx, connection);
+  
+          try {
+            await connection.confirmTransaction(signature, "confirmed");
+      
+            console.log('selected genesis to charge', token)
+            //upgrade meta of token
+            let newMeta = token.meta
+            localStorage.setItem("old-charges", newMeta.attributes[0].value)
+            newMeta.attributes[0].value = newMeta.attributes[0].value + 1
+            localStorage.setItem("new-charges", newMeta.attributes[0].value)
+            await updateMeta(token, newMeta, wallet.publicKey, txSignature)
+            
+            fetchData()
+          } catch(e) {
+            console.log("error", e)
+          }
+          
+          //go to success screen
+          // router.push('/charge-success')
+          openChargeSuccess();
+        }
+  
+        closeLoadingModal()
       }
-      // await fetchData()
+
+      return true
     } catch(e) {
-      console.log("endGame error", e)
+      closeLoadingModal()
+      return false
+    }
+  }
+
+  const endGame = async (level, hasWon) => {
+    if(!ruggedAccount) return true
+
+    //generate lootbox
+    if(level > 1) {
+      openLoadingModal()
+      try {
+        let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
+
+        const create_tx = new anchor.web3.Transaction().add(transferInstruction)
+        let txSignature = api.randomString(20) //window.crypto.randomUUID()
+        let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
+        create_tx.add(signatureTx)
+
+        const signature = await wallet.sendTransaction(create_tx, connection, {
+          maxRetries: 5
+        });
+        console.log("signature", signature)
+        await connection.confirmTransaction(signature, "confirmed");  
+        
+        await mintLootBox(wallet, level, charged?hasWon:false, 'Premium', txSignature)
+        await fetchData()
+        closeLoadingModal()
+        setPlay(false);
+
+        return true
+      } catch(e) {
+        closeLoadingModal()
+        console.log("endGame error", e)
+        return false
+      }
+    } else {
+      return true
     }
   }
 
@@ -287,6 +321,7 @@ export default function Hero({ play, setPlay }) {
   };
 
   const handlePlay = () => {
+    setCharged(false)
     if (!play) {
       document.body.style.overflow = "hidden";
       // if(hasGenesis && !charged) {
@@ -304,12 +339,14 @@ export default function Hero({ play, setPlay }) {
       setPlay(false);
     }
     
-    // if (play) document.body.style.overflow = "unset";
-    // else document.body.style.overflow = "hidden";
-    // setPlay(!play);
+    if (play) document.body.style.overflow = "unset";
+    else document.body.style.overflow = "hidden";
+    setPlay(!play);
   };
 
   const chargeForLootBox = async () => {
+    openLoadingModal()
+
     let token = tokens.find((t)=>{
       return t.data.name == Const.GENESIS_NFT_NAME && t.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && t.meta.attributes[0].value > 0
     })
@@ -318,12 +355,12 @@ export default function Hero({ play, setPlay }) {
     let oldMeta = token.meta
     oldMeta.attributes[0].value = oldMeta.attributes[0].value - 1
 
-    let tx = mainProgram.transaction.charge({
-      accounts: {
-        ruggedAccount: ruggedAccount,
-        authority: provider.wallet.publicKey,
-      },
-    });
+    // let tx = mainProgram.transaction.charge({
+    //   accounts: {
+    //     ruggedAccount: ruggedAccount,
+    //     authority: provider.wallet.publicKey,
+    //   },
+    // });
 
     let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
 
@@ -331,19 +368,18 @@ export default function Hero({ play, setPlay }) {
     let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
     const create_tx = new anchor.web3.Transaction().add(
       transferInstruction, 
-      tx, 
+      // tx, 
       signatureTx
     )
 
     let blockhashObj = await connection.getLatestBlockhash();
     console.log("blockhashObj", blockhashObj);
     create_tx.recentBlockhash = blockhashObj.blockhash;
-
-    const signature = await wallet.sendTransaction(create_tx, connection);
-
+    
     try {
+      const signature = await wallet.sendTransaction(create_tx, connection);
       await connection.confirmTransaction(signature, "confirmed");
-  
+
       console.log('signature', signature)
       await updateMeta(
         token, 
@@ -351,9 +387,12 @@ export default function Hero({ play, setPlay }) {
         wallet.publicKey, 
         txSignature
       )
-      
-      await fetchData()
+
+      setCharged(true)
+      closeLoadingModal()
+      fetchData()
     } catch(e) {
+      closeLoadingModal()
       console.log("Exception", e)
     }
   }

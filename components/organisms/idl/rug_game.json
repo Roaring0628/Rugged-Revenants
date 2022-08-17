@@ -93,43 +93,6 @@
       "args": []
     },
     {
-      "name": "stake",
-      "accounts": [
-        {
-          "name": "ruggedAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "tokenAccount",
-          "type": "publicKey"
-        }
-      ]
-    },
-    {
-      "name": "unstake",
-      "accounts": [
-        {
-          "name": "ruggedAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "mintNft",
       "accounts": [
         {

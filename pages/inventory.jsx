@@ -8,6 +8,10 @@ import classNames from "classnames";
 import CustomScroll from "components/molecules/CustomScroll";
 
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useContext } from 'react';
+import { NotificationContext } from "contexts/NotificationContext";
+import { LoadingContext } from "contexts/LoadingContext";
+
 import * as anchor from "@project-serum/anchor";
 import { Program } from "@project-serum/anchor";
 import { useRouter } from 'next/router';
@@ -59,9 +63,8 @@ export default function BurnRuggedNFTs() {
   const [showLootboxConfirm, setShowLootboxConfirm] = useState(false);
   const [showLootboxNotification, setShowLootboxNotification] = useState(false);
   const [lootboxNotificationData, setLootboxNotificationData] = useState(null);
+  const { openLoadingModal, closeLoadingModal } = useContext(LoadingContext);
 
-  const [charged, setCharged] = useState(false)
-  const [staked, setStaked] = useState(false)
   const [ruggedAccount, setRuggedAccount] = useState()
   const [mainProgram, setMainProgram] = useState()
   const [rugToken, setRugToken] = useState(0)
@@ -72,6 +75,7 @@ export default function BurnRuggedNFTs() {
   const provider = new anchor.AnchorProvider(connection, wallet);
   const hasGenesis = allTokens.filter(o=>o.data.name == Const.GENESIS_NFT_NAME && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY).length > 0
   const router = useRouter();
+  const { openNotificationModal } = useContext(NotificationContext);
 
   console.log('hasGenesis', hasGenesis)
   useEffect(() => {
@@ -127,13 +131,6 @@ export default function BurnRuggedNFTs() {
     setAllTokens(filteredNfts)
     updateTokenMetas(filteredNfts)
     selectTab('genesis', filteredNfts)
-
-    if(ruggedAccount && mainProgram) {
-      let programAccount = await mainProgram.account.ruggedAccount.fetch(ruggedAccount);
-      console.log('ruggedAccount', programAccount)
-      setCharged(programAccount.charged)
-      setStaked(programAccount.staked)
-    }
   }
 
   const initMainProgram = async () => {
@@ -172,8 +169,18 @@ export default function BurnRuggedNFTs() {
 
         await connection.confirmTransaction(signature, "confirmed");
 
-        let fetchData = await program.account.ruggedAccount.fetch(ruggedAccount.publicKey);
-        console.log('ruggedAccount', fetchData)
+        while(true) {
+          try {
+            let sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+            await sleep(3000);
+    
+            let fetchData = await program.account.ruggedAccount.fetch(ruggedAccount.publicKey);
+            console.log('ruggedAccount', fetchData)
+            break
+          } catch(e) {
+            console.log("error", e)
+          }
+        }
 
         api.addRuggedAccount({
           player_account: wallet.publicKey,
@@ -184,9 +191,6 @@ export default function BurnRuggedNFTs() {
         setRuggedAccount(ruggedAccount.publicKey)
       } else {
         console.log('check account')
-        let ruggedAccount = await program.account.ruggedAccount.fetch(ret[0].rugged_account);
-        console.log('ruggedAccount', ruggedAccount)
-        setCharged(ruggedAccount.charged)
         setRuggedAccount(ret[0].rugged_account)
       }
     })
@@ -244,11 +248,22 @@ export default function BurnRuggedNFTs() {
   };
 
   const openLootboxConfirm = () => {
-    if(charged) {
-      setShowLootboxConfirm(true);
-    } else {
-      openLootbox(selectedNFT)
+    setShowLootboxConfirm(true);
+  }
+
+  const openLootboxBefore = async () => {
+    if(await openLootbox(selectedNFT)) {
+      return
     }
+    openNotificationModal("Transaction has been failed because of network status is bad. Are you going to try again to get reward?", okOpenLootboxCallback, noOpenLootboxCallback, true)
+  }
+
+  const okOpenLootboxCallback = () => {
+    openLootboxBefore()
+  }
+
+  const noOpenLootboxCallback = async () => {
+    
   }
 
   const closeLootboxConfirm = () => {
@@ -270,43 +285,32 @@ export default function BurnRuggedNFTs() {
   }
 
   const openLootbox = async (token) => {
+    //get token meta
+    const meta = token.meta
+        
+    let beatLevel = meta.attributes.find(o=>o.trait_type == 'level').value
+    let nftType = meta.attributes.find(o=>o.trait_type == 'nft').value
+    const requiredCharges = nftType == 'No'?1:25
     //if user don't have genesis which has charges, he cannot open lootbox
     let genesisToken = null
     if(hasGenesis) {
-      genesisToken = allTokens.find(o=>o.data.name == Const.GENESIS_NFT_NAME && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && o.meta.attributes[0].value > 0)
+      genesisToken = allTokens.find(o=>o.data.name == Const.GENESIS_NFT_NAME && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && o.meta.attributes[0].value >= requiredCharges)
       if(!genesisToken) {
-        return
+        openNotificationModal("You don't have enough charges to open lootbox", ()=>{}, ()=>{}, false)
+        return true
       }
     } else {
-      return
+      return true
     }
 
     console.log(token);
     anchor.setProvider(provider);
 
-    //get token meta
-    const meta = await axios.get(api.get1KinUrl(token.data.uri))
-    console.log(meta)
-    if(!meta || !meta.data) {
-      return
-    }
-
-    let beatLevel = meta.data.attributes.find(o=>o.trait_type == 'level').value
-    let nftType = charged ? meta.data.attributes.find(o=>o.trait_type == 'nft').value : 'No'
+    openLoadingModal()
 
     console.log('burn', token)
     let burnInstruction = await burnTx(token.mint, provider.wallet.publicKey, wallet, connection, 1)
     const create_tx = new anchor.web3.Transaction().add(burnInstruction)
-
-    if(charged) {
-      let tx = mainProgram.transaction.decharge({
-        accounts: {
-          ruggedAccount: ruggedAccount,
-          authority: provider.wallet.publicKey,
-        },
-      });
-      create_tx.add(tx)
-    }
 
     let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.BACKEND_ACCOUNT_PUBKEY), Const.MINT_FEE);
     create_tx.add(transferInstruction)
@@ -343,7 +347,7 @@ export default function BurnRuggedNFTs() {
   
       //update genesis
       let newMeta = genesisToken.meta
-      newMeta.attributes[0].value = newMeta.attributes[0].value - 1
+      newMeta.attributes[0].value = newMeta.attributes[0].value - requiredCharges
       await updateMeta(
         genesisToken, 
         newMeta, 
@@ -359,8 +363,12 @@ export default function BurnRuggedNFTs() {
       }
 
       await fetchData()
+      closeLoadingModal()
+      return true
     } catch(e) {
       console.log('error', e)
+      closeLoadingModal()
+      return false
     }
   };
 

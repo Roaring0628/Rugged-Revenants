@@ -1,7 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 import { useEffect, useState, useRef } from "react";
+import Script from "next/script";
 import GameWinner from "./GameWinner";
 import GameWinnerLootbox from "./GameWinnerLootbox";
+import { useContext } from 'react';
+import { NotificationContext } from "contexts/NotificationContext";
 
 const Demo = ({
   handlePlay,
@@ -17,6 +20,7 @@ const Demo = ({
   const [showLootboxChest, setShowLootboxChest] = useState(false);
   const [currentLevel, setCurrentLevel] = useState();
   const [isWin, setIsWin] = useState(false);
+  const { openNotificationModal } = useContext(NotificationContext);
 
   useEffect(() => {
     window.addEventListener(
@@ -32,33 +36,10 @@ const Demo = ({
           // console.log("========= UNITY MESSAGE =========");
           // console.log(event.data);
 
-          if (
-            event.data.type === "win" &&
-            event.data.hasWon &&
-            event.data.level &&
-            event.data.level == 1
-          ) {
-            // Handle 5% of the time the users beat level 1
-            closeFullScreen();
-            openChest();
-          }
-
-          // if (
-          //   event.data.type === "win" &&
-          //   event.data.hasWon &&
-          //   event.data.level &&
-          //   event.data.level == 2
-          // ) {
-          //   // TODO - Need to update this, open lootbox chest when the user beat level 2 for demo
-          //   openLootboxChest();
-          // }
-
           handleGameResult(
-            event.data.type === "win" && event.data.hasWon,
-            event.data.type === "die",
+            event.data.type,
             event.data.level,
-            event.data.levelsComplete,
-            event.data.isLastLevel
+            event.data.sessionID
           );
         }
       },
@@ -68,10 +49,10 @@ const Demo = ({
     // For new build of game: Need to update loaderUrl, and download build files and replace them
     // Live loaderUrl
     let loaderUrl =
-      "https://v6p9d9t4.ssl.hwcdn.net/html/6236366/RuggedWebGL/Build/RuggedWebGL.loader.js";
+      "https://v6p9d9t4.ssl.hwcdn.net/html/6352974/RuggedWebGL/Build/RuggedWebGL.loader.js";
     // Test purpose loaderUrl
     // let loaderUrl =
-    //   "https://v6p9d9t4.ssl.hwcdn.net/html/6138872/RuggedWebGLTesting/Build/RuggedWebGLTesting.loader.js";
+    //   "https://v6p9d9t4.ssl.hwcdn.net/html/6329858/RuggedWebGLTesting/Build/RuggedWebGLTesting.loader.js";
 
     let script = document.createElement("script");
     script.src = loaderUrl;
@@ -96,6 +77,7 @@ const Demo = ({
           // devicePixelRatio: 1, // Uncomment this to override low DPI rendering on high DPI displays.
         })
         .then((unityInstance) => {
+          window.unityInstance = unityInstance;
           window.myGameInstance = unityInstance;
           setMyGameInstance(unityInstance);
           myGameInstanceRef.current = unityInstance;
@@ -108,42 +90,62 @@ const Demo = ({
   const sendMessageToGameInstance = () => {
     // let testObject = { hasDopeCat: true, hasPixelBand: false };
     // console.log("TOKEN OWNERSHIP DATA: ", tokenOwnershipData);
-    let jsonString = JSON.stringify(tokenOwnershipData);
+    let { rrGen1MetaArray, ...tokenOwnershipData1 } = tokenOwnershipData;
+    let jsonString = JSON.stringify(tokenOwnershipData1);
     myGameInstance.SendMessage(
       "JavascriptHook",
       "RecieveWalletJson",
       jsonString
     );
+    (rrGen1MetaArray || []).forEach((token) => {
+      if (!token.meta) return;
+      let metaString = JSON.stringify(token.meta);
+      myGameInstance.SendMessage("JavascriptHook", "ReceiveAttributeJson", metaString);
+    })
   };
 
   const handleGameResult = (
-    isWin,
-    isDie,
+    type,
     currentLevel,
-    completedLevelsCount,
-    isFinalLevel
+    sessionID,
   ) => {
     console.log('handleGameResult')
-    console.log("win", isWin);
-    console.log("die", isDie);
+    console.log("type", type);
     console.log("currentLevel", currentLevel);
-    // we have this completedLevelsCount value when only the user die
-    console.log("completedLevelsCount", completedLevelsCount);
-    console.log("isFinalLevel", isFinalLevel);
 
     closeFullScreen();
 
-    if(isDie || isFinalLevel) {
-      if(currentLevel > 1) {
-        setCurrentLevel(currentLevel)
-        setIsWin(isWin)
+    if (type == "level" && currentLevel == 1) {
+      // Handle 5% of the time the users beat level 1
+      openChest();
+    } else if(type == "die" || type == "win") {
+      if(currentLevel > 1 || type == "win") { // now, when the user clear all levels, i don't get level number
+        setCurrentLevel(currentLevel || 7) // now, when the user clear all levels, i don't get level number
+        setIsWin(type == "win")
         openLootboxChest();
       } 
-    } 
+    } else {
+      goToNextLevel()
+    }
   };
 
+  const goToNextLevel = () => {
+    if (window.myGameInstance) window.myGameInstance.SendMessage("JavascriptHook", "NextLevel");
+  }
+
   const endGameBefore = async () => {
-    await endGame(currentLevel, isWin)
+      if(await endGame(currentLevel, isWin)) {
+        quitGame()
+        return
+      }
+      
+      openNotificationModal("Transaction has been failed because of network status is bad. Are you going to try again to get reward?", okEndGameCallback, noEndGameCallback, true)
+  }
+
+  const okEndGameCallback = async () => {
+    endGameBefore()
+  }
+  const noEndGameCallback = async () => {
     quitGame()
   }
 
@@ -176,6 +178,7 @@ const Demo = ({
 
   const closeChest = () => {
     setShowChest(false);
+    goToNextLevel();
   };
 
   const openLootboxChest = () => {
@@ -184,10 +187,26 @@ const Demo = ({
 
   const closeLootboxChest = () => {
     setShowLootboxChest(false);
+    goToNextLevel();
   };
 
   return (
     <div className="game-wrapper">
+      <Script id="firebase-script">
+        {`
+          var firebaseConfig = {
+            apiKey: "AIzaSyBvgWGvvytGS4U8MwPAlwcdZwpgOv9erws",
+            authDomain: "rugged-revenants.firebaseapp.com",
+            databaseURL: "https://rugged-revenants-default-rtdb.firebaseio.com",
+            projectId: "rugged-revenants",
+            storageBucket: "rugged-revenants.appspot.com",
+            messagingSenderId: "424403245267",
+            appId: "1:424403245267:web:cdb2820c1060c915161c26",
+            measurementId: "G-PS6WZT7XML"
+          };
+          if (firebase) firebase.initializeApp(firebaseConfig);
+        `}
+      </Script>
       <div className="demo-wrapper">
         <img
           className="tv-screen"

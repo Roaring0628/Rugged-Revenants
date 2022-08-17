@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
+import Script from "next/script";
 import Header from "components/organisms/layout/Header";
 import Footer from "components/organisms/layout/Footer";
 import MetaTags from "components/organisms/layout/MetaTags";
-import WalletContextProvider from "../contexts/WalletContextProvider";
+import WalletContextProvider from "contexts/WalletContextProvider";
+import { NotificationContextProvider } from "contexts/NotificationContext";
+import NotificationModal from "components/molecules/NotificationModal";
+import { LoadingContextProvider } from "contexts/LoadingContext";
+import LoadingModal from "components/molecules/LoadingModal";
 import "@solana/wallet-adapter-react-ui/styles.css";
 
 import "styles/globals.scss";
@@ -50,11 +55,33 @@ function MyApp({ Component, pageProps }) {
           }}
         />
       </Head>
+      <Script
+        src="https://www.gstatic.com/firebasejs/7.19.1/firebase-app.js"
+        strategy="beforeInteractive"
+      />
+      <Script
+        src="https://www.gstatic.com/firebasejs/7.19.1/firebase-database.js"
+        strategy="beforeInteractive"
+      />
+      <Script
+        src="https://www.gstatic.com/firebasejs/7.19.1/firebase-auth.js"
+        strategy="beforeInteractive"
+      />
+      <Script
+        src="https://www.gstatic.com/firebasejs/7.19.1/firebase-storage.js"
+        strategy="beforeInteractive"
+      />
       <WalletContextProvider>
-        <MetaTags />
-        <Header />
-        <Component {...pageProps} />
-        {!hideFooter && <Footer />}
+        <NotificationContextProvider>
+          <LoadingContextProvider>
+            <NotificationModal />
+            <LoadingModal />
+            <MetaTags />
+            <Header />
+            <Component {...pageProps} />
+            {!hideFooter && <Footer />}
+          </LoadingContextProvider>
+        </NotificationContextProvider>
       </WalletContextProvider>
     </>
   );
