@@ -49,7 +49,7 @@ const Demo = ({
     // For new build of game: Need to update loaderUrl, and download build files and replace them
     // Live loaderUrl
     let loaderUrl =
-      "https://v6p9d9t4.ssl.hwcdn.net/html/6344190/RuggedWebGL/Build/RuggedWebGL.loader.js";
+      "https://v6p9d9t4.ssl.hwcdn.net/html/6352974/RuggedWebGL/Build/RuggedWebGL.loader.js";
     // Test purpose loaderUrl
     // let loaderUrl =
     //   "https://v6p9d9t4.ssl.hwcdn.net/html/6329858/RuggedWebGLTesting/Build/RuggedWebGLTesting.loader.js";
