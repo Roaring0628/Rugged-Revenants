@@ -28,7 +28,7 @@ export default function Home() {
       <Partnerships />
       <Roadmap />
       <TeamMembers />
-      <FAQ />
+      {/* <FAQ /> */}
     </main>
   );
 }
