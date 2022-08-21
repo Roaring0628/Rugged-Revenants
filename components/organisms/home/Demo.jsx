@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { useEffect, useState, useRef } from "react";
 import Script from "next/script";
+import axios from "axios";
 import GameWinner from "./GameWinner";
 import GameWinnerLootbox from "./GameWinnerLootbox";
 import { useContext } from 'react';
@@ -49,7 +50,7 @@ const Demo = ({
     // For new build of game: Need to update loaderUrl, and download build files and replace them
     // Live loaderUrl
     let loaderUrl =
-      "https://v6p9d9t4.ssl.hwcdn.net/html/6352974/RuggedWebGL/Build/RuggedWebGL.loader.js";
+      "https://v6p9d9t4.ssl.hwcdn.net/html/6362262/RuggedWebGL/Build/RuggedWebGL.loader.js";
     // Test purpose loaderUrl
     // let loaderUrl =
     //   "https://v6p9d9t4.ssl.hwcdn.net/html/6329858/RuggedWebGLTesting/Build/RuggedWebGLTesting.loader.js";
@@ -104,7 +105,7 @@ const Demo = ({
     })
   };
 
-  const handleGameResult = (
+  const handleGameResult = async (
     type,
     currentLevel,
     sessionID,
@@ -117,8 +118,21 @@ const Demo = ({
 
     if (type == "level" && currentLevel == 1) {
       // Handle 5% of the time the users beat level 1
+      const response = await axios.get(`https://us-central1-rugged-revenants.cloudfunctions.net/levelWon?id=${sessionID}`)
+      console.log(response.data)
+      if (response.data !== true && response.data !== 'true') return
       openChest();
     } else if(type == "die" || type == "win") {
+      if (type == "win") {
+        const response = await axios.get(`https://us-central1-rugged-revenants.cloudfunctions.net/checkHasWon?id=${sessionID}`)
+        console.log(response.data)
+        if (response.data !== true && response.data !== 'true') return
+      }
+      if (type == "die") {
+        const response = await axios.get(`https://us-central1-rugged-revenants.cloudfunctions.net/playerDied?id=${sessionID}`)
+        console.log(response.data)
+        if (response.data !== true && response.data !== 'true') return
+      }
       if(currentLevel > 1 || type == "win") { // now, when the user clear all levels, i don't get level number
         setCurrentLevel(currentLevel || 7) // now, when the user clear all levels, i don't get level number
         setIsWin(type == "win")
