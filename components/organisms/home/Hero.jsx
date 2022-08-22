@@ -26,7 +26,7 @@ import axios from 'axios'
 
 import RugGameIdl from "../idl/rug_game.json";
 
-import { uploadMetadataToIpfs, mint, mintGenesis, mintPotion, mintLootBox, updateMeta, payToBackendTx, setProgramTransaction } from "../utils/mint";
+import { uploadMetadataToIpfs, mint, mintGenesis, mintPotion, mintLootBox, updateMeta, payToBackendTx, setProgramTransaction, getMemoInstruction } from "../utils/mint";
 import {burn, burnTx} from '../utils/nftburn'
 import api from "../api"
 import * as Const from '../utils/constants'
@@ -188,7 +188,7 @@ export default function Hero({ play, setPlay }) {
             console.log('ruggedAccount', fetchData)
             break
           } catch(e) {
-            console.log("error", e)
+            // console.log("error", e)
           }
         }
 
@@ -226,7 +226,7 @@ export default function Hero({ play, setPlay }) {
         });
         await connection.confirmTransaction(signature, "confirmed");
   
-        await mintGenesis(wallet, txSignature)
+        await mintGenesis(wallet, signature)
         fetchData()      
       } else {
         const token = tokens.find((t)=>{
@@ -257,7 +257,7 @@ export default function Hero({ play, setPlay }) {
             localStorage.setItem("old-charges", newMeta.attributes[0].value)
             newMeta.attributes[0].value = newMeta.attributes[0].value + 1
             localStorage.setItem("new-charges", newMeta.attributes[0].value)
-            await updateMeta(token, newMeta, wallet.publicKey, txSignature)
+            await updateMeta(token, newMeta, wallet.publicKey, signature)
             
             fetchData()
           } catch(e) {
@@ -299,7 +299,7 @@ export default function Hero({ play, setPlay }) {
         console.log("signature", signature)
         await connection.confirmTransaction(signature, "confirmed");  
         
-        await mintLootBox(wallet, level, charged?hasWon:false, 'Premium', txSignature)
+        await mintLootBox(wallet, level, charged?hasWon:false, 'Premium', signature)
         await fetchData()
         closeLoadingModal()
         setPlay(false);
@@ -355,26 +355,20 @@ export default function Hero({ play, setPlay }) {
     let oldMeta = token.meta
     oldMeta.attributes[0].value = oldMeta.attributes[0].value - 1
 
-    // let tx = mainProgram.transaction.charge({
-    //   accounts: {
-    //     ruggedAccount: ruggedAccount,
-    //     authority: provider.wallet.publicKey,
-    //   },
-    // });
-
     let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
 
     let txSignature = api.randomString(20) //window.crypto.randomUUID()
     let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
     const create_tx = new anchor.web3.Transaction().add(
       transferInstruction, 
+      // getMemoInstruction("RuggedRevenants", wallet.publicKey),
       // tx, 
       signatureTx
     )
 
-    let blockhashObj = await connection.getLatestBlockhash();
-    console.log("blockhashObj", blockhashObj);
-    create_tx.recentBlockhash = blockhashObj.blockhash;
+    // let blockhashObj = await connection.getLatestBlockhash();
+    // console.log("blockhashObj", blockhashObj);
+    // create_tx.recentBlockhash = blockhashObj.blockhash;
     
     try {
       const signature = await wallet.sendTransaction(create_tx, connection);
@@ -385,7 +379,7 @@ export default function Hero({ play, setPlay }) {
         token, 
         oldMeta, 
         wallet.publicKey, 
-        txSignature
+        signature
       )
 
       setCharged(true)

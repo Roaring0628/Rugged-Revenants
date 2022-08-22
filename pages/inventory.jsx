@@ -342,7 +342,7 @@ export default function BurnRuggedNFTs() {
         beatLevel,
         potionMeta,
         nftType,
-        txId: txSignature
+        txId: signature
       })
   
       //update genesis

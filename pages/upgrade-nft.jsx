@@ -26,7 +26,7 @@ import {PublicKey, sendAndConfirmTransaction} from "@solana/web3.js";
 
 import RugGameIdl from "../components/organisms/idl/rug_game.json";
 
-import { uploadMetadataToIpfs, mint, mintGenesis, mintPotion, mintLootBox, updateMeta, payToBackendTx, createPotionMeta } from "../components/organisms/utils/mint";
+import { uploadMetadataToIpfs, mint, mintGenesis, mintPotion, mintLootBox, updateMeta, payToBackendTx, createPotionMeta, setProgramTransaction } from "../components/organisms/utils/mint";
 import {burn, burnTx} from '../components/organisms/utils/nftburn'
 import api from "../components/organisms/api"
 import * as Const from '../components/organisms/utils/constants'
@@ -398,7 +398,7 @@ const UpgradeNFT = () => {
         key: selectedNFT.mint,
         tokenAmount: selectedRugOption,
         playerAccount: wallet.publicKey.toBase58(),
-        txId: txSignature,
+        txId: signature,
       },
     )
 
