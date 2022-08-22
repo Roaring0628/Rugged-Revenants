@@ -279,7 +279,7 @@ export default function BurnRuggedNFTs() {
         await connection.confirmTransaction(signature, "confirmed");
         
         //mint genesis
-        await mintGenesis(wallet, txSignature)
+        await mintGenesis(wallet, signature)
       }
       await fetchData(whitelist)
     } catch(e) {
