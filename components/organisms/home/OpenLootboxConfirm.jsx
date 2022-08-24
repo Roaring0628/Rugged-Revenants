@@ -13,7 +13,8 @@ const OpenLootboxConfirm = ({ closeConfirm, openLootbox, selectedNFT }) => {
 
   const meta = selectedNFT?.meta
   let nftType = meta?meta.attributes.find(o=>o.trait_type == 'nft').value:'No'
-  const requiredCharges = nftType == 'No'?1:25
+  let beatLevel = meta?meta.attributes.find(o=>o.trait_type == 'level').value:1
+  const requiredCharges = nftType == 'No'?beatLevel:25
 
   return (
     <div className="z-[60] fixed inset-0 w-full h-[100vh]">
