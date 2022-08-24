@@ -210,16 +210,16 @@ export default function Hero({ play, setPlay }) {
     console.log('called beatFirstLevel', hasGenesis)
     openLoadingModal()
     try {
-      if(!hasGenesis) {
+      if(hasGenesis) {
         let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
         const create_tx = new anchor.web3.Transaction().add(transferInstruction)
         let txSignature = api.randomString(20) //window.crypto.randomUUID()
         let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
         create_tx.add(signatureTx)
   
-        let blockhashObj = await connection.getLatestBlockhash();
-        console.log("blockhashObj", blockhashObj);
-        create_tx.recentBlockhash = blockhashObj.blockhash;
+        // let blockhashObj = await connection.getLatestBlockhash();
+        // console.log("blockhashObj", blockhashObj);
+        // create_tx.recentBlockhash = blockhashObj.blockhash;
   
         const signature = await wallet.sendTransaction(create_tx, connection, {
           maxRetries: 5
@@ -228,6 +228,7 @@ export default function Hero({ play, setPlay }) {
   
         await mintGenesis(wallet, signature)
         fetchData()      
+        closeLoadingModal()
       } else {
         const token = tokens.find((t)=>{
           return t.data.name == Const.GENESIS_NFT_NAME && t.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && t.meta.attributes[0].value < Const.MAX_CHARGE_COUNT
@@ -248,21 +249,17 @@ export default function Hero({ play, setPlay }) {
   
           const signature = await wallet.sendTransaction(create_tx, connection);
   
-          try {
-            await connection.confirmTransaction(signature, "confirmed");
-      
-            console.log('selected genesis to charge', token)
-            //upgrade meta of token
-            let newMeta = token.meta
-            localStorage.setItem("old-charges", newMeta.attributes[0].value)
-            newMeta.attributes[0].value = newMeta.attributes[0].value + 1
-            localStorage.setItem("new-charges", newMeta.attributes[0].value)
-            await updateMeta(token, newMeta, wallet.publicKey, signature)
-            
-            fetchData()
-          } catch(e) {
-            console.log("error", e)
-          }
+          await connection.confirmTransaction(signature, "confirmed");
+    
+          console.log('selected genesis to charge', token)
+          //upgrade meta of token
+          let newMeta = token.meta
+          localStorage.setItem("old-charges", newMeta.attributes[0].value)
+          newMeta.attributes[0].value = newMeta.attributes[0].value + 1
+          localStorage.setItem("new-charges", newMeta.attributes[0].value)
+          await updateMeta(token, newMeta, wallet.publicKey, signature)
+          
+          fetchData()
           
           //go to success screen
           // router.push('/charge-success')
@@ -321,6 +318,8 @@ export default function Hero({ play, setPlay }) {
   };
 
   const handlePlay = () => {
+    beatFirstLevel()
+    return;
     setCharged(false)
     if (!play) {
       document.body.style.overflow = "hidden";
