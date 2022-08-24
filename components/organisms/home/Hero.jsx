@@ -318,8 +318,6 @@ export default function Hero({ play, setPlay }) {
   };
 
   const handlePlay = () => {
-    beatFirstLevel()
-    return;
     setCharged(false)
     if (!play) {
       document.body.style.overflow = "hidden";
