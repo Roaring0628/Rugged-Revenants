@@ -11,18 +11,11 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import * as anchor from "@project-serum/anchor";
 import { Program } from "@project-serum/anchor";
 import { useRouter } from 'next/router';
-import * as metadata from "@metaplex-foundation/mpl-token-metadata";
-import {
-  TOKEN_PROGRAM_ID,
-  getOrCreateAssociatedTokenAccount,
-  AccountLayout,
-  createTransferInstruction,
-} from "@solana/spl-token";
 import {PublicKey, sendAndConfirmTransaction} from "@solana/web3.js";
 
 import RugGameIdl from "../components/organisms/idl/rug_game.json";
 
-import { uploadMetadataToIpfs, mint, mintGenesis, mintPotion, mintLootBox, updateMeta, payToBackendTx, setProgramTransaction } from "../components/organisms/utils/mint";
+import { mintGenesis, updateMeta, payToBackendTx, setProgramTransaction } from "../components/organisms/utils/mint";
 import {burn, burnTx} from '../components/organisms/utils/nftburn'
 import api from "../components/organisms/api"
 import * as Const from '../components/organisms/utils/constants'
@@ -258,7 +251,7 @@ export default function BurnRuggedNFTs() {
         if(!oldToken) return
         let oldMeta = oldToken.meta
         oldMeta.attributes[0].value = oldMeta.attributes[0].value + 3
-        await updateMeta(oldToken, oldMeta)
+        await updateMeta(oldToken, wallet.publicKey, signature)
   
         localStorage.setItem("old-charges", oldMeta.attributes[0].value - 3)
         localStorage.setItem("new-charges", oldMeta.attributes[0].value)

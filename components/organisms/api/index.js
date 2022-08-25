@@ -49,17 +49,6 @@ export default {
     getUpgradeTasks(cb){
         this.baseApi('/upgrade-tasks', 'GET', {}, cb)
     },
-    async mintRugToken(data){
-        return new Promise((resolve, reject)=>{
-            this.baseApi('/players/mintRugToken', 'POST', data, (err, ret)=>{
-                if(err) {
-                    reject()
-                } else {
-                    resolve(ret)
-                }
-            })
-        })
-    },
     async mintNft(data){
         return new Promise((resolve, reject)=>{
             this.baseApi('/players/mintNft', 'POST', data, (err, ret)=>{
@@ -71,9 +60,42 @@ export default {
             })
         })
     },
+    async mintGenesisNft(data){
+        return new Promise((resolve, reject)=>{
+            this.baseApi('/players/mintGenesisNft', 'POST', data, (err, ret)=>{
+                if(err) {
+                    reject()
+                } else {
+                    resolve(ret)
+                }
+            })
+        })
+    },
+    async mintLootboxNft(data){
+        return new Promise((resolve, reject)=>{
+            this.baseApi('/players/mintLootboxNft', 'POST', data, (err, ret)=>{
+                if(err) {
+                    reject()
+                } else {
+                    resolve(ret)
+                }
+            })
+        })
+    },
     async updateNftMeta(data){
         return new Promise((resolve, reject)=>{
             this.baseApi('/players/updateNftMeta', 'POST', data, (err, ret)=>{
+                if(err) {
+                    reject()
+                } else {
+                    resolve(ret)
+                }
+            })
+        })
+    },
+    async updateNftMetaData(data){
+        return new Promise((resolve, reject)=>{
+            this.baseApi('/players/updateNftMetaData', 'POST', data, (err, ret)=>{
                 if(err) {
                     reject()
                 } else {

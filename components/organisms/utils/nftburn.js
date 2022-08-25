@@ -79,28 +79,6 @@ export async function burn(tokenMintAddress, owner, wallet, connection, amount) 
 }
 
 export async function burnTx(tokenMintAddress, owner, wallet, connection, amount) {
-    // try {
-    //     const mintPublickey = new PublicKey(tokenMintAddress);
-    //     console.log('here-1', mintPublickey)
-    //     const associatedAddress = await getAssociatedTokenAddress(
-    //         mintPublickey,
-    //         owner,
-    //     );
-    //     console.log('here-2', associatedAddress)
-
-    //     const burnInstruction = await createBurnInstruction(
-    //         associatedAddress,
-    //         mintPublickey,
-    //         owner,
-    //         amount,
-    //         [],
-    //         TOKEN_PROGRAM_ID,
-    //     );
-
-    //     return burnInstruction
-    // } catch (error) {
-    //     console.log(error)
-    // }
 
     const fromTokenAccount = await getOrCreateAssociatedTokenAccount(connection, wallet, new PublicKey(tokenMintAddress), wallet.publicKey);
     const toTokenAccount = await api.getOrCreateAssociatedBurnTokenAccount(tokenMintAddress);
