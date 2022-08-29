@@ -1,20 +1,28 @@
 import axios from "axios";
+import aes from 'crypto-js/aes';
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL
 console.log("API_URL", API_URL)
 const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+const AES_KEY = 'ruggedrevenants'
 
 export default {
-    async baseApi(subUrl, method, jsonData, cb) {
+    async baseApi(subUrl, method, jsonData, needEncrypt, cb) {
+        if(method === 'POST' && needEncrypt) {
+            jsonData = {
+                data: aes.encrypt(JSON.stringify(jsonData), AES_KEY).toString(),
+                // hasEncrypt: needEncrypt
+            }
+        }
         const startTime = Date.now()
         try {
             const request = {
-            method,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            url: `${API_URL + subUrl}`,
-            data: jsonData,
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                url: `${API_URL + subUrl}`,
+                data: jsonData,
             };
             
             axios(request)
@@ -35,34 +43,23 @@ export default {
         }
     },
     getRuggedAccount(account, cb){
-        this.baseApi('/players?player_account=' + account, 'GET', {}, cb)
+        this.baseApi('/players?player_account=' + account, 'GET', {}, false, cb)
     },
     addRuggedAccount(data, cb){
-        this.baseApi('/players', 'POST', data, cb)
+        this.baseApi('/players', 'POST', data, false, cb)
     },
     getRugTokenAccount(account, cb){
-        this.baseApi('/rug-token-accounts', 'GET', {player_account: account}, cb)
+        this.baseApi('/rug-token-accounts', 'GET', {player_account: account}, false, cb)
     },
     addRugTokenAccount(data, cb){
-        this.baseApi('/rug-token-accounts', 'POST', data, cb)
+        this.baseApi('/rug-token-accounts', 'POST', data, false, cb)
     },
     getUpgradeTasks(cb){
-        this.baseApi('/upgrade-tasks', 'GET', {}, cb)
-    },
-    async mintNft(data){
-        return new Promise((resolve, reject)=>{
-            this.baseApi('/players/mintNft', 'POST', data, (err, ret)=>{
-                if(err) {
-                    reject()
-                } else {
-                    resolve(ret)
-                }
-            })
-        })
+        this.baseApi('/upgrade-tasks', 'GET', {}, false, cb)
     },
     async mintGenesisNft(data){
         return new Promise((resolve, reject)=>{
-            this.baseApi('/players/mintGenesisNft', 'POST', data, (err, ret)=>{
+            this.baseApi('/players/mintGenesisNft', 'POST', data, true, (err, ret)=>{
                 if(err) {
                     reject()
                 } else {
@@ -73,18 +70,7 @@ export default {
     },
     async mintLootboxNft(data){
         return new Promise((resolve, reject)=>{
-            this.baseApi('/players/mintLootboxNft', 'POST', data, (err, ret)=>{
-                if(err) {
-                    reject()
-                } else {
-                    resolve(ret)
-                }
-            })
-        })
-    },
-    async updateNftMeta(data){
-        return new Promise((resolve, reject)=>{
-            this.baseApi('/players/updateNftMeta', 'POST', data, (err, ret)=>{
+            this.baseApi('/players/mintLootboxNft', 'POST', data, true, (err, ret)=>{
                 if(err) {
                     reject()
                 } else {
@@ -95,7 +81,7 @@ export default {
     },
     async updateNftMetaData(data){
         return new Promise((resolve, reject)=>{
-            this.baseApi('/players/updateNftMetaData', 'POST', data, (err, ret)=>{
+            this.baseApi('/players/updateNftMetaData', 'POST', data, true, (err, ret)=>{
                 if(err) {
                     reject()
                 } else {
@@ -106,18 +92,7 @@ export default {
     },
     async updatePlayableNftMeta(data){
         return new Promise((resolve, reject)=>{
-            this.baseApi('/players/updatePlayableNftMeta', 'POST', data, (err, ret)=>{
-                if(err) {
-                    reject()
-                } else {
-                    resolve(ret)
-                }
-            })
-        })
-    },
-    async transferPremiumNft(data){
-        return new Promise((resolve, reject)=>{
-            this.baseApi('/players/transferPremiumNft', 'POST', data, (err, ret)=>{
+            this.baseApi('/players/updatePlayableNftMeta', 'POST', data, true, (err, ret)=>{
                 if(err) {
                     reject()
                 } else {
@@ -128,7 +103,7 @@ export default {
     },
     async getOrCreateAssociatedTokenAccount(key){
         return new Promise((resolve, reject)=>{
-            this.baseApi('/players/getOrCreateAssociatedTokenAccount', 'POST', {key}, (err, ret)=>{
+            this.baseApi('/players/getOrCreateAssociatedTokenAccount', 'POST', {key}, false, (err, ret)=>{
                 if(err) {
                     reject()
                 } else {
@@ -139,18 +114,7 @@ export default {
     },
     async getOrCreateAssociatedBurnTokenAccount(key){
         return new Promise((resolve, reject)=>{
-            this.baseApi('/players/getOrCreateAssociatedBurnTokenAccount', 'POST', {key}, (err, ret)=>{
-                if(err) {
-                    reject()
-                } else {
-                    resolve(ret)
-                }
-            })
-        })
-    },
-    async unstake(playerAccount, tokenAccount){
-        return new Promise((resolve, reject)=>{
-            this.baseApi('/players/unstake', 'POST', {playerAccount, tokenAccount}, (err, ret)=>{
+            this.baseApi('/players/getOrCreateAssociatedBurnTokenAccount', 'POST', {key}, false, (err, ret)=>{
                 if(err) {
                     reject()
                 } else {
@@ -161,7 +125,7 @@ export default {
     },
     async getRuggedWhitelistAuthorities(){
         return new Promise((resolve, reject)=>{
-            this.baseApi('/rugged-whitelists?type=simple', 'GET', {}, (err, ret)=>{
+            this.baseApi('/rugged-whitelists?type=simple', 'GET', {}, false, (err, ret)=>{
                 if(err) {
                     reject()
                 } else {
@@ -172,7 +136,7 @@ export default {
     },
     async getRuggedWhitelist(){
         return new Promise((resolve, reject)=>{
-            this.baseApi('/rugged-whitelists', 'GET', {}, (err, ret)=>{
+            this.baseApi('/rugged-whitelists', 'GET', {}, false, (err, ret)=>{
                 if(err) {
                     reject()
                 } else {
@@ -183,7 +147,7 @@ export default {
     },
     async filterRuggedWhitelist(data){
         return new Promise((resolve, reject)=>{
-            this.baseApi('/rugged-whitelists/filter', 'POST', data, (err, ret)=>{
+            this.baseApi('/rugged-whitelists/filter', 'POST', data, false, (err, ret)=>{
                 if(err) {
                     reject()
                 } else {
@@ -194,7 +158,7 @@ export default {
     },
     async openLootBox(data){
         return new Promise((resolve, reject)=>{
-            this.baseApi('/players/openLootBox', 'POST', data, (err, ret)=>{
+            this.baseApi('/players/openLootBox', 'POST', data, true, (err, ret)=>{
                 if(err) {
                     reject()
                 } else {
@@ -205,7 +169,7 @@ export default {
     },
     async getGlobalSetting(){
         return new Promise((resolve, reject)=>{
-            this.baseApi('/setting', 'GET', {}, (err, ret)=>{
+            this.baseApi('/setting', 'GET', {}, false, (err, ret)=>{
                 if(err) {
                     reject()
                 } else {
