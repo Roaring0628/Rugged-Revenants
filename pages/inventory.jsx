@@ -15,18 +15,11 @@ import { LoadingContext } from "contexts/LoadingContext";
 import * as anchor from "@project-serum/anchor";
 import { Program } from "@project-serum/anchor";
 import { useRouter } from 'next/router';
-import * as metadata from "@metaplex-foundation/mpl-token-metadata";
-import {
-  TOKEN_PROGRAM_ID,
-  getOrCreateAssociatedTokenAccount,
-  AccountLayout,
-  createTransferInstruction,
-} from "@solana/spl-token";
 import {PublicKey, sendAndConfirmTransaction} from "@solana/web3.js";
 
 import RugGameIdl from "../components/organisms/idl/rug_game.json";
 
-import { uploadMetadataToIpfs, mint, mintGenesis, mintPotion, mintLootBox, updateMeta, payToBackendTx, createPotionMeta, setProgramTransaction } from "../components/organisms/utils/mint";
+import { payToBackendTx, setProgramTransaction } from "../components/organisms/utils/mint";
 import {burn, burnTx} from '../components/organisms/utils/nftburn'
 import api from "../components/organisms/api"
 import * as Const from '../components/organisms/utils/constants'
@@ -39,22 +32,8 @@ import {
 
 const { SystemProgram } = anchor.web3;
 
-function getRandomInt(min, max) {       
-  // Create byte array and fill with 1 random number
-  var byteArray = new Uint8Array(1);
-  window.crypto.getRandomValues(byteArray);
-
-  var range = max - min + 1;
-  var max_range = 256;
-  if (byteArray[0] >= Math.floor(max_range / range) * range)
-      return getRandomInt(min, max);
-  return min + (byteArray[0] % range);
-}
-
 export default function BurnRuggedNFTs() {
   const [keyword, setKeyword] = useState("");
-  // const [tokens, setTokens] = useState([]);
-  const [tokensWithImage, setTokensWithImage] = useState([]);
   const [selectedNFT, setSelectedNFT] = useState(null);
   const [tab, setTab] = useState("genesis"); // player, lootbox, genesis
 
@@ -201,26 +180,6 @@ export default function BurnRuggedNFTs() {
     setSelectedNFT(null);
   };
 
-  // useEffect(() => {
-  //   setTokensWithImage([]);
-  //   const promises = tokens.map(async (token) => {
-  //     const imageURL = await getImageFromMetadata(token.data.uri);
-  //     return { ...token, image: imageURL };
-  //   });
-  //   Promise.all(promises).then((results) => {
-  //     setTokensWithImage(results);
-  //   });
-  // }, [tokens]);
-
-  // const getImageFromMetadata = async (uri) => {
-  //   try {
-  //     const meta = await axios.get(uri);
-  //     return meta.data.image || "";
-  //   } catch (e) {
-  //     return "";
-  //   }
-  // };
-
   const selectNFT = (token) => {
     setSelectedNFT(token);
   };
@@ -290,7 +249,7 @@ export default function BurnRuggedNFTs() {
         
     let beatLevel = meta.attributes.find(o=>o.trait_type == 'level').value
     let nftType = meta.attributes.find(o=>o.trait_type == 'nft').value
-    const requiredCharges = nftType == 'No'?1:25
+    const requiredCharges = nftType == 'No'?beatLevel:25
     //if user don't have genesis which has charges, he cannot open lootbox
     let genesisToken = null
     if(hasGenesis) {
@@ -335,25 +294,16 @@ export default function BurnRuggedNFTs() {
     try {
       const signature = await wallet.sendTransaction(create_tx, connection);
       await connection.confirmTransaction(signature, "confirmed");
-  
-      let potionMeta = await createPotionMeta()
+
+      genesisToken.meta.attributes[0].value = genesisToken.meta.attributes[0].value - requiredCharges
+
       let openResult = await api.openLootBox({
         key:wallet.publicKey.toBase58(),
         beatLevel,
-        potionMeta,
         nftType,
-        txId: signature
+        txId: signature,
+        genesisToken,
       })
-  
-      //update genesis
-      let newMeta = genesisToken.meta
-      newMeta.attributes[0].value = newMeta.attributes[0].value - requiredCharges
-      await updateMeta(
-        genesisToken, 
-        newMeta, 
-        wallet.publicKey, 
-        //txSignature
-      )
 
       let {rugTokenAmount, potionAmount, hasPremium} = openResult.result
       console.log("openbox result", rugTokenAmount, potionAmount, hasPremium)

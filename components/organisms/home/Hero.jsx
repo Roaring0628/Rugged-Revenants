@@ -13,21 +13,12 @@ import { useRouter } from 'next/router';
 import { useContext } from 'react';
 import { LoadingContext } from "contexts/LoadingContext";
 
-// import { Metadata } from "@metaplex-foundation/mpl-token-metadata";
-import * as metadata from "@metaplex-foundation/mpl-token-metadata";
-import {
-  TOKEN_PROGRAM_ID,
-  getOrCreateAssociatedTokenAccount,
-  AccountLayout,
-  createTransferInstruction,
-} from "@solana/spl-token";
 import {PublicKey, sendAndConfirmTransaction} from "@solana/web3.js";
 import axios from 'axios'
 
 import RugGameIdl from "../idl/rug_game.json";
 
-import { uploadMetadataToIpfs, mint, mintGenesis, mintPotion, mintLootBox, updateMeta, payToBackendTx, setProgramTransaction, getMemoInstruction } from "../utils/mint";
-import {burn, burnTx} from '../utils/nftburn'
+import { mintGenesis, mintLootBox, updateMeta, payToBackendTx, setProgramTransaction } from "../utils/mint";
 import api from "../api"
 import * as Const from '../utils/constants'
 
@@ -40,9 +31,6 @@ import {
 } from "@nfteyez/sol-rayz";
 
 const { SystemProgram } = anchor.web3;
-
-const RUG_TOKEN_MINTKEY="Dt7gQrFFWzToJAEUqyMZWb1fRi4M2pLM4o6MDtS57R7e"
-const METADATA_PROGRAM = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s";
 
 export default function Hero({ play, setPlay }) {
   const [isDesktop, setDesktop] = useState(false);
@@ -217,17 +205,12 @@ export default function Hero({ play, setPlay }) {
         let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
         create_tx.add(signatureTx)
   
-        let blockhashObj = await connection.getLatestBlockhash();
-        console.log("blockhashObj", blockhashObj);
-        create_tx.recentBlockhash = blockhashObj.blockhash;
-  
-        const signature = await wallet.sendTransaction(create_tx, connection, {
-          maxRetries: 5
-        });
+        const signature = await wallet.sendTransaction(create_tx, connection);
         await connection.confirmTransaction(signature, "confirmed");
   
         await mintGenesis(wallet, signature)
         fetchData()      
+        closeLoadingModal()
       } else {
         const token = tokens.find((t)=>{
           return t.data.name == Const.GENESIS_NFT_NAME && t.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && t.meta.attributes[0].value < Const.MAX_CHARGE_COUNT
@@ -248,21 +231,17 @@ export default function Hero({ play, setPlay }) {
   
           const signature = await wallet.sendTransaction(create_tx, connection);
   
-          try {
-            await connection.confirmTransaction(signature, "confirmed");
-      
-            console.log('selected genesis to charge', token)
-            //upgrade meta of token
-            let newMeta = token.meta
-            localStorage.setItem("old-charges", newMeta.attributes[0].value)
-            newMeta.attributes[0].value = newMeta.attributes[0].value + 1
-            localStorage.setItem("new-charges", newMeta.attributes[0].value)
-            await updateMeta(token, newMeta, wallet.publicKey, signature)
-            
-            fetchData()
-          } catch(e) {
-            console.log("error", e)
-          }
+          await connection.confirmTransaction(signature, "confirmed");
+    
+          console.log('selected genesis to charge', token)
+          //upgrade meta of token
+          let newMeta = token.meta
+          localStorage.setItem("old-charges", newMeta.attributes[0].value)
+          newMeta.attributes[0].value = newMeta.attributes[0].value + 1
+          localStorage.setItem("new-charges", newMeta.attributes[0].value)
+          await updateMeta(token, wallet.publicKey, signature)
+          
+          fetchData()
           
           //go to success screen
           // router.push('/charge-success')
@@ -377,7 +356,6 @@ export default function Hero({ play, setPlay }) {
       console.log('signature', signature)
       await updateMeta(
         token, 
-        oldMeta, 
         wallet.publicKey, 
         signature
       )
