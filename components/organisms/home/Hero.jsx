@@ -25,6 +25,7 @@ import * as Const from '../utils/constants'
 import Demo from "./Demo.jsx";
 import ChargeSuccess from "./ChargeSuccess";
 import ConsumeChargeConfirm from "./ConsumeChargeConfirm";
+import { NotificationContext } from "contexts/NotificationContext";
 
 import {
   getParsedNftAccountsByOwner,
@@ -48,7 +49,7 @@ export default function Hero({ play, setPlay }) {
   const [showConsumeConfirm, setShowConsumeConfirm] = useState(false);
 
   const { openLoadingModal, closeLoadingModal } = useContext(LoadingContext);
-
+  const { openNotificationModal } = useContext(NotificationContext);
 
   const wallet = useWallet();
   const { publicKey, connected } = useWallet();
@@ -195,10 +196,25 @@ export default function Hero({ play, setPlay }) {
   }
 
   const beatFirstLevel = async()=>{
+    if(await processBeatFirstLevel()) {
+      return
+    }
+    
+    openNotificationModal("Transaction has been failed because of network status is bad. Are you going to try again to get reward?", okBeatFirstLevelCallback, noBeatFirstLevelCallback, true)
+  }
+
+  const okBeatFirstLevelCallback = async () => {
+    beatFirstLevel()
+  }
+  const noBeatFirstLevelCallback = async () => {
+    
+  }
+
+  const processBeatFirstLevel = async() => {
     console.log('called beatFirstLevel', hasGenesis)
     openLoadingModal()
     try {
-      if(!hasGenesis) {
+      if(hasGenesis) {
         let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
         const create_tx = new anchor.web3.Transaction().add(transferInstruction)
         let txSignature = api.randomString(20) //window.crypto.randomUUID()

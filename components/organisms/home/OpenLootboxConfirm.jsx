@@ -1,7 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 import { useState } from "react";
 
-const OpenLootboxConfirm = ({ closeConfirm, openLootbox, selectedNFT }) => {
+import * as Const from '../utils/constants'
+
+
+const OpenLootboxConfirm = ({ closeConfirm, openLootbox, selectedNFT, rrdcNFTCounts }) => {
   let [processing, setProcessing] = useState(false);
   const consumeCharge = async () => {
     // Logic to consume charge
@@ -14,7 +17,7 @@ const OpenLootboxConfirm = ({ closeConfirm, openLootbox, selectedNFT }) => {
   const meta = selectedNFT?.meta
   let nftType = meta?meta.attributes.find(o=>o.trait_type == 'nft').value:'No'
   let beatLevel = meta?meta.attributes.find(o=>o.trait_type == 'level').value:1
-  const requiredCharges = nftType == 'No'?beatLevel:25
+  const requiredCharges = nftType == 'No'?Math.max(beatLevel - rrdcNFTCounts, 0):Math.max(Const.MAX_REQUIRED_CHARGES_COUNT - rrdcNFTCounts, 10)
 
   return (
     <div className="z-[60] fixed inset-0 w-full h-[100vh]">
