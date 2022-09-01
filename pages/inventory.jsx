@@ -47,6 +47,7 @@ export default function BurnRuggedNFTs() {
   const [ruggedAccount, setRuggedAccount] = useState()
   const [mainProgram, setMainProgram] = useState()
   const [rugToken, setRugToken] = useState(0)
+  const [rrdcNFTCounts, setRrdcNFTCounts] = useState(0)
 
   const { connection } = useConnection();
   const wallet = useWallet();
@@ -90,6 +91,8 @@ export default function BurnRuggedNFTs() {
 
     let filteredNfts = nftArray.filter(tokenmeta=>(tokenmeta.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && (tokenmeta.data.name == Const.GENESIS_NFT_NAME || tokenmeta.data.name == Const.LOOTBOX_NFT_NAME || tokenmeta.data.symbol == Const.PLAYABLE_NFT_SYMBOL)))
     
+    let rrdcNFTCounts = nftArray.filter(o=>o.data.symbol == 'RRDC').length
+    setRrdcNFTCounts(rrdcNFTCounts)
     // for(let address of tokenAddresses) {
     //   try {
     //     let tokenmetaPubkey = await metadata.Metadata.getPDA(address);
@@ -249,7 +252,7 @@ export default function BurnRuggedNFTs() {
         
     let beatLevel = meta.attributes.find(o=>o.trait_type == 'level').value
     let nftType = meta.attributes.find(o=>o.trait_type == 'nft').value
-    const requiredCharges = nftType == 'No'?beatLevel:25
+    const requiredCharges = nftType == 'No'?beatLevel:Math.max(Const.MAX_REQUIRED_CHARGES_COUNT - rrdcNFTCounts, 10)
     //if user don't have genesis which has charges, he cannot open lootbox
     let genesisToken = null
     if(hasGenesis) {
@@ -633,6 +636,7 @@ export default function BurnRuggedNFTs() {
                   closeConfirm={closeLootboxConfirm}
                   openLootbox={openLootbox}
                   selectedNFT={selectedNFT}
+                  rrdcNFTCounts={rrdcNFTCounts}
                 />
               }
               {showLootboxNotification && 

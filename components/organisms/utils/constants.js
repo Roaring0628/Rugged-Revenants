@@ -29,6 +29,7 @@ export const PLAYABLE_NFT_SYMBOL = "Real-RR"
 
 export const MAX_GAME_LEVEL = 10
 export const MAX_CHARGE_COUNT = 99
+export const MAX_REQUIRED_CHARGES_COUNT = 25
 export const UPDATE_META_FEE = 10000 //lamports, 0.000005 SOL
 export const TRANSFER_FEE = 10000 //lamports, 0.000005 SOL
 export const MINT_FEE = 6000000 //lamports, 0.00562172 SOL
