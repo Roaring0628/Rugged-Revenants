@@ -17,7 +17,7 @@ const OpenLootboxConfirm = ({ closeConfirm, openLootbox, selectedNFT, rrdcNFTCou
   const meta = selectedNFT?.meta
   let nftType = meta?meta.attributes.find(o=>o.trait_type == 'nft').value:'No'
   let beatLevel = meta?meta.attributes.find(o=>o.trait_type == 'level').value:1
-  const requiredCharges = nftType == 'No'?beatLevel:Math.max(Const.MAX_REQUIRED_CHARGES_COUNT - rrdcNFTCounts, 10)
+  const requiredCharges = nftType == 'No'?Math.max(beatLevel - rrdcNFTCounts, 0):Math.max(Const.MAX_REQUIRED_CHARGES_COUNT - rrdcNFTCounts, 10)
 
   return (
     <div className="z-[60] fixed inset-0 w-full h-[100vh]">
