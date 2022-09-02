@@ -199,7 +199,7 @@ export default function Hero({ play, setPlay }) {
     console.log('called beatFirstLevel', hasGenesis)
     openLoadingModal()
     try {
-      if(hasGenesis) {
+      if(!hasGenesis) {
         let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
         const create_tx = new anchor.web3.Transaction().add(transferInstruction)
         let txSignature = api.randomString(20) //window.crypto.randomUUID()
