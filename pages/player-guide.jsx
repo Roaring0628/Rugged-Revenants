@@ -8,6 +8,7 @@ import WIN2EARN from "components/organisms/player-guide/WIN2EARN";
 import BurnNFT from "components/organisms/player-guide/BurnNFT";
 import SkillStatUpgrades from "components/organisms/player-guide/SkillStatUpgrades";
 import PlayYourWay from "components/organisms/player-guide/PlayYourWay";
+import RugsToRiches from "components/organisms/player-guide/RugsToRiches";
 import Attributes1 from "components/organisms/player-guide/Attributes1";
 import Attributes2 from "components/organisms/player-guide/Attributes2";
 import Attributes3 from "components/organisms/player-guide/Attributes3";
@@ -29,6 +30,7 @@ export default function PlayerGuide() {
       <BurnNFT />
       <SkillStatUpgrades />
       <PlayYourWay />
+      <RugsToRiches />
       <Attributes1 />
       <Attributes2 />
       <Attributes3 />
