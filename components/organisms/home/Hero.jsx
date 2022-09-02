@@ -69,6 +69,7 @@ export default function Hero({ play, setPlay }) {
 
   console.log('hasGenesis', hasGenesis)
   console.log('solBalance', solBalance)
+  console.log('***********version 20220902.01*************')
 
   const tokenOwnershipData = { hasDopeCat, hasPixelBand, hasHippo, hasCyberSamurai, hasSovanaEgg: hasSovanaEgg || hasRRGen1, hasRRGen1, rrGen1MetaArray };
   console.log(tokenOwnershipData);
@@ -196,25 +197,10 @@ export default function Hero({ play, setPlay }) {
   }
 
   const beatFirstLevel = async()=>{
-    if(await processBeatFirstLevel()) {
-      return
-    }
-    
-    openNotificationModal("Transaction has been failed because of network status is bad. Are you going to try again to get reward?", okBeatFirstLevelCallback, noBeatFirstLevelCallback, true)
-  }
-
-  const okBeatFirstLevelCallback = async () => {
-    beatFirstLevel()
-  }
-  const noBeatFirstLevelCallback = async () => {
-    
-  }
-
-  const processBeatFirstLevel = async() => {
     console.log('called beatFirstLevel', hasGenesis)
     openLoadingModal()
     try {
-      if(hasGenesis) {
+      if(!hasGenesis) {
         let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
         const create_tx = new anchor.web3.Transaction().add(transferInstruction)
         let txSignature = api.randomString(20) //window.crypto.randomUUID()
