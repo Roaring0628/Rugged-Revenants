@@ -196,21 +196,6 @@ export default function Hero({ play, setPlay }) {
   }
 
   const beatFirstLevel = async()=>{
-    if(await processBeatFirstLevel()) {
-      return
-    }
-    
-    openNotificationModal("Transaction has been failed because of network status is bad. Are you going to try again to get reward?", okBeatFirstLevelCallback, noBeatFirstLevelCallback, true)
-  }
-
-  const okBeatFirstLevelCallback = async () => {
-    beatFirstLevel()
-  }
-  const noBeatFirstLevelCallback = async () => {
-    
-  }
-
-  const processBeatFirstLevel = async() => {
     console.log('called beatFirstLevel', hasGenesis)
     openLoadingModal()
     try {
