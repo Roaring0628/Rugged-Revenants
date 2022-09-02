@@ -25,7 +25,7 @@ export default function Header() {
             <NavItem link="/#team" text="Team" />
             <NavItem link="/#FAQ" text="FAQ" />
             <NavItem link="/inventory" text="Inventory" />
-            <NavItem link="/whitepaper" text="Whitepaper" />
+            <NavItem link="/player-guide" text="Player Guide" />
             <li>
               <a
                 target="_blank"
@@ -108,8 +108,8 @@ export default function Header() {
               click={setHamburgerOpen}
             />
             <MobileNavItem
-              link="/whitepaper"
-              text="Whitepaper"
+              link="/player-guide"
+              text="Player Guide"
               click={setHamburgerOpen}
             />
             <li className="border-b border-white border-opacity-10">
