@@ -6,6 +6,8 @@ import PlayableNFT from "components/organisms/player-guide/PlayableNFT";
 import UpgradeSystem from "components/organisms/player-guide/UpgradeSystem";
 import WIN2EARN from "components/organisms/player-guide/WIN2EARN";
 import BurnNFT from "components/organisms/player-guide/BurnNFT";
+import SkillStatUpgrades from "components/organisms/player-guide/SkillStatUpgrades";
+import PlayYourWay from "components/organisms/player-guide/PlayYourWay";
 import Attributes1 from "components/organisms/player-guide/Attributes1";
 import Attributes2 from "components/organisms/player-guide/Attributes2";
 import Attributes3 from "components/organisms/player-guide/Attributes3";
@@ -25,6 +27,8 @@ export default function PlayerGuide() {
       <UpgradeSystem />
       <WIN2EARN />
       <BurnNFT />
+      <SkillStatUpgrades />
+      <PlayYourWay />
       <Attributes1 />
       <Attributes2 />
       <Attributes3 />
