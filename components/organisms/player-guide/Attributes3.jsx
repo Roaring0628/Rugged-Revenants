@@ -16,6 +16,9 @@ export default function Attributes3() {
               </h1>
             </div>
             <img src="/media/player-guide/attr3.png" alt="" />
+            <p className="py-2 px-2 text-center text-[0.7rem] leading-[1rem] block sm:hidden text-black">
+              (Please use tablet or desktop to see this guide.)
+            </p>
           </div>
         </div>
       </section>
