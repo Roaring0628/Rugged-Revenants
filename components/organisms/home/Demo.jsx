@@ -48,7 +48,8 @@ const Demo = ({
     // For new build of game: Need to update loaderUrl, and download build files and replace them
     // Live loaderUrl
     let loaderUrl =
-      "https://v6p9d9t4.ssl.hwcdn.net/html/6362262/RuggedWebGL/Build/RuggedWebGL.loader.js";
+      // "https://v6p9d9t4.ssl.hwcdn.net/html/6362262/RuggedWebGL/Build/RuggedWebGL.loader.js";
+      "https://v6p9d9t4.ssl.hwcdn.net/html/6464308/RuggedRevenants/Build/RuggedRevenants.loader.js";
     // Test purpose loaderUrl
     // let loaderUrl =
     //   "https://v6p9d9t4.ssl.hwcdn.net/html/6329858/RuggedWebGLTesting/Build/RuggedWebGLTesting.loader.js";
@@ -60,9 +61,12 @@ const Demo = ({
       window
         .createUnityInstance(document.querySelector("#unity-canvas"), {
           // Live build files
-          dataUrl: "/Build/RuggedWebGL.data.unityweb",
-          frameworkUrl: "/Build/RuggedWebGL.framework.js.unityweb",
-          codeUrl: "/Build/RuggedWebGL.wasm.unityweb",
+          // dataUrl: "/Build/RuggedWebGL.data.unityweb",
+          // frameworkUrl: "/Build/RuggedWebGL.framework.js.unityweb",
+          // codeUrl: "/Build/RuggedWebGL.wasm.unityweb",
+          dataUrl: "/Build/RuggedRevenants.data.unityweb",
+          frameworkUrl: "/Build/RuggedRevenants.framework.js.unityweb",
+          codeUrl: "/Build/RuggedRevenants.wasm.unityweb",
           // Test purpose files
           // dataUrl: "/Build/RuggedWebGLTesting.data.unityweb",
           // frameworkUrl: "/Build/RuggedWebGLTesting.framework.js.unityweb",

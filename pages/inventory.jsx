@@ -325,6 +325,32 @@ export default function BurnRuggedNFTs() {
     }
   };
 
+  const consumeSolForCharges = async (token) => {
+    console.log('consumeSolForCharges', token);
+    anchor.setProvider(provider);
+
+    try {
+      let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.SOL_ACCOUNT_PUBKEY), Const.SOL_AMOUNT_FOR_CHARGES);
+
+      const create_tx = new anchor.web3.Transaction().add(transferInstruction)
+      let txSignature = api.randomString(20) //window.crypto.randomUUID()
+      let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
+      create_tx.add(signatureTx)
+      const signature = await wallet.sendTransaction(create_tx, connection);
+      await connection.confirmTransaction(signature, "confirmed");
+
+      //update meta
+      token.attributes[0].value = Const.MAX_CHARGE_COUNT
+      await updateMeta(token, wallet.publicKey, signature)
+
+      await fetchData()
+      return true
+    } catch(e) {
+      console.log('error', e)
+      return false
+    }
+  };
+
   const chargeGenesisNFT = (token) => {
     // TODO - Logic to charge Genesis NFT
     console.log(token);

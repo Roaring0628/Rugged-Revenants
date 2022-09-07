@@ -69,7 +69,7 @@ export default function Hero({ play, setPlay }) {
 
   console.log('hasGenesis', hasGenesis)
   console.log('solBalance', solBalance)
-  console.log('***********version 20220902.01*************')
+  console.log('***********version 20220907.01*************')
 
   const tokenOwnershipData = { hasDopeCat, hasPixelBand, hasHippo, hasCyberSamurai, hasSovanaEgg: hasSovanaEgg || hasRRGen1, hasRRGen1, rrGen1MetaArray };
   console.log(tokenOwnershipData);
@@ -90,7 +90,7 @@ export default function Hero({ play, setPlay }) {
 
   const updateTokenMetas = async (tokens) => {
     tokens = await Promise.all(tokens.map(async (token)=>{
-      if(token.updateAuthority == Const.NFT_ACCOUNT_PUBKEY) {
+      if(token.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && token.data.name == Const.GENESIS_NFT_NAME) {
         const meta = await axios.get(api.get1KinUrl(token.data.uri))
         return {...token, meta: meta.data}
       } else if (token.data && token.data.symbol == 'RRDC') {
@@ -101,7 +101,7 @@ export default function Hero({ play, setPlay }) {
       }
     }))
 
-    console.log('updateTokenMetas', tokens)
+    // console.log('updateTokenMetas', tokens)
     setTokens(tokens)
   }
 
@@ -119,9 +119,9 @@ export default function Hero({ play, setPlay }) {
     }); 
 
     console.log('tokens', nftArray.length, Date.now() - timeStart)
-    for(let item of nftArray) {
-      console.log('item', item)
-    }
+    // for(let item of nftArray) {
+    //   console.log('item', item)
+    // }
     setTokens(nftArray)
     await updateTokenMetas(nftArray)
     setGotTokens(true);

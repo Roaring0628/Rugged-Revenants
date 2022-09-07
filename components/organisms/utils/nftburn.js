@@ -78,19 +78,36 @@ export async function burn(tokenMintAddress, owner, wallet, connection, amount) 
     }
 }
 
+// export async function burnTx(tokenMintAddress, owner, wallet, connection, amount) {
+
+//     const fromTokenAccount = await getOrCreateAssociatedTokenAccount(connection, wallet, new PublicKey(tokenMintAddress), wallet.publicKey);
+//     const toTokenAccount = await api.getOrCreateAssociatedBurnTokenAccount(tokenMintAddress);
+//     console.log('fromTokenAccount, toTokenAccount', fromTokenAccount.address.toBase58(), toTokenAccount.result)
+
+//     return createTransferInstruction(
+//       fromTokenAccount.address, // source
+//       // toTokenAccount.address, // dest
+//       new PublicKey(toTokenAccount.result),
+//       wallet.publicKey,
+//       1,
+//       [],
+//       TOKEN_PROGRAM_ID
+//    )
+// }
+
 export async function burnTx(tokenMintAddress, owner, wallet, connection, amount) {
+  const mintPublickey = new PublicKey(tokenMintAddress);
+  const associatedAddress = await getAssociatedTokenAddress(
+      mintPublickey,
+      owner,
+  );
 
-    const fromTokenAccount = await getOrCreateAssociatedTokenAccount(connection, wallet, new PublicKey(tokenMintAddress), wallet.publicKey);
-    const toTokenAccount = await api.getOrCreateAssociatedBurnTokenAccount(tokenMintAddress);
-    console.log('fromTokenAccount, toTokenAccount', fromTokenAccount.address.toBase58(), toTokenAccount.result)
-
-    return createTransferInstruction(
-      fromTokenAccount.address, // source
-      // toTokenAccount.address, // dest
-      new PublicKey(toTokenAccount.result),
-      wallet.publicKey,
-      1,
+  return await createBurnInstruction(
+      associatedAddress,
+      mintPublickey,
+      owner,
+      amount,
       [],
-      TOKEN_PROGRAM_ID
-   )
+      TOKEN_PROGRAM_ID,
+  );
 }
