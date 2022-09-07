@@ -239,7 +239,7 @@ export default function Hero({ play, setPlay }) {
           //upgrade meta of token
           let newMeta = token.meta
           localStorage.setItem("old-charges", newMeta.attributes[0].value)
-          newMeta.attributes[0].value = 99 //newMeta.attributes[0].value + 1
+          newMeta.attributes[0].value = newMeta.attributes[0].value + 1
           localStorage.setItem("new-charges", newMeta.attributes[0].value)
           await updateMeta(token, wallet.publicKey, signature)
           
