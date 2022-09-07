@@ -90,7 +90,7 @@ export default function Hero({ play, setPlay }) {
 
   const updateTokenMetas = async (tokens) => {
     tokens = await Promise.all(tokens.map(async (token)=>{
-      if(token.updateAuthority == Const.NFT_ACCOUNT_PUBKEY) {
+      if(token.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && token.data.name == Const.GENESIS_NFT_NAME) {
         const meta = await axios.get(api.get1KinUrl(token.data.uri))
         return {...token, meta: meta.data}
       } else if (token.data && token.data.symbol == 'RRDC') {
@@ -101,7 +101,7 @@ export default function Hero({ play, setPlay }) {
       }
     }))
 
-    console.log('updateTokenMetas', tokens)
+    // console.log('updateTokenMetas', tokens)
     setTokens(tokens)
   }
 
@@ -119,9 +119,9 @@ export default function Hero({ play, setPlay }) {
     }); 
 
     console.log('tokens', nftArray.length, Date.now() - timeStart)
-    for(let item of nftArray) {
-      console.log('item', item)
-    }
+    // for(let item of nftArray) {
+    //   console.log('item', item)
+    // }
     setTokens(nftArray)
     await updateTokenMetas(nftArray)
     setGotTokens(true);
@@ -239,7 +239,7 @@ export default function Hero({ play, setPlay }) {
           //upgrade meta of token
           let newMeta = token.meta
           localStorage.setItem("old-charges", newMeta.attributes[0].value)
-          newMeta.attributes[0].value = newMeta.attributes[0].value + 1
+          newMeta.attributes[0].value = 99 //newMeta.attributes[0].value + 1
           localStorage.setItem("new-charges", newMeta.attributes[0].value)
           await updateMeta(token, wallet.publicKey, signature)
           
