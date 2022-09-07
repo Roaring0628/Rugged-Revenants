@@ -28,7 +28,7 @@ const OpenLootboxConfirm = ({ closeConfirm, openLootbox, selectedNFT, rrdcNFTCou
           alt="warning back"
           className="absolute top-0 left-0 w-full h-full"
         />
-        <div className="relative px-12 pt-24 pb-4 text-center">
+        {requiredCharges > 0 && <div className="relative px-12 pt-24 pb-4 text-center">
           OPENING THIS LOOT WILL CONSUME{" "}
           <span className="underline">{requiredCharges} {requiredCharges>1?'CHARGES':'CHARGE'}</span>   FROM ONE OF YOUR GENESIS NFTS.
           <br />
@@ -36,7 +36,15 @@ const OpenLootboxConfirm = ({ closeConfirm, openLootbox, selectedNFT, rrdcNFTCou
           <span className="text-sm ">
             {"<"}Will you proceed?{">"}
           </span>
-        </div>
+        </div>}
+        {requiredCharges == 0 && <div className="relative px-12 pt-24 pb-4 text-center">
+          OPENING THIS LOOT WILL NOT CONSUME CHARGE FROM ONE OF YOUR GENESIS NFTS.
+          <br />
+          <br />
+          <span className="text-sm ">
+            {"<"}Will you proceed?{">"}
+          </span>
+        </div>}
         <div className="flex justify-center pb-8 gap-8">
           <button
             className="w-32 h-10 relative flex justify-center items-center cursor-pointer border-2 border-[#ED1C24]"
