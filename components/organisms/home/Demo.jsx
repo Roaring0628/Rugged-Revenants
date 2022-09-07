@@ -23,29 +23,27 @@ const Demo = ({
   const [isWin, setIsWin] = useState(false);
   const { openNotificationModal } = useContext(NotificationContext);
 
+  const handleMessage = (event) => {
+    if (event.origin !== window.location.origin) return;
+
+    if (
+      event.data &&
+      typeof event.data === "object" &&
+      event.data.key === "htc4mc3piwgxupacohjtjjhseuaubqu9"
+    ) {
+      // console.log("========= UNITY MESSAGE =========");
+      // console.log(event.data);
+
+      handleGameResult(
+        event.data.type,
+        event.data.level,
+        event.data.sessionID
+      );
+    }
+  }
+
   useEffect(() => {
-    window.addEventListener(
-      "message",
-      (event) => {
-        if (event.origin !== window.location.origin) return;
-
-        if (
-          event.data &&
-          typeof event.data === "object" &&
-          event.data.key === "htc4mc3piwgxupacohjtjjhseuaubqu9"
-        ) {
-          // console.log("========= UNITY MESSAGE =========");
-          // console.log(event.data);
-
-          handleGameResult(
-            event.data.type,
-            event.data.level,
-            event.data.sessionID
-          );
-        }
-      },
-      false
-    );
+    window.addEventListener("message", handleMessage);
 
     // For new build of game: Need to update loaderUrl, and download build files and replace them
     // Live loaderUrl
@@ -85,6 +83,10 @@ const Demo = ({
         });
     };
     document.body.appendChild(script);
+
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
