@@ -31,8 +31,11 @@ const Demo = ({
       typeof event.data === "object" &&
       event.data.key === "htc4mc3piwgxupacohjtjjhseuaubqu9"
     ) {
-      // console.log("========= UNITY MESSAGE =========");
-      // console.log(event.data);
+      console.log("========= UNITY MESSAGE =========");
+      console.log({
+        type: event.data.type,
+        level: event.data.level,
+      });
 
       handleGameResult(
         event.data.type,
@@ -49,7 +52,7 @@ const Demo = ({
     // Live loaderUrl
     let loaderUrl =
       // "https://v6p9d9t4.ssl.hwcdn.net/html/6362262/RuggedWebGL/Build/RuggedWebGL.loader.js";
-      "https://v6p9d9t4.ssl.hwcdn.net/html/6464308/RuggedRevenants/Build/RuggedRevenants.loader.js";
+      "https://v6p9d9t4.ssl.hwcdn.net/html/6474765/RuggedRevenants/Build/RuggedRevenants.loader.js";
     // Test purpose loaderUrl
     // let loaderUrl =
     //   "https://v6p9d9t4.ssl.hwcdn.net/html/6329858/RuggedWebGLTesting/Build/RuggedWebGLTesting.loader.js";
@@ -125,18 +128,18 @@ const Demo = ({
     if (type == "level" && currentLevel == 1) {
       // Handle 5% of the time the users beat level 1
       const response = await axios.get(`https://us-central1-rugged-revenants.cloudfunctions.net/levelWon?id=${sessionID}`)
-      console.log(response.data)
+      console.log('valdiation api check result', response.data)
       if (response.data !== true && response.data !== 'true') return
       openChest();
     } else if(type == "die" || type == "win") {
       if (type == "win") {
         const response = await axios.get(`https://us-central1-rugged-revenants.cloudfunctions.net/checkHasWon?id=${sessionID}`)
-        console.log(response.data)
+        console.log('valdiation api check result', response.data)
         if (response.data !== true && response.data !== 'true') return
       }
       if (type == "die") {
         const response = await axios.get(`https://us-central1-rugged-revenants.cloudfunctions.net/playerDied?id=${sessionID}`)
-        console.log(response.data)
+        console.log('valdiation api check result', response.data)
         if (response.data !== true && response.data !== 'true') return
       }
       if(currentLevel > 1 || type == "win") { // now, when the user clear all levels, i don't get level number
