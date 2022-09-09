@@ -49,7 +49,7 @@ const Demo = ({
     // Live loaderUrl
     let loaderUrl =
       // "https://v6p9d9t4.ssl.hwcdn.net/html/6362262/RuggedWebGL/Build/RuggedWebGL.loader.js";
-      "https://v6p9d9t4.ssl.hwcdn.net/html/6465282/RuggedRevenants/Build/RuggedRevenants.loader.js";
+      "https://v6p9d9t4.ssl.hwcdn.net/html/6470478/RuggedRevenants/Build/RuggedRevenants.loader.js";
     // Test purpose loaderUrl
     // let loaderUrl =
     //   "https://v6p9d9t4.ssl.hwcdn.net/html/6329858/RuggedWebGLTesting/Build/RuggedWebGLTesting.loader.js";
