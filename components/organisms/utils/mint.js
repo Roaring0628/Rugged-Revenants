@@ -8,6 +8,12 @@ export const updateMeta = async (token, playerAccount, txId)=>{
   return ret
 }
 
+export const updateGenesis = async (token, playerAccount, chargedAmount, txId)=>{
+  let ret = await api.updateGenesisNftMetaData({token, playerAccount, chargedAmount, txId})
+  console.log('ret', ret)
+  return ret
+}
+
 export const mintGenesis = async (wallet, txId) => {
   let ret = await api.mintGenesisNft({playerKey: wallet.publicKey, txId})
   console.log('mint result from api', ret)
