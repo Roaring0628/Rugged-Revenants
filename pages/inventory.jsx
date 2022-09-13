@@ -80,6 +80,16 @@ export default function BurnRuggedNFTs() {
     setAllTokens(tokens)
   }
 
+  const refreshGenesisTokenMetas = async (tokens) => {
+    tokens = tokens.filter(token => token.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && token.data.name == Const.GENESIS_NFT_NAME)
+    tokens = await Promise.all(tokens.map(async (token)=>{
+      const meta = await axios.get(api.get1KinUrl(token.data.uri))
+        return {...token, meta: meta.data}
+    }))
+
+    return tokens
+  }
+
   const fetchData = async () => {
     let walletInfo = await connection.getAccountInfo(provider.wallet.publicKey)
     console.log("walletInfo", walletInfo)
@@ -255,8 +265,9 @@ export default function BurnRuggedNFTs() {
     const requiredCharges = nftType == 'No'?Math.max(beatLevel - rrdcNFTCounts, 0):Math.max(Const.MAX_REQUIRED_CHARGES_COUNT - rrdcNFTCounts, 10)
     //if user don't have genesis which has charges, he cannot open lootbox
     let genesisToken = null
-    if(hasGenesis) {
-      genesisToken = allTokens.find(o=>o.data.name == Const.GENESIS_NFT_NAME && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && o.meta.attributes[0].value >= requiredCharges)
+    let genesisTokens = await refreshGenesisTokenMetas(allTokens)
+    if(genesisTokens && genesisTokens.length > 0) {
+      genesisToken = genesisTokens.find(o=>o.meta.attributes[0].value >= requiredCharges)
       if(!genesisToken) {
         openNotificationModal("You don't have enough charges to open lootbox", ()=>{}, ()=>{}, false)
         return true
@@ -274,15 +285,15 @@ export default function BurnRuggedNFTs() {
     let burnInstruction = await burnTx(token.mint, provider.wallet.publicKey, wallet, connection, 1)
     const create_tx = new anchor.web3.Transaction().add(burnInstruction)
 
-    let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.BACKEND_ACCOUNT_PUBKEY), Const.MINT_FEE);
-    create_tx.add(transferInstruction)
-
-    transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE + Const.MINT_FEE);
+    let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.BACKEND_ACCOUNT_PUBKEY), Const.MINT_FEE + Const.UPDATE_META_FEE);
     create_tx.add(transferInstruction)
 
     if(nftType != 'No') 
     {
       transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.PREMIUM_ACCOUNT_PUBKEY), Const.MINT_FEE);
+      create_tx.add(transferInstruction)
+    } else {
+      transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
       create_tx.add(transferInstruction)
     }
 
@@ -305,7 +316,8 @@ export default function BurnRuggedNFTs() {
         beatLevel,
         nftType,
         txId: signature,
-        genesisToken,
+        genesisToken: genesisToken.mint,
+        requiredCharges,
       })
 
       let {rugTokenAmount, potionAmount, hasPremium} = openResult.result

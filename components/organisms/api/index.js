@@ -90,6 +90,17 @@ export default {
             })
         })
     },
+    async updateGenesisNftMetaData(data){
+        return new Promise((resolve, reject)=>{
+            this.baseApi('/players/updateGenesisNftMetaData', 'POST', data, true, (err, ret)=>{
+                if(err) {
+                    reject()
+                } else {
+                    resolve(ret)
+                }
+            })
+        })
+    },
     async updatePlayableNftMeta(data){
         return new Promise((resolve, reject)=>{
             this.baseApi('/players/updatePlayableNftMeta', 'POST', data, true, (err, ret)=>{
@@ -158,7 +169,7 @@ export default {
     },
     async openLootBox(data){
         return new Promise((resolve, reject)=>{
-            this.baseApi('/players/openLootBox', 'POST', data, true, (err, ret)=>{
+            this.baseApi('/players/openLootBox2', 'POST', data, true, (err, ret)=>{
                 if(err) {
                     reject()
                 } else {

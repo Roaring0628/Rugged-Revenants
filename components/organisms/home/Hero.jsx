@@ -18,7 +18,7 @@ import axios from 'axios'
 
 import RugGameIdl from "../idl/rug_game.json";
 
-import { mintGenesis, mintLootBox, updateMeta, payToBackendTx, setProgramTransaction } from "../utils/mint";
+import { mintGenesis, mintLootBox, updateMeta, payToBackendTx, setProgramTransaction, updateGenesis } from "../utils/mint";
 import api from "../api"
 import * as Const from '../utils/constants'
 
@@ -64,8 +64,6 @@ export default function Hero({ play, setPlay }) {
   const hasCyberSamurai = tokens.filter(o=>o.data.symbol == 'CSAMURAI'||o.data.symbol == 'CSCOMIC'||o.data.name.startsWith("Cyber Samurai")).length > 0
   const hasRRGen1 = tokens.filter(o=>o.data.symbol == 'RRDC').length > 0
   const rrGen1MetaArray = tokens.filter(o=>o.data.symbol == 'RRDC')
-
-  // const burnAvailable = !hasGenesis || tokens.filter(o=>o.meta && o.meta.attributes[0].value < 3).length > 0
 
   console.log('hasGenesis', hasGenesis)
   console.log('solBalance', solBalance)
@@ -196,11 +194,22 @@ export default function Hero({ play, setPlay }) {
     })
   }
 
+  const refreshGenesisTokenMetas = async (tokens) => {
+    tokens = tokens.filter(token => token.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && token.data.name == Const.GENESIS_NFT_NAME)
+    tokens = await Promise.all(tokens.map(async (token)=>{
+      const meta = await axios.get(api.get1KinUrl(token.data.uri))
+        return {...token, meta: meta.data}
+    }))
+
+    return tokens
+  }
+
   const beatFirstLevel = async()=>{
     console.log('called beatFirstLevel', hasGenesis)
     openLoadingModal()
     try {
-      if(!hasGenesis) {
+      let genesisTokens = await refreshGenesisTokenMetas(tokens)
+      if(!genesisTokens || genesisTokens.length == 0) {
         let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
         const create_tx = new anchor.web3.Transaction().add(transferInstruction)
         let txSignature = api.randomString(20) //window.crypto.randomUUID()
@@ -214,8 +223,8 @@ export default function Hero({ play, setPlay }) {
         fetchData()      
         closeLoadingModal()
       } else {
-        const token = tokens.find((t)=>{
-          return t.data.name == Const.GENESIS_NFT_NAME && t.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && t.meta.attributes[0].value < Const.MAX_CHARGE_COUNT
+        const token = genesisTokens.find((t)=>{
+          return t.meta.attributes[0].value < Const.MAX_CHARGE_COUNT
         })
   
         if(token) {
@@ -238,11 +247,11 @@ export default function Hero({ play, setPlay }) {
           console.log('selected genesis to charge', token)
           //upgrade meta of token
           let newMeta = token.meta
-          localStorage.setItem("old-charges", newMeta.attributes[0].value)
           newMeta.attributes[0].value = newMeta.attributes[0].value + 1
-          localStorage.setItem("new-charges", newMeta.attributes[0].value)
-          await updateMeta(token, wallet.publicKey, signature)
-          
+          let ret = await updateGenesis(token.mint, wallet.publicKey, 1, signature)
+          console.log('updateGenesis result', ret)
+          localStorage.setItem("old-charges", ret.oldCharges)
+          localStorage.setItem("new-charges", ret.newCharges)
           fetchData()
           
           //go to success screen
@@ -301,13 +310,14 @@ export default function Hero({ play, setPlay }) {
     setDesktop(window.innerWidth > 1023);
   };
 
-  const handlePlay = () => {
+  const handlePlay = async () => {
     setCharged(false)
     if (!play) {
       document.body.style.overflow = "hidden";
-      // if(hasGenesis && !charged) {
-      if(hasGenesis) {
-        if(tokens.find(o=>o.data.name == Const.GENESIS_NFT_NAME && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && o.meta.attributes[0].value > 0)) {
+      let genesisTokens = await refreshGenesisTokenMetas(tokens)
+      console.log('genesisTokens', genesisTokens)
+      if(genesisTokens && genesisTokens.length > 0) {
+        if(genesisTokens.find(o=>o.meta.attributes[0].value > 0)) {
           openConsumeConfirm();
         } else {
           setPlay(true);
@@ -328,8 +338,14 @@ export default function Hero({ play, setPlay }) {
   const chargeForLootBox = async () => {
     openLoadingModal()
 
-    let token = tokens.find((t)=>{
-      return t.data.name == Const.GENESIS_NFT_NAME && t.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && t.meta.attributes[0].value > 0
+    let genesisTokens = await refreshGenesisTokenMetas(tokens)
+    if(!genesisTokens || genesisTokens.length == 0) {
+      closeLoadingModal()
+      return
+    }
+
+    let token = genesisTokens.find((t)=>{
+      return t.meta.attributes[0].value > 0
     })
 
     console.log('chargeForLootBox', token)
@@ -356,11 +372,15 @@ export default function Hero({ play, setPlay }) {
       await connection.confirmTransaction(signature, "confirmed");
 
       console.log('signature', signature)
-      await updateMeta(
-        token, 
-        wallet.publicKey, 
-        signature
-      )
+
+      let ret = await updateGenesis(token.mint, wallet.publicKey, -1, signature)
+      console.log('updateGenesis result', ret)
+
+      // await updateMeta(
+      //   token, 
+      //   wallet.publicKey, 
+      //   signature
+      // )
 
       setCharged(true)
       closeLoadingModal()
