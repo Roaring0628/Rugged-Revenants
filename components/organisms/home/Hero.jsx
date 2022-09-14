@@ -47,6 +47,7 @@ export default function Hero({ play, setPlay }) {
 
   const [showChargeSuccess, setShowChargeSuccess] = useState(false);
   const [showConsumeConfirm, setShowConsumeConfirm] = useState(false);
+  const [gameId, setGameId] = useState();
 
   const { openLoadingModal, closeLoadingModal } = useContext(LoadingContext);
   const { openNotificationModal } = useContext(NotificationContext);
@@ -408,6 +409,27 @@ export default function Hero({ play, setPlay }) {
     setShowChargeSuccess(false);
   };
 
+  const createGameSession = () => {
+    console.log('createGameSession')
+    api.createGameSession({
+      player: wallet?wallet.publicKey:undefined,
+      start_time: new Date(),
+    }, (ret, err)=>{
+      if(ret) {
+        setGameId(ret.id)
+      }
+    })
+  }
+
+  const endGameSession = () => {
+    console.log('endGameSession', gameId)
+    if(gameId) {
+      api.updateGameSession(gameId, {
+        end_time: new Date(),
+      })
+    }
+  }
+
   return (
     <>
       <section id="hero" className="mt-28 scroll-mt-28">
@@ -490,6 +512,8 @@ export default function Hero({ play, setPlay }) {
               hasGenesis={hasGenesis}
               tokenOwnershipData={tokenOwnershipData}
               solBalance={solBalance}
+              createGameSession={createGameSession}
+              endGameSession={endGameSession}
             />
           </div>
         )}
