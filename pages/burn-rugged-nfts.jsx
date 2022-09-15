@@ -266,7 +266,7 @@ export default function BurnRuggedNFTs() {
       await connection.confirmTransaction(signature, "confirmed");
 
       //update meta
-      let ret = await updateGenesis(genesisToken.mint, wallet.publicKey, 3, signature)
+      let ret = await updateGenesis(genesisToken.mint, wallet.publicKey, 1, signature)
       console.log('updateGenesis result', ret)
       localStorage.setItem("old-charges", ret.oldCharges)
       localStorage.setItem("new-charges", ret.newCharges)
@@ -357,7 +357,7 @@ export default function BurnRuggedNFTs() {
                     alt="flame"
                     className="absolute top-0 left-0 w-full h-full"
                   />
-                  <span className="text-lg">3 Charges</span>
+                  <span className="text-lg">1 Charge</span>
                 </div>
                 {genesisToken && <span className="text-[0.7rem] tracking-tighter">
                   Total Charges : {genesisToken.meta.attributes[0].value}
