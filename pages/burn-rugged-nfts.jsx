@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import NextImage from "next/image";
 import Link from "next/link";
 import axios from "axios";
@@ -11,11 +11,13 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import * as anchor from "@project-serum/anchor";
 import { Program } from "@project-serum/anchor";
 import { useRouter } from 'next/router';
+import { LoadingContext } from "contexts/LoadingContext";
+
 import {PublicKey, sendAndConfirmTransaction} from "@solana/web3.js";
 
 import RugGameIdl from "../components/organisms/idl/rug_game.json";
 
-import { mintGenesis, updateMeta, payToBackendTx, setProgramTransaction } from "../components/organisms/utils/mint";
+import { mintGenesis, updateMeta, payToBackendTx, setProgramTransaction, updateGenesis } from "../components/organisms/utils/mint";
 import {burn, burnTx} from '../components/organisms/utils/nftburn'
 import api from "../components/organisms/api"
 import * as Const from '../components/organisms/utils/constants'
@@ -39,6 +41,7 @@ export default function BurnRuggedNFTs() {
   const [ruggedAccount, setRuggedAccount] = useState()
   const [mainProgram, setMainProgram] = useState()
   const [selectedGenesisNft, setSelectedGenesisNft] = useState()
+  const { openLoadingModal, closeLoadingModal } = useContext(LoadingContext);
 
   const { connection } = useConnection();
   const wallet = useWallet();
@@ -96,7 +99,7 @@ export default function BurnRuggedNFTs() {
         } else if(whitelist.indexOf(tokenmeta.updateAuthority) != -1) {
           ruggedNftCandidates.push({
             authority: tokenmeta.updateAuthority,
-            address: address
+            address: tokenmeta.mint
           })
           tokens.push(tokenmeta)
         } 
@@ -227,56 +230,54 @@ export default function BurnRuggedNFTs() {
     setSelectedNFT(token);
   };
 
+  const refreshGenesisTokenMetas = async (tokens) => {
+    tokens = tokens.filter(token => token.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && token.data.name == Const.GENESIS_NFT_NAME)
+    tokens = await Promise.all(tokens.map(async (token)=>{
+      const meta = await axios.get(api.get1KinUrl(token.data.uri))
+        return {...token, meta: meta.data}
+    }))
+
+    return tokens
+  }
+
   const burnSelectedNFT = async (token) => {
+    let genesisTokens = await refreshGenesisTokenMetas(allTokens)
+    let genesisToken = selectedGenesisNft?genesisTokens.find(o=>o.mint == selectedGenesisNft):
+    genesisTokens.find(o=>o.data.name == Const.GENESIS_NFT_NAME && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && o.meta.attributes[0].value < Const.MAX_CHARGE_COUNT)
+
+    if(!genesisToken) return
+
+    openLoadingModal()
     // TODO - Logic to burn selected NFT
-    console.log(token);
+    console.log(token, genesisToken);
     anchor.setProvider(provider);
-    let burnTransaction = await burnTx(token.mint, provider.wallet.publicKey, wallet, connection, 1)
-
+    
     try {
-      if(hasGenesis) {
-        let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
-  
-        const create_tx = new anchor.web3.Transaction().add(transferInstruction, burnTransaction)
+      let burnTransaction = await burnTx(token.mint, provider.wallet.publicKey, wallet, connection, 1)
+      let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
 
-        let blockhashObj = await connection.getLatestBlockhash();
-        console.log("blockhashObj", blockhashObj);
-        create_tx.recentBlockhash = blockhashObj.blockhash;
+      const create_tx = new anchor.web3.Transaction().add(transferInstruction, burnTransaction)
+      
+      let txSignature = api.randomString(20) //window.crypto.randomUUID()
+      let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
+      create_tx.add(signatureTx)
 
-        const signature = await wallet.sendTransaction(create_tx, connection);
-        await connection.confirmTransaction(signature, "confirmed");
-  
-        //update meta
-        let oldToken = allTokens.find(o=>o.data.name == Const.GENESIS_NFT_NAME && o.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && o.meta.attributes[0].value < Const.MAX_CHARGE_COUNT)
-        if(!oldToken) return
-        let oldMeta = oldToken.meta
-        oldMeta.attributes[0].value = oldMeta.attributes[0].value + 3
-        await updateMeta(oldToken, wallet.publicKey, signature)
-  
-        localStorage.setItem("old-charges", oldMeta.attributes[0].value - 3)
-        localStorage.setItem("new-charges", oldMeta.attributes[0].value)
-        router.push('/charge-success')
-      } else {
-        let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
-  
-        const create_tx = new anchor.web3.Transaction().add(transferInstruction, burnTransaction)
-        let txSignature = api.randomString(20) //window.crypto.randomUUID()
-        let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
-        create_tx.add(signatureTx)
-        
-        let blockhashObj = await connection.getLatestBlockhash();
-        console.log("blockhashObj", blockhashObj);
-        create_tx.recentBlockhash = blockhashObj.blockhash;
+      const signature = await wallet.sendTransaction(create_tx, connection);
+      await connection.confirmTransaction(signature, "confirmed");
 
-        const signature = await wallet.sendTransaction(create_tx, connection);
-        await connection.confirmTransaction(signature, "confirmed");
-        
-        //mint genesis
-        await mintGenesis(wallet, signature)
-      }
+      //update meta
+      let ret = await updateGenesis(genesisToken.mint, wallet.publicKey, 3, signature)
+      console.log('updateGenesis result', ret)
+      localStorage.setItem("old-charges", ret.oldCharges)
+      localStorage.setItem("new-charges", ret.newCharges)
+
+      router.push('/charge-success')
       await fetchData(whitelist)
+
+      closeLoadingModal()
     } catch(e) {
       console.log('error', e)
+      closeLoadingModal()
     }
   };
 
@@ -366,10 +367,10 @@ export default function BurnRuggedNFTs() {
                 src="/media/inventory/Inventory_Page/ui_inventory_burnbutton.png"
                 alt="flame"
                 className={classNames("w-56 cursor-pointer", {
-                  "opacity-60": !selectedNFT,
+                  "opacity-60": !selectedNFT || !genesisToken,
                 })}
                 onClick={() => {
-                  if (selectedNFT) {
+                  if (selectedNFT && genesisToken) {
                     burnSelectedNFT(selectedNFT);
                   }
                 }}
