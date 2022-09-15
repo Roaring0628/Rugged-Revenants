@@ -6,6 +6,7 @@ import GameWinner from "./GameWinner";
 import GameWinnerLootbox from "./GameWinnerLootbox";
 import { useContext } from 'react';
 import { NotificationContext } from "contexts/NotificationContext";
+import api from "../api";
 
 const Demo = ({
   handlePlay,
@@ -14,6 +15,8 @@ const Demo = ({
   tokenOwnershipData,
   solBalance,
   endGame,
+  createGameSession,
+  endGameSession,
 }) => {
   const [myGameInstance, setMyGameInstance] = useState(null);
   const myGameInstanceRef = useRef();
@@ -88,6 +91,8 @@ const Demo = ({
           setMyGameInstance(unityInstance);
           myGameInstanceRef.current = unityInstance;
         });
+
+        createGameSession()
     };
     document.body.appendChild(script);
 
@@ -173,6 +178,8 @@ const Demo = ({
   }
 
   const quitGame = () => {
+    endGameSession()
+
     if (myGameInstance) myGameInstance.Quit();
     const scriptEl = document.querySelector("#demo-game-script");
     if (scriptEl) scriptEl.remove();

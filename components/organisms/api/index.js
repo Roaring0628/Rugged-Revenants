@@ -178,6 +178,40 @@ export default {
             })
         })
     },
+    async createGameSession(data, cb){
+        return new Promise((resolve, reject)=>{
+            this.baseApi('/games', 'POST', data, false, (err, ret)=>{
+                if(err) {
+                    if(cb){
+                        cb(null, err)
+                    }
+                    reject()
+                } else {
+                    if(cb) {
+                        cb(ret)
+                    }
+                    resolve(ret)
+                }
+            })
+        })
+    },
+    async updateGameSession(id, data, cb){
+        return new Promise((resolve, reject)=>{
+            this.baseApi(`/games/${id}`, 'PUT', data, false, (err, ret)=>{
+                if(err) {
+                    if(cb){
+                        cb(null, err)
+                    }
+                    reject()
+                } else {
+                    if(cb) {
+                        cb(ret)
+                    }
+                    resolve(ret)
+                }
+            })
+        })
+    },
     async getGlobalSetting(){
         return new Promise((resolve, reject)=>{
             this.baseApi('/setting', 'GET', {}, false, (err, ret)=>{
