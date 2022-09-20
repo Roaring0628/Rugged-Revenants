@@ -570,3 +570,20 @@ a {
   -webkit-align-items: center;
   align-items: center;
 }
+
+.terms-content {
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: bold;
+    padding-top: 20px;
+    padding-bottom: 30px;
+  }
+  p {
+    font-size: 1.2rem;
+    line-height: 1.9rem;
+    padding-bottom: 20px;
+  }
+  a {
+    text-decoration: underline;
+    color: #3b82f6;
+  }
+}
