@@ -13,6 +13,11 @@ export default function Footer() {
           />
         </a>
       </Link>
+      <Link href="/terms" passHref>
+        <a className="flex-shrink-0 hidden md:block">
+          Terms and Conditions
+        </a>
+      </Link>
       <div className="hidden md:flex items-center">
         <ul className="flex items-center space-x-2">
           <li>

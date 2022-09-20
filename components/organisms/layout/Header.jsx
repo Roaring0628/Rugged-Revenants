@@ -112,6 +112,11 @@ export default function Header() {
               text="Player Guide"
               click={setHamburgerOpen}
             />
+            <MobileNavItem
+              link="/terms"
+              text="Terms and Conditions"
+              click={setHamburgerOpen}
+            />
             <li className="border-b border-white border-opacity-10">
               <a
                 target="_blank"
