@@ -11,12 +11,14 @@ const NotificationContextProvider = ({ children }) => {
   const [isConditional, setIsConditional] = useState(false);
   const [message, setMessage] = useState("");
   const [callbacks, setCallbacks] = useState(null);
+  const [imageURL, setImageURL] = useState(null);
 
   const openNotificationModal = (
     message,
     yesCallback = null,
     noCallback = null,
-    isConditional = false
+    isConditional = false,
+    imageURL = null
   ) => {
     setMessage(message);
     setCallbacks({
@@ -24,6 +26,7 @@ const NotificationContextProvider = ({ children }) => {
       noCallback,
     });
     setIsConditional(isConditional);
+    setImageURL(imageURL);
     document.body.style.overflow = "hidden";
     setShowModal(true);
   };
@@ -45,6 +48,7 @@ const NotificationContextProvider = ({ children }) => {
         message,
         showModal,
         isConditional,
+        imageURL,
         openNotificationModal,
         closeNotificationModal,
       }}
