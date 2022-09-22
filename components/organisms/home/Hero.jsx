@@ -295,6 +295,8 @@ export default function Hero({ play, setPlay }) {
         closeLoadingModal()
         setPlay(false);
 
+        // openNotificationModal("Loot Box NFT Wallet Empty. Loot Box Not Opened.");
+
         return true
       } catch(e) {
         closeLoadingModal()
