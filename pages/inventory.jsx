@@ -19,7 +19,7 @@ import {PublicKey, sendAndConfirmTransaction} from "@solana/web3.js";
 
 import RugGameIdl from "../components/organisms/idl/rug_game.json";
 
-import { payToBackendTx, setProgramTransaction } from "../components/organisms/utils/mint";
+import { payToBackendTx, setProgramTransaction, getOwnedNftsCount } from "../components/organisms/utils/mint";
 import {burn, burnTx} from '../components/organisms/utils/nftburn'
 import api from "../components/organisms/api"
 import * as Const from '../components/organisms/utils/constants'
@@ -259,9 +259,21 @@ export default function BurnRuggedNFTs() {
   const openLootbox = async (token) => {
     //get token meta
     const meta = token.meta
+    openLoadingModal()
         
     let beatLevel = meta.attributes.find(o=>o.trait_type == 'level').value
     let nftType = meta.attributes.find(o=>o.trait_type == 'nft').value
+
+    if(nftType != 'No') {
+      let premiumRemains = await getOwnedNftsCount(new PublicKey(Const.PREMIUM_ACCOUNT_PUBKEY), connection)
+      console.log('premiumRemains', premiumRemains)
+      if(premiumRemains == 0) {
+        openNotificationModal("Loot Box NFT Wallet Empty. Loot Box Not Opened.", null, null, null, '/media/lootPile.png');
+        closeLoadingModal()
+        return true
+      }
+    }
+
     const requiredCharges = nftType == 'No'?Math.max(beatLevel - rrdcNFTCounts, 0):Math.max(Const.MAX_REQUIRED_CHARGES_COUNT - rrdcNFTCounts, 10)
     //if user don't have genesis which has charges, he cannot open lootbox
     let genesisToken = null
@@ -270,16 +282,16 @@ export default function BurnRuggedNFTs() {
       genesisToken = genesisTokens.find(o=>o.meta.attributes[0].value >= requiredCharges)
       if(!genesisToken) {
         openNotificationModal("You don't have enough charges to open lootbox", ()=>{}, ()=>{}, false)
+        closeLoadingModal()
         return true
       }
     } else {
+      closeLoadingModal()
       return true
     }
 
     console.log(token);
     anchor.setProvider(provider);
-
-    openLoadingModal()
 
     console.log('burn', token)
     let burnInstruction = await burnTx(token.mint, provider.wallet.publicKey, wallet, connection, 1)
