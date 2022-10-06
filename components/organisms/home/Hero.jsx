@@ -87,14 +87,30 @@ export default function Hero({ play, setPlay }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [publicKey]);
 
+  const sleep = (ms) => {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
   const updateTokenMetas = async (tokens) => {
     tokens = await Promise.all(tokens.map(async (token)=>{
       if(token.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && token.data.name == Const.GENESIS_NFT_NAME) {
-        const meta = await axios.get(api.get1KinUrl(token.data.uri))
-        return {...token, meta: meta.data}
+        try {
+          await sleep(1000);
+          const meta = await axios.get(api.get1KinUrl(token.data.uri))
+          return {...token, meta: meta.data}
+        } catch (e) {
+          console.log(e)
+          return {...token}
+        }
       } else if (token.data && token.data.symbol == 'RRDC') {
-        const meta = await axios.get(api.get1KinUrl(token.data.uri))
-        return {...token, meta: meta.data}
+        try {
+          await sleep(1000);
+          const meta = await axios.get(api.get1KinUrl(token.data.uri))
+          return {...token, meta: meta.data}
+        } catch (e) {
+          console.log(e)
+          return {...token}
+        }
       } else {
         return {...token}
       }
