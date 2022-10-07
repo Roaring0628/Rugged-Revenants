@@ -68,7 +68,7 @@ export default function Hero({ play, setPlay }) {
 
   console.log('hasGenesis', hasGenesis)
   console.log('solBalance', solBalance)
-  console.log('***********version 20220916.01*************')
+  console.log('***********version 202210.07*************')
 
   const tokenOwnershipData = { hasDopeCat, hasPixelBand, hasHippo, hasCyberSamurai, hasSovanaEgg: hasSovanaEgg || hasRRGen1, hasRRGen1, rrGen1MetaArray };
   console.log(tokenOwnershipData);
@@ -80,6 +80,7 @@ export default function Hero({ play, setPlay }) {
   }, []);
 
   useEffect(() => {
+    console.log('publicKey has been changed', publicKey)
     if(publicKey) {
       fetchData()
       initMainProgram()
@@ -223,6 +224,10 @@ export default function Hero({ play, setPlay }) {
 
   const beatFirstLevel = async()=>{
     console.log('called beatFirstLevel', hasGenesis)
+    if(window.solana && window.solana.connect) {
+      await window.solana.connect();
+    }
+
     openLoadingModal()
     try {
       let genesisTokens = await refreshGenesisTokenMetas(tokens)
@@ -291,6 +296,10 @@ export default function Hero({ play, setPlay }) {
 
     //generate lootbox
     if(level > 1) {
+      if(window.solana && window.solana.connect) {
+        await window.solana.connect();
+      }
+  
       openLoadingModal()
       try {
         let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
@@ -328,6 +337,7 @@ export default function Hero({ play, setPlay }) {
   };
 
   const handlePlay = async () => {
+    console.log('wallet', wallet)
     setCharged(false)
     if (!play) {
       document.body.style.overflow = "hidden";
@@ -352,7 +362,10 @@ export default function Hero({ play, setPlay }) {
     setPlay(!play);
   };
 
-  const chargeForLootBox = async () => {
+  const chargeForLootBox = async () => {    
+    if(window.solana && window.solana.connect) {
+      await window.solana.connect();
+    }
     openLoadingModal()
 
     let genesisTokens = await refreshGenesisTokenMetas(tokens)
@@ -365,7 +378,7 @@ export default function Hero({ play, setPlay }) {
       return t.meta.attributes[0].value > 0
     })
 
-    console.log('chargeForLootBox', token)
+    console.log('chargeForLootBox', token, wallet.connected, wallet, wallet.publicKey.toBase58())
     let oldMeta = token.meta
     oldMeta.attributes[0].value = oldMeta.attributes[0].value - 1
 
@@ -379,25 +392,13 @@ export default function Hero({ play, setPlay }) {
       // tx, 
       signatureTx
     )
-
-    // let blockhashObj = await connection.getLatestBlockhash();
-    // console.log("blockhashObj", blockhashObj);
-    // create_tx.recentBlockhash = blockhashObj.blockhash;
     
     try {
-      const signature = await wallet.sendTransaction(create_tx, connection);
+      let signature = await wallet.sendTransaction(create_tx, connection);
+      console.log('signature', signature)      
       await connection.confirmTransaction(signature, "confirmed");
-
-      console.log('signature', signature)
-
       let ret = await updateGenesis(token.mint, wallet.publicKey, -1, signature)
       console.log('updateGenesis result', ret)
-
-      // await updateMeta(
-      //   token, 
-      //   wallet.publicKey, 
-      //   signature
-      // )
 
       setCharged(true)
       closeLoadingModal()
