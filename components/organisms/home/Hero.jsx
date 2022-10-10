@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import NextImage from "next/image";
 import classNames from "classnames";
-import { WalletAdapterNetwork, WalletNotConnectedError } from "@solana/wallet-adapter-base";
 
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
@@ -364,12 +363,10 @@ export default function Hero({ play, setPlay }) {
   };
 
   const chargeForLootBox = async () => {  
-    if(!publicKey) {
-      throw new WalletNotConnectedError();
-    }  
-    if(window.solana && window.solana.connect) {
+    if(window.solana && !window.solana.isConnected) {
       await window.solana.connect();
     }
+    if(!window.solana.isConnected) return
     openLoadingModal()
 
     let genesisTokens = await refreshGenesisTokenMetas(tokens)
@@ -396,7 +393,9 @@ export default function Hero({ play, setPlay }) {
       // tx, 
       signatureTx
     )
-    
+    let blockhashObj = await connection.getLatestBlockhash();
+        console.log("blockhashObj", blockhashObj);
+        create_tx.recentBlockhash = blockhashObj.blockhash;
     try {
       let signature = await wallet.sendTransaction(create_tx, connection);
       console.log('signature', signature)      
