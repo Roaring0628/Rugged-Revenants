@@ -224,9 +224,10 @@ export default function Hero({ play, setPlay }) {
 
   const beatFirstLevel = async()=>{
     console.log('called beatFirstLevel', hasGenesis)
-    if(window.solana && window.solana.connect) {
+    if(window.solana && !window.solana.isConnected) {
       await window.solana.connect();
     }
+    if(!window.solana.isConnected) return
 
     openLoadingModal()
     try {
@@ -296,9 +297,10 @@ export default function Hero({ play, setPlay }) {
 
     //generate lootbox
     if(level > 1) {
-      if(window.solana && window.solana.connect) {
+      if(window.solana && !window.solana.isConnected) {
         await window.solana.connect();
       }
+      if(!window.solana.isConnected) return
   
       openLoadingModal()
       try {
@@ -308,7 +310,9 @@ export default function Hero({ play, setPlay }) {
         let txSignature = api.randomString(20) //window.crypto.randomUUID()
         let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
         create_tx.add(signatureTx)
-
+        let blockhashObj = await connection.getLatestBlockhash();
+        create_tx.recentBlockhash = blockhashObj.blockhash;
+  
         const signature = await wallet.sendTransaction(create_tx, connection, {
           maxRetries: 5
         });
@@ -393,13 +397,15 @@ export default function Hero({ play, setPlay }) {
       // tx, 
       signatureTx
     )
-    let blockhashObj = await connection.getLatestBlockhash();
-        console.log("blockhashObj", blockhashObj);
-        create_tx.recentBlockhash = blockhashObj.blockhash;
+
     try {
-      let signature = await wallet.sendTransaction(create_tx, connection);
-      console.log('signature', signature)      
+      let blockhashObj = await connection.getLatestBlockhash();
+      create_tx.recentBlockhash = blockhashObj.blockhash;
+
+      const signature = await wallet.sendTransaction(create_tx, connection);
+
       await connection.confirmTransaction(signature, "confirmed");
+
       let ret = await updateGenesis(token.mint, wallet.publicKey, -1, signature)
       console.log('updateGenesis result', ret)
 
