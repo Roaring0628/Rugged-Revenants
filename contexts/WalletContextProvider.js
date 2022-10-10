@@ -45,7 +45,7 @@ const WalletContextProvider = (props) => {
   return (
     // TODO: updates needed for updating and referencing endpoint: wallet adapter rework
     <ConnectionProvider endpoint={endpoint} config={{confirmTransactionInitialTimeout: 100000}}>
-      <WalletProvider wallets={wallets} onError={onError} autoConnect={true}>
+      <WalletProvider wallets={wallets} onError={onError} autoConnect>
         <ReactUIWalletModalProvider>
           {props.children}
         </ReactUIWalletModalProvider>

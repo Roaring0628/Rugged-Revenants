@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import NextImage from "next/image";
 import classNames from "classnames";
+import { WalletAdapterNetwork, WalletNotConnectedError } from "@solana/wallet-adapter-base";
 
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
@@ -68,7 +69,7 @@ export default function Hero({ play, setPlay }) {
 
   console.log('hasGenesis', hasGenesis)
   console.log('solBalance', solBalance)
-  console.log('***********version 202210.07*************')
+  console.log('***********version 202210.10*************')
 
   const tokenOwnershipData = { hasDopeCat, hasPixelBand, hasHippo, hasCyberSamurai, hasSovanaEgg: hasSovanaEgg || hasRRGen1, hasRRGen1, rrGen1MetaArray };
   console.log(tokenOwnershipData);
@@ -362,7 +363,10 @@ export default function Hero({ play, setPlay }) {
     setPlay(!play);
   };
 
-  const chargeForLootBox = async () => {    
+  const chargeForLootBox = async () => {  
+    if(!publicKey) {
+      throw new WalletNotConnectedError();
+    }  
     if(window.solana && window.solana.connect) {
       await window.solana.connect();
     }
