@@ -51,7 +51,7 @@ const Demo = ({
   useEffect(() => {
     window.addEventListener("message", handleMessage);
 
-    console.log('Game Version: 6611210');
+    console.log('Game Version: 6652288');
 
     // For new build of game: Need to update loaderUrl, and download build files and replace them
     // Live loaderUrl
@@ -149,7 +149,7 @@ const Demo = ({
         if (response.data !== true && response.data !== 'true') return
       }
       if(currentLevel > 1 || type == "win") { // now, when the user clear all levels, i don't get level number
-        setCurrentLevel(currentLevel || 8) // now, when the user clear all levels, i don't get level number
+        setCurrentLevel(currentLevel || 9) // now, when the user clear all levels, i don't get level number
         setIsWin(type == "win")
         openLootboxChest();
       } 
