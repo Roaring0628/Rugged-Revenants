@@ -38,6 +38,12 @@ const TeamMembers = () => {
       image: "/media/team/jason.png",
       bio: "President and Chief Operating Officer 1KL, entrepreneur-in residence for international Chinese venture firms, Previously funded founder, HBS MBA 2021",
     },
+    {
+      name: 'Jason "Zofrus" Fuller',
+      title: "Chief Technical Officer",
+      image: "/media/team/zforus.png",
+      bio: "Chief Technical Officer, Founder Paperhand Labs, Co-Founder Rocketpower Labs, Co-host web3zone",
+    },
   ];
 
   return (
