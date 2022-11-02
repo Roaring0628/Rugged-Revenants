@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import NextImage from "next/image";
 import classNames from "classnames";
+import * as Sentry from "@sentry/nextjs";
 
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
@@ -100,6 +101,8 @@ export default function Hero({ play, setPlay }) {
           return {...token, meta: meta.data}
         } catch (e) {
           console.log(e)
+          // Sentry Log: Error when getting nft metadata
+          Sentry.captureException(e, { level: "warning" });
           return {...token}
         }
       } else if (token.data && token.data.symbol == 'RRDC') {
@@ -109,6 +112,8 @@ export default function Hero({ play, setPlay }) {
           return {...token, meta: meta.data}
         } catch (e) {
           console.log(e)
+          // Sentry Log: Error when getting nft metadata
+          Sentry.captureException(e, { level: "warning" });
           return {...token}
         }
       } else {
