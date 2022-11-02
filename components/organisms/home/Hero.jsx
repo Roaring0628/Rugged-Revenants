@@ -287,6 +287,9 @@ export default function Hero({ play, setPlay }) {
       return true
     } catch(e) {
       closeLoadingModal()
+      console.log("beatFirstLevel error", e)
+      // Sentry Log: Error happened when opening chest
+      Sentry.captureMessage("Error happened when opening chest", "critical");
       return false
     }
   }
@@ -320,6 +323,8 @@ export default function Hero({ play, setPlay }) {
       } catch(e) {
         closeLoadingModal()
         console.log("endGame error", e)
+        // Sentry Log: Error happened when generating lootbox
+        Sentry.captureMessage("Error happened when generating lootbox", "critical");
         return false
       }
     } else {

@@ -138,7 +138,7 @@ const Demo = ({
       console.log('valdiation api check result', response.data)
       if (response.data !== true && response.data !== 'true') {
         // Sentry Log: valdiation api check result
-        Sentry.captureException(`Validation API returned 'false': Type 'level' Level '${currentLevel}'`, "info");
+        Sentry.captureMessage(`Validation API returned 'false': Type 'level' Level '${currentLevel}'`, "info");
         return
       }
       openChest();
@@ -148,7 +148,7 @@ const Demo = ({
         console.log('valdiation api check result', response.data)
         if (response.data !== true && response.data !== 'true') {
           // Sentry Log: valdiation api check result
-          Sentry.captureException(`Validation API returned 'false': Type 'win' Level '${currentLevel || 'final'}'`, "info");
+          Sentry.captureMessage(`Validation API returned 'false': Type 'win' Level '${currentLevel || 'final'}'`, "info");
           return
         }
       }
@@ -157,7 +157,7 @@ const Demo = ({
         console.log('valdiation api check result', response.data)
         if (response.data !== true && response.data !== 'true') {
           // Sentry Log: valdiation api check result
-          Sentry.captureException(`Validation API returned 'false': Type 'die' Level '${currentLevel}'`, "info");
+          Sentry.captureMessage(`Validation API returned 'false': Type 'die' Level '${currentLevel}'`, "info");
           return
         }
       }
