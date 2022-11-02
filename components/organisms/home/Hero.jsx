@@ -102,7 +102,7 @@ export default function Hero({ play, setPlay }) {
         } catch (e) {
           console.log(e)
           // Sentry Log: Error when getting nft metadata
-          Sentry.captureException(e, { level: "warning" });
+          Sentry.captureMessage("Error happened when getting metadata", "warning");
           return {...token}
         }
       } else if (token.data && token.data.symbol == 'RRDC') {
@@ -113,7 +113,7 @@ export default function Hero({ play, setPlay }) {
         } catch (e) {
           console.log(e)
           // Sentry Log: Error when getting nft metadata
-          Sentry.captureException(e, { level: "warning" });
+          Sentry.captureMessage("Error happened when getting metadata", "warning");
           return {...token}
         }
       } else {
