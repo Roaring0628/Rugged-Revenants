@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import NextImage from "next/image";
 import classNames from "classnames";
+import * as Sentry from "@sentry/nextjs";
 
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
@@ -100,6 +101,8 @@ export default function Hero({ play, setPlay }) {
           return {...token, meta: meta.data}
         } catch (e) {
           console.log(e)
+          // Sentry Log: Error when getting nft metadata
+          Sentry.captureMessage("Error happened when getting metadata", "warning");
           return {...token}
         }
       } else if (token.data && token.data.symbol == 'RRDC') {
@@ -109,6 +112,8 @@ export default function Hero({ play, setPlay }) {
           return {...token, meta: meta.data}
         } catch (e) {
           console.log(e)
+          // Sentry Log: Error when getting nft metadata
+          Sentry.captureMessage("Error happened when getting metadata", "warning");
           return {...token}
         }
       } else {
@@ -282,6 +287,9 @@ export default function Hero({ play, setPlay }) {
       return true
     } catch(e) {
       closeLoadingModal()
+      console.log("beatFirstLevel error", e)
+      // Sentry Log: Error happened when opening chest
+      Sentry.captureMessage("Error happened when opening chest", "critical");
       return false
     }
   }
@@ -315,6 +323,8 @@ export default function Hero({ play, setPlay }) {
       } catch(e) {
         closeLoadingModal()
         console.log("endGame error", e)
+        // Sentry Log: Error happened when generating lootbox
+        Sentry.captureMessage("Error happened when generating lootbox", "critical");
         return false
       }
     } else {

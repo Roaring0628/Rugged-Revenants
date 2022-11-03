@@ -4,6 +4,7 @@ import axios from "axios";
 import moment from "moment";
 import classNames from "classnames";
 import { Swiper, SwiperSlide } from "swiper/react";
+import * as Sentry from "@sentry/nextjs";
 
 import "swiper/css";
 
@@ -346,73 +347,79 @@ const UpgradeNFT = () => {
   }
 
   const upgrade = async () => {
-    console.log(
-      "upgrade",
-      selectedNFT,
-      selectedPotion,
-      selectedRugOption
-    ); 
+    try {
+      console.log(
+        "upgrade",
+        selectedNFT,
+        selectedPotion,
+        selectedRugOption
+      ); 
 
-    //consume $RUG
-    const fromRugTokenAccount = await getOrCreateAssociatedTokenAccount(connection, wallet, new PublicKey(Const.RUG_TOKEN_MINTKEY), wallet.publicKey);
-    const toRugTokenAccount = await api.getOrCreateAssociatedTokenAccount(Const.RUG_TOKEN_MINTKEY);
+      //consume $RUG
+      const fromRugTokenAccount = await getOrCreateAssociatedTokenAccount(connection, wallet, new PublicKey(Const.RUG_TOKEN_MINTKEY), wallet.publicKey);
+      const toRugTokenAccount = await api.getOrCreateAssociatedTokenAccount(Const.RUG_TOKEN_MINTKEY);
 
-    console.log('fromTokenAccount, toTokenAccount', fromRugTokenAccount.address.toBase58(), toRugTokenAccount.result)
-    let rugTokenTransferInstruction = createTransferInstruction(
-      fromRugTokenAccount.address, // source
-      new PublicKey(toRugTokenAccount.result),
-      wallet.publicKey,
-      selectedRugOption * 1000000,
-      [],
-      TOKEN_PROGRAM_ID
-   )
-    
-    //burn Potion NFT
-    let burnInstruction = await burnTx(selectedPotion.mint, provider.wallet.publicKey, wallet, connection, 1)
+      console.log('fromTokenAccount, toTokenAccount', fromRugTokenAccount.address.toBase58(), toRugTokenAccount.result)
+      let rugTokenTransferInstruction = createTransferInstruction(
+        fromRugTokenAccount.address, // source
+        new PublicKey(toRugTokenAccount.result),
+        wallet.publicKey,
+        selectedRugOption * 1000000,
+        [],
+        TOKEN_PROGRAM_ID
+      )
+      
+      //burn Potion NFT
+      let burnInstruction = await burnTx(selectedPotion.mint, provider.wallet.publicKey, wallet, connection, 1)
 
-    //upgrade playableNFT meta
-    let oldMeta = selectedNFT.meta
-    setOldMeta([...JSON.parse(JSON.stringify(oldMeta.attributes))])
+      //upgrade playableNFT meta
+      let oldMeta = selectedNFT.meta
+      setOldMeta([...JSON.parse(JSON.stringify(oldMeta.attributes))])
 
-    let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
+      let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.UPDATE_META_FEE);
 
-    let txSignature = api.randomString(20) //window.crypto.randomUUID()
-    let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
-    const create_tx = new anchor.web3.Transaction().add(
-      transferInstruction, 
-      rugTokenTransferInstruction,
-      burnInstruction,
-      signatureTx
-    )
+      let txSignature = api.randomString(20) //window.crypto.randomUUID()
+      let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
+      const create_tx = new anchor.web3.Transaction().add(
+        transferInstruction, 
+        rugTokenTransferInstruction,
+        burnInstruction,
+        signatureTx
+      )
 
-    let blockhashObj = await connection.getLatestBlockhash();
-    console.log("blockhashObj", blockhashObj);
-    create_tx.recentBlockhash = blockhashObj.blockhash;
+      let blockhashObj = await connection.getLatestBlockhash();
+      console.log("blockhashObj", blockhashObj);
+      create_tx.recentBlockhash = blockhashObj.blockhash;
 
-    const signature = await wallet.sendTransaction(create_tx, connection);
-    await connection.confirmTransaction(signature, "confirmed");
+      const signature = await wallet.sendTransaction(create_tx, connection);
+      await connection.confirmTransaction(signature, "confirmed");
 
-    console.log('signature', signature)
-    let upgradeResult = await api.updatePlayableNftMeta(
-      {
-        key: selectedNFT.mint,
-        tokenAmount: selectedRugOption,
-        playerAccount: wallet.publicKey.toBase58(),
-        txId: signature,
-      },
-    )
+      console.log('signature', signature)
+      let upgradeResult = await api.updatePlayableNftMeta(
+        {
+          key: selectedNFT.mint,
+          tokenAmount: selectedRugOption,
+          playerAccount: wallet.publicKey.toBase58(),
+          txId: signature,
+        },
+      )
 
-    console.log('upgradeResult', upgradeResult)
-    if(upgradeResult.stauts == 'pending') {
-      //TODO: display update date
-      console.log('Due Date', new Date(upgradeResult.dueDate))
-    } else if(upgradeResult.stauts == 'success'){
-      setNewMeta(upgradeResult.updatedMeta.attributes)
-      setSelectedNFTImage(upgradeResult.updatedMeta.image)
-      openResult();
+      console.log('upgradeResult', upgradeResult)
+      if(upgradeResult.stauts == 'pending') {
+        //TODO: display update date
+        console.log('Due Date', new Date(upgradeResult.dueDate))
+      } else if(upgradeResult.stauts == 'success'){
+        setNewMeta(upgradeResult.updatedMeta.attributes)
+        setSelectedNFTImage(upgradeResult.updatedMeta.image)
+        openResult();
+      }
+      setSelectedPotion(null)
+      fetchData()
+    } catch(e) {
+      console.log('upgrade error', e)
+      // Sentry Log: Error happened when upgrading nft
+      Sentry.captureMessage("Error happened when upgrading nft", "critical");
     }
-    setSelectedPotion(null)
-    fetchData()
   };
 
   let filteredNFTs = playableNfts.filter((token) =>

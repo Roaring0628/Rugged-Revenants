@@ -4,6 +4,7 @@ import NextImage from "next/image";
 import Link from "next/link";
 import axios from "axios";
 import classNames from "classnames";
+import * as Sentry from "@sentry/nextjs";
 
 import CustomScroll from "components/molecules/CustomScroll";
 
@@ -276,7 +277,9 @@ export default function BurnRuggedNFTs() {
 
       closeLoadingModal()
     } catch(e) {
-      console.log('error', e)
+      console.log('burnSelectedNFT error', e)
+      // Sentry Log: Error happened when burning selected nft
+      Sentry.captureMessage("Error happened when burning selected nft", "critical");
       closeLoadingModal()
     }
   };

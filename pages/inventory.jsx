@@ -4,6 +4,7 @@ import NextImage from "next/image";
 import Link from "next/link";
 import axios from "axios";
 import classNames from "classnames";
+import * as Sentry from "@sentry/nextjs";
 
 import CustomScroll from "components/molecules/CustomScroll";
 
@@ -331,7 +332,9 @@ export default function BurnRuggedNFTs() {
       closeLoadingModal()
       return true
     } catch(e) {
-      console.log('error', e)
+      console.log('openLootbox error', e)
+      // Sentry Log: Error happened when opening lootbox on inventory page
+      Sentry.captureMessage("Error happened when opening lootbox on inventory page", "critical");
       closeLoadingModal()
       return false
     }
