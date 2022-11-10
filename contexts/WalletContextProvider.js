@@ -33,19 +33,19 @@ const WalletContextProvider = (props) => {
   );
 
   const onError = useCallback((error) => {
+    console.log('ERROR Happened in WalletProvider', error)
     notification["error"]({
       message: "Error",
       description: error.message
         ? `${error.name}: ${error.message}`
         : error.name,
     });
-    console.error(error);
   }, []);
 
   return (
     // TODO: updates needed for updating and referencing endpoint: wallet adapter rework
     <ConnectionProvider endpoint={endpoint} config={{confirmTransactionInitialTimeout: 100000}}>
-      <WalletProvider wallets={wallets} onError={onError} autoConnect={true}>
+      <WalletProvider wallets={wallets} onError={onError} autoConnect>
         <ReactUIWalletModalProvider>
           {props.children}
         </ReactUIWalletModalProvider>
