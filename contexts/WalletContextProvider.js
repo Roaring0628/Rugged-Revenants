@@ -17,7 +17,8 @@ import { useCallback, useMemo } from "react";
 
 const WalletContextProvider = (props) => {
   const network = WalletAdapterNetwork.Mainnet;
-  const endpoint = "https://solana-mainnet.g.alchemy.com/v2/I5XOmtgE2oEvJDzRDfJ3wxIFhYu28uhn" //useMemo(() => clusterApiUrl(network), [network]);
+  const endpoint = "https://sly-cold-glade.solana-mainnet.quiknode.pro/2772174063b9e4ddef989018bbf7460a284a8dd2/" 
+  // const endpoint = "https://solana-mainnet.g.alchemy.com/v2/I5XOmtgE2oEvJDzRDfJ3wxIFhYu28uhn" //useMemo(() => clusterApiUrl(network), [network]);
   // const endpoint = "https://sleek-quiet-lambo.solana-mainnet.discover.quiknode.pro/05d4d05ed2a939d8da3cecbf417383d1192c0d40/" //useMemo(() => clusterApiUrl(network), [network]);
   // const endpoint = useMemo(() => clusterApiUrl(network), [network]);
   console.log('endpoint', endpoint)

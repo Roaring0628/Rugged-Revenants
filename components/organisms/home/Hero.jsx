@@ -183,6 +183,8 @@ export default function Hero({ play, setPlay }) {
         try {
           const signature = await wallet.sendTransaction(create_tx, connection, {
             signers: [ruggedAccount],
+            maxRetries: 5,
+            skipPreflight: false
           });
   
           await connection.confirmTransaction(signature, "confirmed");
@@ -244,7 +246,10 @@ export default function Hero({ play, setPlay }) {
         let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
         create_tx.add(signatureTx)
   
-        const signature = await wallet.sendTransaction(create_tx, connection);
+        const signature = await wallet.sendTransaction(create_tx, connection, {
+          maxRetries: 5,
+          skipPreflight: false
+        });
         await connection.confirmTransaction(signature, "confirmed");
   
         await mintGenesis(wallet, signature)
@@ -322,7 +327,8 @@ export default function Hero({ play, setPlay }) {
         create_tx.recentBlockhash = blockhashObj.blockhash;
   
         const signature = await wallet.sendTransaction(create_tx, connection, {
-          maxRetries: 5
+          maxRetries: 5,
+          skipPreflight: false
         });
         console.log("signature", signature)
         await connection.confirmTransaction(signature, "confirmed");  
@@ -412,7 +418,10 @@ export default function Hero({ play, setPlay }) {
       let blockhashObj = await connection.getLatestBlockhash();
       create_tx.recentBlockhash = blockhashObj.blockhash;
 
-      const signature = await wallet.sendTransaction(create_tx, connection);
+      const signature = await wallet.sendTransaction(create_tx, connection, {
+        maxRetries: 5,
+        skipPreflight: false
+      });
 
       await connection.confirmTransaction(signature, "confirmed");
 
