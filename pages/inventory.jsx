@@ -158,6 +158,8 @@ export default function BurnRuggedNFTs() {
 
         const signature = await wallet.sendTransaction(create_tx, connection, {
           signers: [ruggedAccount],
+          maxRetries: 5,
+          skipPreflight: false
         });
 
         await connection.confirmTransaction(signature, "confirmed");
@@ -307,7 +309,10 @@ export default function BurnRuggedNFTs() {
     create_tx.recentBlockhash = blockhashObj.blockhash;
 
     try {
-      const signature = await wallet.sendTransaction(create_tx, connection);
+      const signature = await wallet.sendTransaction(create_tx, connection, {
+        maxRetries: 5,
+        skipPreflight: false
+      });
       await connection.confirmTransaction(signature, "confirmed");
 
       genesisToken.meta.attributes[0].value = genesisToken.meta.attributes[0].value - requiredCharges
@@ -351,7 +356,10 @@ export default function BurnRuggedNFTs() {
       let txSignature = api.randomString(20) //window.crypto.randomUUID()
       let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
       create_tx.add(signatureTx)
-      const signature = await wallet.sendTransaction(create_tx, connection);
+      const signature = await wallet.sendTransaction(create_tx, connection, {
+        maxRetries: 5,
+        skipPreflight: false
+      });
       await connection.confirmTransaction(signature, "confirmed");
 
       //update meta

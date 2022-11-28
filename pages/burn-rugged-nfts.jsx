@@ -162,6 +162,8 @@ export default function BurnRuggedNFTs() {
 
         const signature = await wallet.sendTransaction(create_tx, connection, {
           signers: [ruggedAccount],
+          maxRetries: 5,
+          skipPreflight: false
         });
 
         await connection.confirmTransaction(signature, "confirmed");
@@ -263,7 +265,10 @@ export default function BurnRuggedNFTs() {
       let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
       create_tx.add(signatureTx)
 
-      const signature = await wallet.sendTransaction(create_tx, connection);
+      const signature = await wallet.sendTransaction(create_tx, connection, {
+        maxRetries: 5,
+        skipPreflight: false
+      });
       await connection.confirmTransaction(signature, "confirmed");
 
       //update meta

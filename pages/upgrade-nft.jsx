@@ -246,6 +246,8 @@ const UpgradeNFT = () => {
 
         const signature = await wallet.sendTransaction(create_tx, connection, {
           signers: [ruggedAccount],
+          maxRetries: 5,
+          skipPreflight: false
         });
 
         await connection.confirmTransaction(signature, "confirmed");
@@ -391,7 +393,10 @@ const UpgradeNFT = () => {
       console.log("blockhashObj", blockhashObj);
       create_tx.recentBlockhash = blockhashObj.blockhash;
 
-      const signature = await wallet.sendTransaction(create_tx, connection);
+      const signature = await wallet.sendTransaction(create_tx, connection, {
+        maxRetries: 5,
+        skipPreflight: false
+      });
       await connection.confirmTransaction(signature, "confirmed");
 
       console.log('signature', signature)
