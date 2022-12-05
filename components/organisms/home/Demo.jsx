@@ -52,7 +52,7 @@ const Demo = ({
   useEffect(() => {
     window.addEventListener("message", handleMessage);
 
-    console.log('Game Version: 6880944');
+    console.log('Game Version: 6920097');
 
     // For new build of game: Need to update loaderUrl, and download build files and replace them
     // Live loaderUrl
