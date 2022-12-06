@@ -4,6 +4,7 @@ import NextImage from "next/image";
 import Link from "next/link";
 import axios from "axios";
 import classNames from "classnames";
+import * as Sentry from "@sentry/nextjs";
 
 import CustomScroll from "components/molecules/CustomScroll";
 
@@ -161,6 +162,8 @@ export default function BurnRuggedNFTs() {
 
         const signature = await wallet.sendTransaction(create_tx, connection, {
           signers: [ruggedAccount],
+          maxRetries: 5,
+          skipPreflight: false
         });
 
         await connection.confirmTransaction(signature, "confirmed");
@@ -262,7 +265,10 @@ export default function BurnRuggedNFTs() {
       let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
       create_tx.add(signatureTx)
 
-      const signature = await wallet.sendTransaction(create_tx, connection);
+      const signature = await wallet.sendTransaction(create_tx, connection, {
+        maxRetries: 5,
+        skipPreflight: false
+      });
       await connection.confirmTransaction(signature, "confirmed");
 
       //update meta
@@ -276,7 +282,9 @@ export default function BurnRuggedNFTs() {
 
       closeLoadingModal()
     } catch(e) {
-      console.log('error', e)
+      console.log('burnSelectedNFT error', e)
+      // Sentry Log: Error happened when burning selected nft
+      Sentry.captureMessage("Error happened when burning selected nft", "critical");
       closeLoadingModal()
     }
   };

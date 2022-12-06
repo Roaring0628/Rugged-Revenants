@@ -70,7 +70,10 @@ export async function burn(tokenMintAddress, owner, wallet, connection, amount) 
         console.log("blockhashObj", blockhashObj);
         BurnTransaction.recentBlockhash = blockhashObj.blockhash;
 
-        const BurnandCloseSignature = await wallet.sendTransaction(BurnTransaction, connection);
+        const BurnandCloseSignature = await wallet.sendTransaction(BurnTransaction, connection, {
+          maxRetries: 5,
+          skipPreflight: false
+        });
 
         return await connection.confirmTransaction(BurnandCloseSignature, 'processed');
     } catch (error) {

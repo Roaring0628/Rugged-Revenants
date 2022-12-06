@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import NextImage from "next/image";
 import classNames from "classnames";
+import * as Sentry from "@sentry/nextjs";
 
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
@@ -68,7 +69,7 @@ export default function Hero({ play, setPlay }) {
 
   console.log('hasGenesis', hasGenesis)
   console.log('solBalance', solBalance)
-  console.log('***********version 20220916.01*************')
+  console.log('***********version 202210.10*************')
 
   const tokenOwnershipData = { hasDopeCat, hasPixelBand, hasHippo, hasCyberSamurai, hasSovanaEgg: hasSovanaEgg || hasRRGen1, hasRRGen1, rrGen1MetaArray };
   console.log(tokenOwnershipData);
@@ -80,6 +81,7 @@ export default function Hero({ play, setPlay }) {
   }, []);
 
   useEffect(() => {
+    console.log('publicKey has been changed', publicKey)
     if(publicKey) {
       fetchData()
       initMainProgram()
@@ -87,14 +89,34 @@ export default function Hero({ play, setPlay }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [publicKey]);
 
+  const sleep = (ms) => {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
   const updateTokenMetas = async (tokens) => {
     tokens = await Promise.all(tokens.map(async (token)=>{
       if(token.updateAuthority == Const.NFT_ACCOUNT_PUBKEY && token.data.name == Const.GENESIS_NFT_NAME) {
-        const meta = await axios.get(api.get1KinUrl(token.data.uri))
-        return {...token, meta: meta.data}
+        try {
+          await sleep(1000);
+          const meta = await axios.get(api.get1KinUrl(token.data.uri))
+          return {...token, meta: meta.data}
+        } catch (e) {
+          console.log(e)
+          // Sentry Log: Error when getting nft metadata
+          Sentry.captureMessage("Error happened when getting metadata", "warning");
+          return {...token}
+        }
       } else if (token.data && token.data.symbol == 'RRDC') {
-        const meta = await axios.get(api.get1KinUrl(token.data.uri))
-        return {...token, meta: meta.data}
+        try {
+          await sleep(1000);
+          const meta = await axios.get(api.get1KinUrl(token.data.uri))
+          return {...token, meta: meta.data}
+        } catch (e) {
+          console.log(e)
+          // Sentry Log: Error when getting nft metadata
+          Sentry.captureMessage("Error happened when getting metadata", "warning");
+          return {...token}
+        }
       } else {
         return {...token}
       }
@@ -161,6 +183,8 @@ export default function Hero({ play, setPlay }) {
         try {
           const signature = await wallet.sendTransaction(create_tx, connection, {
             signers: [ruggedAccount],
+            maxRetries: 5,
+            skipPreflight: false
           });
   
           await connection.confirmTransaction(signature, "confirmed");
@@ -207,6 +231,11 @@ export default function Hero({ play, setPlay }) {
 
   const beatFirstLevel = async()=>{
     console.log('called beatFirstLevel', hasGenesis)
+    if(window.solana && !window.solana.isConnected) {
+      await window.solana.connect();
+    }
+    if(!window.solana.isConnected) return
+
     openLoadingModal()
     try {
       let genesisTokens = await refreshGenesisTokenMetas(tokens)
@@ -217,7 +246,10 @@ export default function Hero({ play, setPlay }) {
         let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
         create_tx.add(signatureTx)
   
-        const signature = await wallet.sendTransaction(create_tx, connection);
+        const signature = await wallet.sendTransaction(create_tx, connection, {
+          maxRetries: 5,
+          skipPreflight: false
+        });
         await connection.confirmTransaction(signature, "confirmed");
   
         await mintGenesis(wallet, signature)
@@ -266,6 +298,9 @@ export default function Hero({ play, setPlay }) {
       return true
     } catch(e) {
       closeLoadingModal()
+      console.log("beatFirstLevel error", e)
+      // Sentry Log: Error happened when opening chest
+      Sentry.captureMessage("Error happened when opening chest", "critical");
       return false
     }
   }
@@ -275,6 +310,11 @@ export default function Hero({ play, setPlay }) {
 
     //generate lootbox
     if(level > 1) {
+      if(window.solana && !window.solana.isConnected) {
+        await window.solana.connect();
+      }
+      if(!window.solana.isConnected) return
+  
       openLoadingModal()
       try {
         let transferInstruction = payToBackendTx(wallet.publicKey, new PublicKey(Const.NFT_ACCOUNT_PUBKEY), Const.MINT_FEE);
@@ -283,9 +323,12 @@ export default function Hero({ play, setPlay }) {
         let txSignature = api.randomString(20) //window.crypto.randomUUID()
         let signatureTx = setProgramTransaction(mainProgram, ruggedAccount, txSignature, wallet)
         create_tx.add(signatureTx)
-
+        let blockhashObj = await connection.getLatestBlockhash();
+        create_tx.recentBlockhash = blockhashObj.blockhash;
+  
         const signature = await wallet.sendTransaction(create_tx, connection, {
-          maxRetries: 5
+          maxRetries: 5,
+          skipPreflight: false
         });
         console.log("signature", signature)
         await connection.confirmTransaction(signature, "confirmed");  
@@ -301,6 +344,8 @@ export default function Hero({ play, setPlay }) {
       } catch(e) {
         closeLoadingModal()
         console.log("endGame error", e)
+        // Sentry Log: Error happened when generating lootbox
+        Sentry.captureMessage("Error happened when generating lootbox", "critical");
         return false
       }
     } else {
@@ -314,6 +359,7 @@ export default function Hero({ play, setPlay }) {
   };
 
   const handlePlay = async () => {
+    console.log('wallet', wallet)
     setCharged(false)
     if (!play) {
       document.body.style.overflow = "hidden";
@@ -338,7 +384,11 @@ export default function Hero({ play, setPlay }) {
     setPlay(!play);
   };
 
-  const chargeForLootBox = async () => {
+  const chargeForLootBox = async () => {  
+    if(window.solana && !window.solana.isConnected) {
+      await window.solana.connect();
+    }
+    if(!window.solana.isConnected) return
     openLoadingModal()
 
     let genesisTokens = await refreshGenesisTokenMetas(tokens)
@@ -351,7 +401,7 @@ export default function Hero({ play, setPlay }) {
       return t.meta.attributes[0].value > 0
     })
 
-    console.log('chargeForLootBox', token)
+    console.log('chargeForLootBox', token, wallet.connected, wallet, wallet.publicKey.toBase58())
     let oldMeta = token.meta
     oldMeta.attributes[0].value = oldMeta.attributes[0].value - 1
 
@@ -366,24 +416,19 @@ export default function Hero({ play, setPlay }) {
       signatureTx
     )
 
-    // let blockhashObj = await connection.getLatestBlockhash();
-    // console.log("blockhashObj", blockhashObj);
-    // create_tx.recentBlockhash = blockhashObj.blockhash;
-    
     try {
-      const signature = await wallet.sendTransaction(create_tx, connection);
-      await connection.confirmTransaction(signature, "confirmed");
+      let blockhashObj = await connection.getLatestBlockhash();
+      create_tx.recentBlockhash = blockhashObj.blockhash;
 
-      console.log('signature', signature)
+      const signature = await wallet.sendTransaction(create_tx, connection, {
+        maxRetries: 5,
+        skipPreflight: false
+      });
+
+      await connection.confirmTransaction(signature, "confirmed");
 
       let ret = await updateGenesis(token.mint, wallet.publicKey, -1, signature)
       console.log('updateGenesis result', ret)
-
-      // await updateMeta(
-      //   token, 
-      //   wallet.publicKey, 
-      //   signature
-      // )
 
       setCharged(true)
       closeLoadingModal()

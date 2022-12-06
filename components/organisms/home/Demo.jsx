@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from "react";
 import Script from "next/script";
 import axios from "axios";
+import * as Sentry from "@sentry/nextjs";
 import GameWinner from "./GameWinner";
 import GameWinnerLootbox from "./GameWinnerLootbox";
 import { useContext } from 'react';
@@ -51,11 +52,12 @@ const Demo = ({
   useEffect(() => {
     window.addEventListener("message", handleMessage);
 
+    console.log('Game Version: 6920097');
+
     // For new build of game: Need to update loaderUrl, and download build files and replace them
     // Live loaderUrl
-    let loaderUrl =
+    let loaderUrl = "/Build/RuggedRevenants.loader.js";
       // "https://v6p9d9t4.ssl.hwcdn.net/html/6362262/RuggedWebGL/Build/RuggedWebGL.loader.js";
-      "https://v6p9d9t4.ssl.hwcdn.net/html/6497430/RuggedRevenants/Build/RuggedRevenants.loader.js";
     // Test purpose loaderUrl
     // let loaderUrl =
     //   "https://v6p9d9t4.ssl.hwcdn.net/html/6329858/RuggedWebGLTesting/Build/RuggedWebGLTesting.loader.js";
@@ -134,21 +136,33 @@ const Demo = ({
       // Handle 5% of the time the users beat level 1
       const response = await axios.get(`https://us-central1-rugged-revenants.cloudfunctions.net/levelWon?id=${sessionID}`)
       console.log('valdiation api check result', response.data)
-      if (response.data !== true && response.data !== 'true') return
+      if (response.data !== true && response.data !== 'true') {
+        // Sentry Log: valdiation api check result
+        Sentry.captureMessage(`Validation API returned 'false': Type 'level' Level '${currentLevel}'`, "info");
+        return
+      }
       openChest();
     } else if(type == "die" || type == "win") {
       if (type == "win") {
         const response = await axios.get(`https://us-central1-rugged-revenants.cloudfunctions.net/checkHasWon?id=${sessionID}`)
         console.log('valdiation api check result', response.data)
-        if (response.data !== true && response.data !== 'true') return
+        if (response.data !== true && response.data !== 'true') {
+          // Sentry Log: valdiation api check result
+          Sentry.captureMessage(`Validation API returned 'false': Type 'win' Level '${currentLevel || 'final'}'`, "info");
+          return
+        }
       }
       if (type == "die") {
         const response = await axios.get(`https://us-central1-rugged-revenants.cloudfunctions.net/playerDied?id=${sessionID}`)
         console.log('valdiation api check result', response.data)
-        if (response.data !== true && response.data !== 'true') return
+        if (response.data !== true && response.data !== 'true') {
+          // Sentry Log: valdiation api check result
+          Sentry.captureMessage(`Validation API returned 'false': Type 'die' Level '${currentLevel}'`, "info");
+          return
+        }
       }
       if(currentLevel > 1 || type == "win") { // now, when the user clear all levels, i don't get level number
-        setCurrentLevel(currentLevel || 7) // now, when the user clear all levels, i don't get level number
+        setCurrentLevel(currentLevel || 9) // now, when the user clear all levels, i don't get level number
         setIsWin(type == "win")
         openLootboxChest();
       } 
