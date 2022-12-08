@@ -271,7 +271,7 @@ export default function BurnRuggedNFTs() {
       let premiumRemains = await getOwnedNftsCount(new PublicKey(Const.PREMIUM_ACCOUNT_PUBKEY), connection)
       console.log('premiumRemains', premiumRemains)
       if(premiumRemains == 0) {
-        openNotificationModal("Loot Box NFT Wallet Empty. Loot Box Not Opened.", null, null, null, '/media/lootPile.png');
+        openNotificationModal("Your request could not be redeemed at this time.  Please try again after our maintenance period (Thursday evening, US local time).", null, null, null, '/media/lootPile.png');
         closeLoadingModal()
         return true
       }

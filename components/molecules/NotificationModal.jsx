@@ -21,7 +21,7 @@ const NotificationModal = ({}) => {
             className={classNames(
               "absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] z-10 w-[32rem] h-[18rem] flex flex-col justify-between",
               {
-                "w-[36rem] h-[22rem]": imageURL,
+                "w-[36rem] h-[24rem]": imageURL,
               }
             )}
           >
