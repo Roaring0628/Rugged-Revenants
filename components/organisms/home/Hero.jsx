@@ -338,6 +338,8 @@ export default function Hero({ play, setPlay }) {
         closeLoadingModal()
         setPlay(false);
 
+        openNotificationModal("Congratulations! The Loot Box NFT will be in your wallet soon!", null, null, null, '/media/lootPile.png');
+
         return true
       } catch(e) {
         closeLoadingModal()
