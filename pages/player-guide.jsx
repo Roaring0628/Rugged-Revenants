@@ -30,9 +30,9 @@ export default function PlayerGuide() {
       <WIN2EARN />
       <BurnNFT />
       <SkillStatUpgrades />
-      <PlayYourWay />
+      {/* <PlayYourWay /> */}
       <RugsToRiches />
-      <Partners />
+      {/* <Partners /> */}
       <Attributes1 />
       <Attributes2 />
       <Attributes3 />

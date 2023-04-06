@@ -526,7 +526,7 @@ export default function Hero({ play, setPlay }) {
                 )}
                 <div className="flex items-center justify-center mt-4">
                   <a
-                    href="https://discord.gg/ruggedrevenants"
+                    href="https://discord.com/invite/1kl"
                     rel="noreferrer"
                     className="mr-6"
                     target="_blank"

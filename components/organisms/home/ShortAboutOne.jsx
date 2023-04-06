@@ -45,7 +45,7 @@ const ShortAboutOne = ({ play, setPlay }) => {
                 })}
               >
                 <a
-                  href="https://discord.gg/ruggedrevenants"
+                  href="https://discord.com/invite/1kl"
                   rel="noreferrer"
                   target="_blank"
                   className="button-container"

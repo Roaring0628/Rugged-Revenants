@@ -40,7 +40,7 @@ export default function Footer() {
             <a
               target="_blank"
               rel="noreferrer"
-              href="https://discord.gg/ruggedrevenants"
+              href="https://discord.com/invite/1kl"
               className="text-primary h-8 padding-huge px-4 flex flex-row justify-center items-center drop-shadow-sm"
             >
               <svg

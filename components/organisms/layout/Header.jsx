@@ -46,7 +46,7 @@ export default function Header() {
               <a
                 target="_blank"
                 rel="noreferrer"
-                href="https://discord.gg/ruggedrevenants"
+                href="https://discord.com/invite/1kl"
                 className="text-primary h-8 padding-huge px-3 flex flex-row justify-center items-center drop-shadow-sm"
               >
                 <svg
@@ -138,7 +138,7 @@ export default function Header() {
               <a
                 target="_blank"
                 rel="noreferrer"
-                href="https://discord.gg/ruggedrevenants"
+                href="https://discord.com/invite/1kl"
                 className="flex flex-nowrap items-center justify-between text-primary py-3.5"
               >
                 Discord

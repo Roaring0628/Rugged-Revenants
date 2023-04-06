@@ -26,8 +26,8 @@ export default function Home() {
       <DemoVideo />
       <WhyJoin />
       <Partnerships />
-      <Roadmap />
-      <TeamMembers />
+      {/* <Roadmap /> */}
+      {/* <TeamMembers /> */}
       {/* <FAQ /> */}
     </main>
   );
